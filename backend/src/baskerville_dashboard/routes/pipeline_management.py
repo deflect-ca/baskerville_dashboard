@@ -1,8 +1,8 @@
 import subprocess
 import traceback
 
-from baskerville_dash.auth import login_required
-from baskerville_dash.utils.helpers import ResponseEnvelope, \
+from baskerville_dashboard.auth import login_required
+from baskerville_dashboard.utils.helpers import ResponseEnvelope, \
     response_jsonified, get_baskerville_config_path
 from flask import Blueprint, request
 

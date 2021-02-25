@@ -1,11 +1,11 @@
 import traceback
 
 from baskerville.db.dashboard_models import User, Organization, UserCategory
-from baskerville_dash.auth import Auth, SignUpGuest, SignUp, \
+from baskerville_dashboard.auth import Auth, SignUpGuest, SignUp, \
     admin_login_required
-from baskerville_dash.db.manager import SessionManager
-from baskerville_dash.utils.enums import UserCategoryEnum
-from baskerville_dash.utils.helpers import ResponseEnvelope, \
+from baskerville_dashboard.db.manager import SessionManager
+from baskerville_dashboard.utils.enums import UserCategoryEnum
+from baskerville_dashboard.utils.helpers import ResponseEnvelope, \
     response_jsonified, register_org
 from flask import Blueprint, request
 

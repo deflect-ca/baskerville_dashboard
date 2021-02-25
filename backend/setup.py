@@ -16,7 +16,7 @@ tests_require = [
     'mock'
 ]
 
-setup(name='baskerville_dash',
+setup(name='baskerville_dashboard',
       version='0.0.1',
       description='',
       long_description=long_description,
@@ -28,10 +28,10 @@ setup(name='baskerville_dash',
       install_requires=REQUIREMENTS,
       package_dir={'': 'src'},
       packages=[
-          'baskerville_dash',
-          'baskerville_dash.db',
-          'baskerville_dash.routes',
-          'baskerville_dash.utils',
-          'baskerville_dash.vm',
+          'baskerville_dashboard',
+          'baskerville_dashboard.db',
+          'baskerville_dashboard.routes',
+          'baskerville_dashboard.utils',
+          'baskerville_dashboard.vm',
       ],
       )

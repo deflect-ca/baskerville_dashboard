@@ -8,14 +8,14 @@ import uuid
 import traceback
 
 from pathlib import Path
-from baskerville_dash.auth import login_required
-from baskerville_dash.utils.helpers import ResponseEnvelope, get_qparams, \
+from baskerville_dashboard.auth import login_required
+from baskerville_dashboard.utils.helpers import ResponseEnvelope, get_qparams, \
     get_rss, response_jsonified, get_active_app, get_extension, is_compressed, \
     get_ip_list, unzip, get_user_by_org_uuid
 from flask import Blueprint, request, session, url_for
 from werkzeug.utils import secure_filename
 from baskerville.db.models import RequestSet, Runtime
-from baskerville_dash.db.manager import SessionManager
+from baskerville_dashboard.db.manager import SessionManager
 
 
 results_app = Blueprint('results_app', __name__)
@@ -39,7 +39,7 @@ def upload_file():
             response.message = 'No selected file'
             return response_jsonified(response, code)
         if file and get_extension(file.filename) in ALLOWED_FILES:
-            from baskerville_dash.app import app
+            from baskerville_dashboard.app import app
             client_uuid = session['org_uuid']
             file_uuid = str(uuid.uuid4())
             filename = f'{file_uuid}_{secure_filename(file.filename)}'

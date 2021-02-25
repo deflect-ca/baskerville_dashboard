@@ -7,9 +7,9 @@ import jwt
 import uuid as uuid
 
 from baskerville.util.enums import UserCategoryEnum
-from baskerville_dash.utils.helpers import ResponseEnvelope
+from baskerville_dashboard.utils.helpers import ResponseEnvelope
 from flask import current_app as app, session
-from baskerville_dash.db.manager import SessionManager
+from baskerville_dashboard.db.manager import SessionManager
 from baskerville.db.dashboard_models import User, UserCategory, Organization
 from flask import request, g
 from flask.json import jsonify
