@@ -1,0 +1,69 @@
+<div class="filter-container mat-action-row mat-elevation-z5">
+  <mat-label>Use the filters to select Request Sets</mat-label>
+  <p></p>
+  <mat-form-field appearance="">
+    <mat-label>App Id</mat-label>
+    <input matInput placeholder="app id" [(ngModel)]="rsFilter.appId" [value]="currentId" [disabled]="userIsGuest()">
+  </mat-form-field>
+  <mat-form-field appearance="">
+    <mat-label>IP</mat-label>
+    <input matInput placeholder="IP" [(ngModel)]="rsFilter.ip" [value]="rsFilter.ip">
+  </mat-form-field>
+  <mat-form-field appearance="">
+    <mat-label>Target/ host</mat-label>
+    <input matInput placeholder="target/ host" [(ngModel)]="rsFilter.target" [value]="rsFilter.target">
+  </mat-form-field>
+
+  <mat-form-field appearance="">
+    <mat-label>Enter a date range</mat-label>
+    <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+      <input matStartDate formControlName="start" placeholder="Start date">
+      <input matEndDate formControlName="end" placeholder="End date">
+    </mat-date-range-input>
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker>
+
+    <mat-error *ngIf="range.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+    <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+  </mat-form-field>
+  <mat-form-field appearance="">
+    <mat-label>Filter Predictions</mat-label>
+    <mat-select [(value)]="rsFilter.prediction">
+      <mat-option value="">All</mat-option>
+      <!--TODO: properly align options-->
+      <mat-option value="bot"><img width="25" height="25" src="/assets/icons/BOT.png" alt="Bot">Bot </mat-option>
+      <mat-option value="notbot"><img width="25" height="25" src="/assets/icons/NOTBOT.png" alt="Not Bot">Not Bot </mat-option>
+      <mat-option value="unknown">Unknown </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="">
+    <mat-label>Filter Feedback</mat-label>
+    <mat-select [(value)]="rsFilter.feedback">
+      <mat-option value="">All</mat-option>
+      <!--TODO: properly align options-->
+      <mat-option value="bot"><img width="25" height="25" src="/assets/icons/BOT.png" alt="Bot">Bot </mat-option>
+      <mat-option value="notbot"><img width="25" height="25" src="/assets/icons/NOTBOT.png" alt="Not Bot">Not Bot </mat-option>
+      <mat-option value="unknown">Unknown </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <div class="mat-action-row mat-elevation-z0">
+    <mat-label>You can also upload a .csv of IPs to filter by:&nbsp;</mat-label>
+    <input #fileInput type="file" [(ngModel)]="selectedFile" (change)="handleFileInput($event.target.files)" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel,.zip">
+    <p>
+      <label class="red" *ngIf="error">{{error}}</label>
+    </p>
+  </div>
+ <!-- <div class="mat-action-row mat-elevation-z0">
+    <mat-label>Submit your feedback to ISAC</mat-label>
+    <input type="checkbox" [checked]="rsFilter.submit">
+  </div>-->
+  <button mat-button color="primary" (click)="submit()">SEARCH</button>
+  <!--<button mat-button color="accent" (click)="attackPanel=!attackPanel">FEEDBACK CONTEXT</button>
+  <button mat-button color="accent" (click)="submitFeedback()">SUBMIT FEEDBACK</button>-->
+</div>
+
+<app-feedback-context *ngIf="attackPanel"></app-feedback-context>
+
+<div class="mat-action-row" *ngIf="envelop?.data">
+  <app-results-table [rsFilter]="rsFilter"></app-results-table>
+</div>
