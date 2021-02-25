@@ -1,0 +1,14 @@
+.upload-card {
+  width: 50vw;
+  height: 50vh;
+  padding: 50px;
+}
+
+.info {
+  float: left;
+}
+
+.temp-logs {
+  margin-right: 0;
+  padding: 4px;
+}

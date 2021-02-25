@@ -1,0 +1,20 @@
+<mat-card class="mat-elevation-z5">
+  <mat-card-title><h1>Available Components</h1></mat-card-title>
+  <mat-card-content>
+    <mat-card *ngFor="let component of availableComponents">
+      <mat-card-title>
+        <span class="status" [ngClass]="component.status.description" [title]="component.status.description"></span>
+        {{component.serviceName}}&nbsp;
+      </mat-card-title>
+      <mat-card-content>
+        {{component.description}}
+
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" [disabled]="component.isRunning()" (click)="componentStart(component.serviceName)">Start</button>
+        <button mat-raised-button color="warn" [disabled]="!component.isRunning()" (click)="componentStop(component.serviceName)">Stop</button>
+        <button mat-raised-button color="accent" (click)="componentRestart(component.serviceName)">Restart</button>
+      </mat-card-actions>
+    </mat-card>
+  </mat-card-content>
+</mat-card>
