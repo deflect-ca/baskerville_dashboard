@@ -1,0 +1,32 @@
+<div class="grid-container">
+  <h1 class="mat-h1">Dashboard</h1>
+  <mat-grid-list cols="2" rowHeight="350px" id="dashboard-list">
+    <mat-grid-tile *ngFor="let card of cards | async; index as i;" [colspan]="card.cols" [rowspan]="card.rows">
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            #{{i+1}}. {{card.title}}
+            <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu" xPosition="before">
+              <button mat-menu-item>Expand</button>
+              <button mat-menu-item>Remove</button>
+            </mat-menu>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <mat-grid-list cols="4" rowHeight="100px">
+            <mat-grid-tile *ngFor="let d of card.details | keyvalue" colspan="1" rowspan="2">
+              <mat-card class="dashboard-card dashboard-details-card">
+                <mat-card-header class="mat-h2">{{d.key}}</mat-card-header>
+                <mat-card-content>{{d.value}}</mat-card-content>
+              </mat-card>
+            </mat-grid-tile>
+            <mat-card-content *ngIf="isEmptyObject(card.details)">No data</mat-card-content>
+          </mat-grid-list>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>
