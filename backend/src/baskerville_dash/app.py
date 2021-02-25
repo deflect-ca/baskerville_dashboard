@@ -194,7 +194,12 @@ def create_app(config=None, environment=None):
     set_up_kafka_thread(app_config, baskerville_conf)
 
     from baskerville_dash.routes.user import user_app
+    from baskerville_dash.routes.stats import stats_app
+    from baskerville_dash.routes.try_baskerville import try_baskerville_app
+
     app.register_blueprint(user_app, url_prefix=url_prefix)
+    app.register_blueprint(stats_app, url_prefix=url_prefix)
+    app.register_blueprint(try_baskerville_app, url_prefix=url_prefix)
 
     return app
 
