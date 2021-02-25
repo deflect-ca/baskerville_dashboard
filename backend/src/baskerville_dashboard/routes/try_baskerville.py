@@ -14,8 +14,8 @@ import requests
 
 from pathlib import Path
 
-from baskerville_dash.auth import login_required
-from baskerville_dash.utils.helpers import response_jsonified, allowed_file, \
+from baskerville_dashboard.auth import login_required
+from baskerville_dashboard.utils.helpers import response_jsonified, allowed_file, \
     validate_config, get_active_app, unzip, init_active_apps, \
     get_baskerville_config, ReadLogs, ResponseEnvelope, is_compressed, \
     get_extension, start_local_baskerville, get_default_data_path
@@ -34,7 +34,7 @@ def upload_temp_file():
     rs_start = None
     filename = 'test_data_1k.json'
     try:
-        from baskerville_dash.app import app
+        from baskerville_dashboard.app import app
         client_uuid = session['org_uuid']
         file_uuid = str(uuid.uuid4())
         temp_filename = f'{file_uuid}_{secure_filename(filename)}'
@@ -76,7 +76,7 @@ def upload_file():
             response.message = 'No selected file'
             return response_jsonified(response, code)
         if file and allowed_file(file.filename):
-            from baskerville_dash.app import app
+            from baskerville_dashboard.app import app
             client_uuid = session['org_uuid']
             file_uuid = str(uuid.uuid4())
             filename = f'{file_uuid}_{secure_filename(file.filename)}'
@@ -112,7 +112,7 @@ def upload_file():
 @login_required
 @init_active_apps
 def start_baskerville_for():
-    from baskerville_dash.app import ACTIVE_APPS
+    from baskerville_dashboard.app import ACTIVE_APPS
 
     from baskerville.util.enums import RunType
     data = request.get_json()
@@ -168,7 +168,7 @@ def start_baskerville_for():
                     'DB_PORT': os.environ['DB_PORT'],
                 }
             )
-            from baskerville_dash.app import socketio
+            from baskerville_dashboard.app import socketio
             t = ReadLogs(org_uuid, log_path)
 
             ACTIVE_APPS[org_uuid] = {

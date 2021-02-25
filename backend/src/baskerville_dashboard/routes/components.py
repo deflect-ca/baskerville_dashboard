@@ -1,12 +1,12 @@
 import os
 import traceback
 
-from baskerville_dash.auth import login_required
-from baskerville_dash.utils.helpers import ResponseEnvelope, \
+from baskerville_dashboard.auth import login_required
+from baskerville_dashboard.utils.helpers import ResponseEnvelope, \
     response_jsonified, get_docker_ps
 from flask import Blueprint
 
-from baskerville_dash.db.manager import SessionManager
+from baskerville_dashboard.db.manager import SessionManager
 
 
 components_app = Blueprint('submit_app', __name__)

@@ -7,14 +7,14 @@ import json
 import re
 
 import eventlet
-from baskerville_dash.utils.kafka import get_kafka_producer
+from baskerville_dashboard.utils.kafka import get_kafka_producer
 
 eventlet.monkey_patch()
 
 from baskerville.db.dashboard_models import User, Organization
 from baskerville.models.config import KafkaConfig
 from baskerville.util.enums import FeedbackEnum
-from baskerville_dash.vm.feedback_vm import FeedbackVM
+from baskerville_dashboard.vm.feedback_vm import FeedbackVM
 from docker.models.containers import Container
 from kafka.errors import NoBrokersAvailable
 
@@ -27,7 +27,7 @@ from threading import Thread, Event
 
 import docker
 from flask import abort
-from baskerville_dash.db.manager import SessionManager
+from baskerville_dashboard.db.manager import SessionManager
 from baskerville.util.helpers import parse_config, SerializableMixin
 from baskerville.util.enums import LabelEnum
 from baskerville.db.models import RequestSet, Runtime
@@ -257,7 +257,7 @@ def get_active_app(app_id):
     :param app_id:
     :return:
     """
-    from baskerville_dash.app import ACTIVE_APPS
+    from baskerville_dashboard.app import ACTIVE_APPS
     return ACTIVE_APPS.get(app_id, None)
 
 

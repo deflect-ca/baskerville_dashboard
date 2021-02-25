@@ -9,17 +9,17 @@ import uuid
 
 import eventlet
 import uuid as uuid
-from baskerville_dash.auth import Auth
-from baskerville_dash.db.manager import SessionManager
+from baskerville_dashboard.auth import Auth
+from baskerville_dashboard.db.manager import SessionManager
 from baskerville.util.enums import UserCategoryEnum
-from baskerville_dash.utils.kafka import consume_from_kafka
+from baskerville_dashboard.utils.kafka import consume_from_kafka
 
 eventlet.monkey_patch()
 import atexit
 
 from baskerville.db import set_up_db, get_db_connection_str
 from baskerville.util.helpers import parse_config, get_logger
-from baskerville_dash.utils.helpers import get_default_conf_path, \
+from baskerville_dashboard.utils.helpers import get_default_conf_path, \
     get_active_processes, response_jsonified, ResponseEnvelope
 from flask import Flask, jsonify
 from flask_socketio import SocketIO, emit
@@ -173,7 +173,7 @@ def set_up_kafka_thread(app_config, baskerville_config):
 
 def create_app(config=None, environment=None):
     global jwtApp, SECRET_KEY
-    from baskerville_dash.db.manager import SessionManager
+    from baskerville_dashboard.db.manager import SessionManager
     from baskerville.util.helpers import parse_config
 
     url_prefix = config['APP_CONFIG']['PREFIX']
@@ -193,9 +193,9 @@ def create_app(config=None, environment=None):
     add_start_up_data(app_config, baskerville_conf)
     set_up_kafka_thread(app_config, baskerville_conf)
 
-    from baskerville_dash.routes.user import user_app
-    from baskerville_dash.routes.stats import stats_app
-    from baskerville_dash.routes.try_baskerville import try_baskerville_app
+    from baskerville_dashboard.routes.user import user_app
+    from baskerville_dashboard.routes.stats import stats_app
+    from baskerville_dashboard.routes.try_baskerville import try_baskerville_app
 
     app.register_blueprint(user_app, url_prefix=url_prefix)
     app.register_blueprint(stats_app, url_prefix=url_prefix)

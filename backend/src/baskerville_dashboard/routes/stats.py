@@ -9,9 +9,9 @@ from collections import OrderedDict
 
 from baskerville.db.models import RequestSet, BanjaxBan, Runtime
 from baskerville.util.enums import LabelEnum
-from baskerville_dash.db.manager import SessionManager
-from baskerville_dash.utils.helpers import ResponseEnvelope
-from baskerville_dash.utils.helpers import get_active_apps, response_jsonified
+from baskerville_dashboard.db.manager import SessionManager
+from baskerville_dashboard.utils.helpers import ResponseEnvelope
+from baskerville_dashboard.utils.helpers import get_active_apps, response_jsonified
 from flask import Blueprint
 
 

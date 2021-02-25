@@ -6,14 +6,14 @@
 import traceback
 
 from baskerville.util.enums import FeedbackContextTypeEnum
-from baskerville_dash.auth import login_required
-from baskerville_dash.db.manager import SessionManager
+from baskerville_dashboard.auth import login_required
+from baskerville_dashboard.db.manager import SessionManager
 from baskerville.db.dashboard_models import User, Feedback, FeedbackContext
-from baskerville_dash.utils.helpers import ResponseEnvelope, \
+from baskerville_dashboard.utils.helpers import ResponseEnvelope, \
     response_jsonified, ALLOWED_FEEDBACK, get_qparams, \
     get_ip_list, get_rss, get_user_by_org_uuid, submit_feedback_vm, \
     camel_case_to_snake_case, convert_dict_to_snake_case
-from baskerville_dash.view_models.feedback_vm import FeedbackContextVM, \
+from baskerville_dashboard.view_models.feedback_vm import FeedbackContextVM, \
     FeedbackVM
 from flask import Blueprint, request, g, session
 from baskerville.db.models import RequestSet, Attack
@@ -293,7 +293,7 @@ def submit_feedback_for(context_id):
 def submit_feedback_to_isac(feedback_vm: FeedbackVM):
     result = submit_feedback_vm(feedback_vm)
     if result:
-        from baskerville_dash.utils.helpers import get_socket_io
+        from baskerville_dashboard.utils.helpers import get_socket_io
         socket_io = get_socket_io()
         socket_io.emit(session['org_uuid'], 'Feedback submitted successfully')
 
