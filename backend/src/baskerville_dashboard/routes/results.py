@@ -53,7 +53,6 @@ def upload_file():
                 _ext = f'_{ext}'
                 unzip(full_path, full_path.replace(dot_ext, _ext))
                 filename = filename.replace(dot_ext, _ext)
-                print('filename: ', filename)
 
             response.message = f'Csv uploaded successfully.'
             response.data = {
@@ -87,18 +86,14 @@ def get_all_results():
     try:
         org_uuid = session['org_uuid']
         ip_file_name = request.args.get('file')
-        print('FILE: ip_file_name', ip_file_name)
         user = get_user_by_org_uuid(org_uuid)
         if not user:
             code = 404
             re.success = False
             re.message = 'No user found'
-            print(re.message)
             return response_jsonified(re, code)
         if ip_file_name:
-            print('in ip_file_name')
             ip_list = get_ip_list(ip_file_name, org_uuid)
-            print('in ip_list', ip_list)
         re.data = get_rss(**_q_filter, user=user, ip_list=ip_list)
         re.message = f'The request sets for {">>"}'
     except Exception as e:
@@ -131,7 +126,6 @@ def get_results(app_id):
             code = 404
             re.success = False
             re.message = 'No user found'
-            print(re.message)
             return response_jsonified(re, code)
         runtime_q = sm.session.query(Runtime)
         app_data = get_active_app(app_id)
@@ -159,5 +153,4 @@ def get_results(app_id):
         code = 500
         traceback.print_exc()
 
-    print('>>>>>>>>>>>>>> ', response_jsonified(re, code))
     return response_jsonified(re, code)

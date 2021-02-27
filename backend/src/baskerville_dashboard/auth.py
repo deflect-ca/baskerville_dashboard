@@ -54,16 +54,15 @@ def login_required(f):
         try:
             payload = parse_token(request)
         except jwt.exceptions.DecodeError:
-            print('jwt.exceptions.DecodeError')
+            traceback.print_exc()
             response = jsonify(message='Token is invalid')
             response.status_code = 401
             return response
         except jwt.exceptions.ExpiredSignatureError:
-            print('jwt.exceptions.ExpiredSignatureError')
+            traceback.print_exc()
             response = jsonify(message='Token has expired')
             response.status_code = 401
             return response
-        print('Setting UUID.....')
         session['org_uuid'] = payload['sub']
 
         return f(*args, **kwargs)
@@ -139,7 +138,6 @@ class Auth(object):
                 'is_active': user.is_active,
                 'category': str(user.category.category)
             }
-            print(msg.data)
             return json.dumps(msg.to_dict()), 200
         else:
             msg.message = "Invalid username/ password"
@@ -258,11 +256,9 @@ class ForgotPassword(object):
             return response
 
         try:
-            print(request.headers.get('Authorization'))
             payload = parse_token(request)
             user_uuid = payload['sub']
             user = self.db_handles.session(User).get_or_404(user_uuid)
-            print(request.data)
             raw_dict = request.get_json(force=True)
             request_dict = raw_dict['data']
 

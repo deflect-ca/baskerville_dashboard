@@ -90,7 +90,6 @@ def upload_file():
                 _ext = f'_{ext}'
                 unzip(full_path, full_path.replace(dot_ext, _ext))
                 filename = filename.replace(dot_ext, _ext)
-                print('filename: ', filename)
 
             response.message = f'Logs uploaded successfully.'
             response.data = {
@@ -120,7 +119,6 @@ def start_baskerville_for():
     file_name = data['filename']
     re = ResponseEnvelope()
     code = 200
-    print('UUID, FILENAME', org_uuid, file_name)
     full_path = os.path.join(
         current_app.config['UPLOAD_FOLDER'],
         org_uuid,
@@ -186,7 +184,6 @@ def start_baskerville_for():
             # register(org_uuid)
             ACTIVE_APPS[org_uuid]['process'].start()
             ACTIVE_APPS[org_uuid]['log_thread'].start()
-            print('>>> Started app', app_name, ' for ', org_uuid)
             re.success = True
             re.message = f'Application {app_name} submitted successfully'
             re.data = {
@@ -242,8 +239,6 @@ def submit_app():
         )
     )
 
-    print(result)
-    print(result.text)
     return result.status_code
     #     POST
     #     http: // [spark - cluster - ip]: 6066 / v1 / submissions / create - -header

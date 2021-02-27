@@ -282,7 +282,6 @@ def start_local_baskerville(config, pipeline, **kwargs):
     try:
         for k, v in kwargs.items():
             os.environ[k] = f'{v}'
-        print(config['database'])
         config['database']['username'] = 'postgres'
         config['database']['password'] = 'secret'
         baskerville_engine = BaskervilleAnalyticsEngine(
@@ -327,7 +326,6 @@ class ReadLogs(Thread):
         self.full_path = full_path
         self.socket_io = get_socket_io()
         self._stop_event = Event()
-        print('>>>>>.', self.org_uuid)
         super(ReadLogs, self).__init__()
 
     def stop(self):
@@ -342,12 +340,10 @@ class ReadLogs(Thread):
         while not os.path.exists(self.full_path):
             time.sleep(1)
         for line in follow_file(self.full_path, timeout=200):
-            print(f'>>>>>> {self.org_uuid}: ', line)
             self.socketio.emit(self.org_uuid, line)
 
         self.socketio.emit(self.org_uuid, '--end--')
         self.socketio.emit('message', '--end--')
-        print(f'>>>>>> {self.org_uuid}: ', line)
 
     def run(self):
         self.follow()
@@ -444,7 +440,6 @@ def get_rss(
             abort(404)
         rs_q = rs_q.filter(RequestSet.prediction == REVERSE_LABELS[prediction])
     count_rss = rs_q.count()
-    print(rs_q)
     rs_q = rs_q.limit(size).offset(page * size)
     total_num_pages = ceil(count_rss / size) if count_rss > 0 else 0
     data = rs_q.all()
@@ -490,7 +485,6 @@ def get_ip_list(file_name, client_uuid):
     # todo: support other formats
     import csv
     full_path = get_path_to_uploaded_file(file_name, client_uuid)
-    print('FULL PATH', full_path)
     headers_passed = False
 
     with open(full_path, newline='') as f:
@@ -511,7 +505,6 @@ def get_qparams(request):
             # todo: proper time from ui
             p = parser.parse(_q_filter[field])
             _q_filter[field] = f'{p.month}/{p.day}/{p.year} 00:00:00'
-    print(_q_filter)
     return _q_filter
 
 
@@ -544,7 +537,6 @@ def is_compressed(file_path: str):
 def get_docker_ps():
     ps = [SerializableContainer(**c.__dict__) for c in
           DOCKER_CLIENT.containers.list(all=True)]
-    print(ps)
     return ps
 
 

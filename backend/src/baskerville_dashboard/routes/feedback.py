@@ -35,7 +35,6 @@ def get_feedback_context_details():
     code = 200
     try:
         re.data = FeedbackContextVM().to_dict()
-        print('REDATA', re.data)
         re.success = True
         re.message = 'Feedback context details'
     except Exception as e:
@@ -118,7 +117,6 @@ def bulk_feedback(context_id, feedback_str):
         code = 404
         re.success = False
         re.message = 'No such feedback'
-        print(re.message)
         return response_jsonified(re, code)
     try:
         data = request.get_json()
@@ -129,7 +127,6 @@ def bulk_feedback(context_id, feedback_str):
             code = 404
             re.success = False
             re.message = 'No user found'
-            print(re.message)
             return response_jsonified(re, code)
 
         for id in data['rss']:
@@ -191,14 +188,10 @@ def set_feedback_for(context_id, rs_id, feedback_str):
     re = ResponseEnvelope()
     code = 200
     updated = False
-    print(request.headers)
-    client_uuid = session['org_uuid']
-    print('CLIENT UUID', client_uuid)
     if feedback_str not in ALLOWED_FEEDBACK:
         code = 404
         re.success = False
         re.message = 'No such feedback'
-        print(re.message)
         return response_jsonified(re, code)
     try:
         # find rs:
@@ -274,7 +267,6 @@ def submit_feedback_for(context_id):
             )
 
         feedback_vm = FeedbackVM(fc, feedback_list)
-        print(feedback_vm.to_dict())
         submit_feedback_to_isac(feedback_vm)
         re.data = None
         re.success = True

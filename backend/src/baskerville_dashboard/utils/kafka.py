@@ -16,7 +16,6 @@ KAFKA_PRODUCER = None
 
 
 def value_deserializer(v):
-    print(v)
     try:
         return json.loads(v.decode('utf-8'))
     except:
@@ -86,8 +85,6 @@ def consume_from_kafka(config, baskerville_config):
     )
     import time
     for cr in kafka_consumer:
-        print('topic:: ', cr.topic)
-        print('value:: ', cr.value)
         if cr.value:
             if cr.topic == 'test.feedback':
                 try:
@@ -105,7 +102,6 @@ def consume_from_kafka(config, baskerville_config):
                                 f'Updated feedback context {fc.id} to not pending'
                             )
                         else:
-                            print(f'Could not find fc {fc_id}')
                             socketio.emit(
                                 cr.value['uuid_organization'],
                                 f'Could not find fc {fc_id}'
@@ -116,7 +112,6 @@ def consume_from_kafka(config, baskerville_config):
                     sm.session.rollback()
             if cr.topic == 'test.register':
                 try:
-                    print('updating organization...')
                     uuid_organization = cr.value['uuid_organization']
 
                     from baskerville.db.dashboard_models import \
@@ -134,7 +129,6 @@ def consume_from_kafka(config, baskerville_config):
                     else:
                         t = f'Could not find organization ' \
                             f'uuid={uuid_organization}'
-                        print(t)
                         socketio.emit(uuid_organization, t)
                 except KeyError:
                     pass

@@ -26,7 +26,6 @@ def get_available_components():
         re.message = str(e)
         code = 500
         traceback.print_exc()
-    print(re.to_dict())
     return response_jsonified(re, code)
 
 
@@ -59,7 +58,6 @@ def docker_compose_config():
 
     project = project_from_options(path, options)
     cmd = TopLevelCommand(project, options)
-    print(cmd.ps(ps_options))
     re = ResponseEnvelope()
     re.message = 'TADA'
     re.data = cmd.ps(config_options)

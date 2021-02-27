@@ -250,7 +250,6 @@ def echo(message):
 
 @socketio.on('register')
 def register(id):
-    print('registering for id:', id)
 
     @socketio.on(id)
     def reply(message):
@@ -263,13 +262,11 @@ def register(id):
 
 @socketio.on('app-status')
 def app_status(app_id):
-    print('>>>>> HEEEEERE')
     # config = ACTIVE_APPS[app_id]._args[0]
-    # print('>>>>> HEEEEERE')
     # for line in follow_file(config['engine']['logpath']):
-    #     print('>>>>> HEEEEERE')
     #     print(line)
     #     emit(line, app_id)
+    pass
 
 
 @app.after_request

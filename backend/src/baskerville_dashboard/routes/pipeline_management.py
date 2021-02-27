@@ -25,7 +25,6 @@ def get_config(pipeline_name):
         with open(get_baskerville_config_path(), 'r+') as ifile:
             lines = ifile.readlines()
             re.data = ''.join(lines)
-            print(re.data)
     except Exception as e:
         re.success = False
         re.message = str(e)

@@ -35,7 +35,6 @@ def register_organization():
     code = 200
     try:
         data = request.get_json()['data']
-        print('>>> DATA:', data)
         org = sm.session.query(Organization).filter_by(uuid=data['orgUUID']).first()
         if not org:
             # org to be registered should be in db
