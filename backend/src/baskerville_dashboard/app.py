@@ -17,7 +17,7 @@ from baskerville_dashboard.utils.kafka import consume_from_kafka
 eventlet.monkey_patch()
 import atexit
 
-from baskerville.db import set_up_db, get_db_connection_str
+from baskerville.db import set_up_db
 from baskerville.util.helpers import parse_config, get_logger
 from baskerville_dashboard.utils.helpers import get_default_conf_path, \
     get_active_processes, response_jsonified, ResponseEnvelope
@@ -193,13 +193,21 @@ def create_app(config=None, environment=None):
     add_start_up_data(app_config, baskerville_conf)
     set_up_kafka_thread(app_config, baskerville_conf)
 
-    from baskerville_dashboard.routes.user import user_app
+    from baskerville_dashboard.routes.feedback import feedback_app
     from baskerville_dashboard.routes.stats import stats_app
     from baskerville_dashboard.routes.try_baskerville import try_baskerville_app
+    from baskerville_dashboard.routes.results import results_app
+    from baskerville_dashboard.routes.user import user_app
+    from baskerville_dashboard.routes.pipeline_management import pipeline_management_app
+    from baskerville_dashboard.routes.components import components_app
 
-    app.register_blueprint(user_app, url_prefix=url_prefix)
+    app.register_blueprint(feedback_app, url_prefix=url_prefix)
     app.register_blueprint(stats_app, url_prefix=url_prefix)
     app.register_blueprint(try_baskerville_app, url_prefix=url_prefix)
+    app.register_blueprint(results_app, url_prefix=url_prefix)
+    app.register_blueprint(user_app, url_prefix=url_prefix)
+    app.register_blueprint(pipeline_management_app, url_prefix=url_prefix)
+    app.register_blueprint(components_app, url_prefix=url_prefix)
 
     return app
 

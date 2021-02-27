@@ -8,15 +8,14 @@ import traceback
 from baskerville.util.enums import FeedbackContextTypeEnum
 from baskerville_dashboard.auth import login_required
 from baskerville_dashboard.db.manager import SessionManager
-from baskerville.db.dashboard_models import User, Feedback, FeedbackContext
+from baskerville.db.dashboard_models import Feedback, FeedbackContext
 from baskerville_dashboard.utils.helpers import ResponseEnvelope, \
     response_jsonified, ALLOWED_FEEDBACK, get_qparams, \
-    get_ip_list, get_rss, get_user_by_org_uuid, submit_feedback_vm, \
-    camel_case_to_snake_case, convert_dict_to_snake_case
-from baskerville_dashboard.view_models.feedback_vm import FeedbackContextVM, \
+    get_user_by_org_uuid, submit_feedback_vm, convert_dict_to_snake_case
+from baskerville_dashboard.vm.feedback_vm import FeedbackContextVM, \
     FeedbackVM
-from flask import Blueprint, request, g, session
-from baskerville.db.models import RequestSet, Attack
+from flask import Blueprint, request, session
+from baskerville.db.models import RequestSet
 
 feedback_app = Blueprint('feedback_app', __name__)
 
@@ -157,7 +156,7 @@ def bulk_feedback(context_id, feedback_str):
             feedback.features = rs.features
             feedback.start = rs.start
             feedback.stop = rs.stop
-            feedback.low_rate = data.get('low_rate')
+            feedback.low_rate = data.get('lowRate')
             feedback.score = rs.score
             feedback.attack_prediction = rs.attack_prediction or 42
             feedback.feedback = feedback_str

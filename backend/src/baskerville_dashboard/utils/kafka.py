@@ -6,7 +6,6 @@
 import asyncio
 import json
 
-from aiokafka import AIOKafkaConsumer
 from baskerville.models.config import KafkaConfig
 from kafka import KafkaProducer
 from sqlalchemy.exc import SQLAlchemyError
@@ -40,6 +39,8 @@ def get_kafka_consumer(kafka_config: KafkaConfig, topics=()):
 
 
 def get_aiokafka_consumer(kafka_config: KafkaConfig, topics=()):
+    from aiokafka import AIOKafkaConsumer
+    # note: for python 3.6 you'll also need to install dataclasses
     global ASYNC_KAFKA_CONSUMER
     if not ASYNC_KAFKA_CONSUMER:
         ASYNC_KAFKA_CONSUMER = AIOKafkaConsumer(
@@ -69,8 +70,8 @@ def get_kafka_producer(kafka_config: KafkaConfig):
 
 
 def consume_from_kafka(config, baskerville_config):
-    from baskerville_dash.utils.helpers import get_socket_io
-    from baskerville_dash.db.manager import SessionManager
+    from baskerville_dashboard.utils.helpers import get_socket_io
+    from baskerville_dashboard.db.manager import SessionManager
     from baskerville.db import set_up_db
 
     # todo: either pickle it and reload it or use
@@ -83,19 +84,6 @@ def consume_from_kafka(config, baskerville_config):
     kafka_consumer = get_kafka_consumer(
         baskerville_config['kafka'], config.get('KAFKA_TOPICS')
     )
-    # await kafka_consumer.start()
-    # try:
-    #     Consume messages
-        # async for msg in kafka_consumer:
-        #     print("consumed: ", msg.topic, msg.partition, msg.offset,
-        #           msg.key, msg.value, msg.timestamp)
-    # finally:
-    #     Will leave consumer group; perform autocommit if enabled.
-        # await kafka_consumer.stop()
-    # kafka_consumer = get_kafka_consumer(
-    #     baskerville_config['kafka'], config.get('KAFKA_TOPICS')
-    # )
-    # asyncio.wrap_future(kafka_consumer.poll())
     import time
     for cr in kafka_consumer:
         print('topic:: ', cr.topic)

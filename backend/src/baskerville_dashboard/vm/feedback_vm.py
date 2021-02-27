@@ -10,7 +10,7 @@ from baskerville.db.dashboard_models import SubmittedFeedback, FeedbackContext, 
 from baskerville.db.models import Attack, RequestSet
 from baskerville.util.enums import FeedbackContextTypeEnum, \
     FEEDBACK_CONTEXT_TO_DESCRIPTION, BaseStrEnum
-from baskerville_dash.db.manager import SessionManager
+from baskerville_dashboard.db.manager import SessionManager
 
 
 class FeedbackVM(object):

@@ -161,7 +161,7 @@ def submit_feedback_vm(feedback_vm: FeedbackVM):
 
 # def update_feedback_context():
 #     from flask import session
-#     from baskerville_dash.utils.helpers import get_socket_io
+#     from baskerville_dashboard.utils.helpers import get_socket_io
 #     socket_io = get_socket_io()
 #     socket_io.emit(session['org_uuid'], 'Feedback submitted successfully')
 
