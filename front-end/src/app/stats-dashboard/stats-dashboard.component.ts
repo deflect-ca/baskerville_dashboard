@@ -52,7 +52,6 @@ export class StatsDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.baskervilleSvc.getAllAppDetails().subscribe(data => {
       this.allAppsDetails = (data as Envelop);
-      console.log(data);
       this.updateCards(this.allAppsDetails, 1);
       this.notificationSvc.showSnackBar('App details loaded');
     }, error => {
@@ -61,7 +60,6 @@ export class StatsDashboardComponent implements OnInit {
     });
     this.baskervilleSvc.getStats().subscribe(data => {
       this.stats = (data as Envelop);
-      console.log(data);
       this.updateCards(this.stats, 0);
       this.notificationSvc.showSnackBar('General stats loaded');
     }, error => {

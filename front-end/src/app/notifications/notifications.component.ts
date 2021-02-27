@@ -14,7 +14,6 @@ export class NotificationsComponent implements OnInit {
     private notificationSvc: NotificationService,
     private sanitizer: DomSanitizer
   ) {
-    console.log('Notifications', this.notifications());
   }
   currentNotification(): Notification{
     return this.notificationSvc.currentNotification;

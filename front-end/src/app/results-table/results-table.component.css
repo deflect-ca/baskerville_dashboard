@@ -47,3 +47,6 @@ tr {
   margin-left: -6px;
   margin-top: -1px;
 }
+.active-low-rate {
+  background-color: yellow;
+}

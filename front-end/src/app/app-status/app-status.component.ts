@@ -29,7 +29,6 @@ export class AppStatusComponent implements OnInit {
     if (this.baskervilleSvc.getActiveAppId()){
       this.baskervilleSvc.getAppStatus().subscribe(
         d => {
-          console.log(d);
           d = (d as Envelop);
           this.statusOK = d.data !== null && d.running === true;
           this.baskervilleSvc.setInProgress(this.statusOK);

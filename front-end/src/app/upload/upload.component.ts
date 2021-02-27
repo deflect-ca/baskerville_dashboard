@@ -28,7 +28,6 @@ export class UploadComponent implements OnInit {
   ngOnInit(): void {
   }
   handleFileInput(files: FileList): any {
-    console.log(files);
 
     if (!files || files.length === 0) {
       this.error = 'No file selected.';
@@ -44,7 +43,6 @@ export class UploadComponent implements OnInit {
     this.error = null;
     this.baskervilleSvc.uploadLogs(files).subscribe(data => {
         this.uploadResults = data as Envelop;
-        console.log(this.uploadResults);
         this.selectedFileName = this.uploadResults.data.filename;
         this.notificationSvc.showSnackBar(this.uploadResults.message);
       },
@@ -57,7 +55,6 @@ export class UploadComponent implements OnInit {
   uploadTempLogs(): void {
     this.baskervilleSvc.uploadTempLogs().subscribe(
       data => {this.uploadResults = data as Envelop;
-               console.log(this.uploadResults);
                this.selectedFileName = this.uploadResults.data.filename;
                this.notificationSvc.showSnackBar(this.uploadResults.message);
         },

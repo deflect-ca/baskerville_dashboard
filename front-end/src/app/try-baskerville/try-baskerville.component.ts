@@ -48,8 +48,6 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
       .pipe(filter((rs): rs is NavigationEnd => rs instanceof NavigationEnd))
       .subscribe(event => {
         const e = event as any;
-        console.log('EVENT', e);
-
         if (
           e.id === 1 &&
           e.url === e.urlAfterRedirects
@@ -59,7 +57,6 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
 
       });
     if (!this.browserRefresh) {
-      console.log('NOT Refresh');
       // this.setMessageComm();
     }
     this.setNotificationsForAppId();
@@ -85,7 +82,6 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
     if (this.activeAppId) {
       this.notificationSvc.getAppLog(this.activeAppId).subscribe(
         d => {
-          console.log('got app-log for ', this.activeAppId, d);
           this.notificationSvc.addNotification(
             d,
             d.indexOf('ERROR') > -1 ? NotificationType.error : NotificationType.basic
@@ -111,14 +107,12 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
   setMessageComm(): void {
     this.notificationSvc.getMessage().subscribe(
       d => {
-        console.log('got message:', d, d.indexOf('ERROR'));
         this.notificationSvc.addNotification(d, NotificationType.basic);
       },
       e => console.error(e)
     );
   }
   handleFileInput(files: FileList): any {
-    console.log(files);
 
     if (!files || files.length === 0) {
       this.error = 'No file selected.';
@@ -134,7 +128,6 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
     this.error = null;
     this.baskervilleSvc.uploadLogs(files).subscribe(data => {
         this.uploadResults = data as Envelop;
-        console.log(this.uploadResults);
         this.selectedFileName = this.uploadResults.data.filename;
         this.notificationSvc.showSnackBar(this.uploadResults.message);
       },

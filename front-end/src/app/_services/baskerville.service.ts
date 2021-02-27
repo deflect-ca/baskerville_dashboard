@@ -125,7 +125,8 @@ export class BaskervilleService {
   }
   sendBulkFeedback(feedback, data): any {
     const body = {
-      rss: data,
+      rss: data.rss,
+      lowRate: data.lowRate,
       client_uuid: this.getUserId()
     };
     return this.http.post(

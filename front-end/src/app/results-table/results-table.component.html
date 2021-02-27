@@ -1,6 +1,6 @@
 <div class="mat-elevation-z8">
   <div *ngIf="allSelected">
-    <mat-slide-toggle (click)="selectAllInQ()" [checked]="allInQSelected" color="primary">all in query</mat-slide-toggle>
+    <!--<mat-slide-toggle (click)="selectAllInQ()" [checked]="allInQSelected" color="primary">all in query</mat-slide-toggle>-->
     <!--<mat-label>Select all in query
     <mat-checkbox (change)="$event ? selectAllInQ() : null"
                   [checked]="selection.hasValue() && isAllInQSelected()"
@@ -15,7 +15,7 @@
         <div *ngIf="isAllSelected()">
           <button mat-icon-button color="primary" (click)="sendPositiveFeedback(row)"><mat-icon aria-hidden="false" aria-label="correct" title="Correct">check</mat-icon></button>
           <button mat-icon-button color="warn" (click)="sendNegativeFeedback(row)"><mat-icon aria-hidden="false" aria-label="incorrect" title="Incorrect">close</mat-icon></button>
-          <button mat-icon-button color="basic" class="attack" (click)="sendAttack(row)"><mat-icon aria-hidden="false" aria-label="low rate" title="Low Rate Attack">slow_motion_video</mat-icon></button>
+          <button mat-icon-button color="basic" class="active-low-rate" (click)="sendNegativeFeedback(row, true)"><span class="material-icons" [ngClass]="{'active-low-rate': row.lowRate}">slow_motion_video</span></button>
         </div>
         <mat-checkbox (change)="$event ? masterToggle() : null"
                       [checked]="selection.hasValue() && isAllSelected()"
@@ -36,6 +36,7 @@
         <div *ngIf="multipleSelectedItems">
           <button mat-icon-button color="primary" (click)="sendBulkBotNotBotFeedback('NOTBOT')"><img src="/assets/icons/NOTBOT.png" alt="NOT BOT" width="40" height="40"></button>
           <button mat-icon-button color="warn" (click)="sendBulkBotNotBotFeedback('BOT')"><img src="/assets/icons/BOT.png" alt="BOT" width="40" height="40"></button>
+          <button mat-icon-button color="warn" (click)="sendBulkBotNotBotFeedback('BOT', true)"><mat-icon aria-hidden="false" aria-label="low rate" title="Low Rate Attack">slow_motion_video</mat-icon></button>
           <!--<button mat-icon-button color="basic" class="attack" (click)="sendBulkAttack()"><mat-icon aria-hidden="false" aria-label="attack" title="Attack">offline_bolt</mat-icon></button>-->
         </div>
       </th>
@@ -48,8 +49,8 @@
           <img  src="/assets/icons/BOT.png" alt="BOT" width="40" height="40">
           <img  *ngIf="row.feedback==='bot'" style="margin-left: -40px;" src="/assets/icons/BOT_selected.png" alt="BOT" width="40" height="40">
         </button>
-        <button mat-icon-button color="warn" title="LOW RATE" (click)="sendNegativeFeedback(row, true)" [disabled]="multipleSelectedItems" class="mat-elevation-z5">
-          <span class="material-icons" [ngClass]="{'lowRateActive': row.lowRate}">slow_motion_video</span>
+        <button mat-icon-button color="warn" title="LOW RATE" [ngClass]="{'active-low-rate': row.lowRate}" (click)="sendNegativeFeedback(row, true)" [disabled]="multipleSelectedItems" class="mat-elevation-z5">
+          <span class="material-icons" [ngClass]="{'active-low-rate': row.lowRate}">slow_motion_video</span>
         </button>
       </td>
     </ng-container>

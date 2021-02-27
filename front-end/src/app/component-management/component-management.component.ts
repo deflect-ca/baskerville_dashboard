@@ -29,10 +29,9 @@ export class ComponentManagementComponent implements OnInit {
   ngOnInit(): void {
     this.baskervilleSvc.getDockerComponents().subscribe(
       d => {
-        console.log(d);
         this.setUpDockerComponents(d.data);
         },
-      e => {console.error(e) }
+      e => {console.error(e); }
     );
   }
   setUpDockerComponents(data): void {

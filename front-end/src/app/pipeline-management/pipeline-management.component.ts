@@ -49,6 +49,6 @@ export class PipelineManagementComponent implements OnInit, AfterViewInit {
   }
   onCodeChanged(value): any {
     console.log('CODE', value);
-    this.codeModel.value = this.data.message
+    this.codeModel.value = this.data.message;
   }
 }

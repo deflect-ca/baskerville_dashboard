@@ -75,7 +75,6 @@ export class NotificationService {
     this.socket.emit(id, msg);
   }
   sendAppId(appId: string): void {
-    console.log('sendAppId');
     this.socket.emit('app-status', appId);
   }
   getUserMessage(uuid): any {

@@ -19,7 +19,6 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanDeactivate<u
     if (localStorage.getItem('currentUser')) {
       const expiresAt = localStorage.getItem('expires_at');
       // todo: check expires at
-      console.log('here', expiresAt);
       if (expiresAt == null) {return false; }
       return !AuthGuard.tokenExpired(+expiresAt);
     }

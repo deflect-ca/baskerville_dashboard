@@ -17,7 +17,7 @@
               Or choose an existing one to update:
             </mat-grid-tile-header>
             <mat-card>
-              <mat-form-field>
+              <mat-form-field appearance="outline">
                 <mat-label>Select an existing feedback context:</mat-label>
                 <select (change)="fcChange($event)" formControlName="fc" matNativeControl >
                   <option value="" selected disabled></option>
@@ -43,7 +43,7 @@
       </mat-step>
       <mat-step>
         <ng-template matStepLabel>Submit</ng-template>
-        <mat-card>
+        <mat-card ngClass="submit-card">
           <mat-card-content>
             <img  src="/assets/icons/Work-26.jpg" alt="" width="450" height="400">
           </mat-card-content>

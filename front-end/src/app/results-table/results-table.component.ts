@@ -83,7 +83,6 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     this.table.dataSource = this.dataSource;
   }
   toggle(row): void{
-    console.log(row);
     row.isSelected = !row.isSelected;
   }
   isAllSelected(): boolean {
@@ -124,26 +123,26 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     const data = this.getSelected();
     this.baskervilleSvc.sendBulkFeedback(FeedbackEnum.correct, data).subscribe(
       d => {
-        console.log(d);
         this.notificationSvc.showSnackBar(d.message);
         this.created.emit(true);
       },
       e => {
-        console.log(e);
         this.notificationSvc.showSnackBar(e.message);
       }
     );
   }
-  sendBulkBotNotBotFeedback(botNotBot: string): any {
-    const data = this.getSelected();
+  sendBulkBotNotBotFeedback(botNotBot: string, lowRate?: boolean): any {
+    const data = {
+      rss: this.getSelected(),
+      lowRate: lowRate || false
+    };
     this.baskervilleSvc.sendBulkFeedback(BotNotBotEnum[botNotBot], data).subscribe(
       d => {
-        console.log(d);
         this.notificationSvc.showSnackBar(d.message);
         this.created.emit(true);
       },
       e => {
-        console.log(e);
+        console.error(e);
         this.notificationSvc.showSnackBar(e.message);
       }
     );
@@ -152,12 +151,11 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     const data = this.getSelected();
     this.baskervilleSvc.sendBulkFeedback(FeedbackReversedEnum[FeedbackEnum.incorrect], data).subscribe(
       d => {
-        console.log(d);
         this.notificationSvc.showSnackBar(d.message);
         this.created.emit(true);
       },
       e => {
-        console.log(e);
+        console.error(e);
         this.notificationSvc.showSnackBar(e.message);
       }
     );
@@ -166,11 +164,10 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     const data = this.getSelected();
     this.baskervilleSvc.sendBulkAttack(FeedbackEnum.correct, data).subscribe(
       d => {
-        console.log(d);
         this.notificationSvc.showSnackBar(d.message);
       },
       e => {
-        console.log(e);
+        console.error(e);
         this.notificationSvc.showSnackBar(e.message);
       }
     );
@@ -181,15 +178,12 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
       feedbackStr, row.id, this.rsFilter.submit
     ).subscribe(
       d => {
-        console.log(d);
         row.feedback = feedbackStr;
-        console.log(row.feedback, this.botNotBotToFeedback(row.prediction, 'NOTBOT'));
-        console.log('ROW', row)
         this.notificationSvc.showSnackBar(d.message);
         this.created.emit(true);
       },
       e => {
-        console.log(e);
+        console.error(e);
         this.notificationSvc.showSnackBar(e.message);
       }
     );
@@ -200,13 +194,13 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
       feedbackStr, row.id, lowRate
     ).subscribe(
       d => {
-        console.log(d);
         row.feedback = feedbackStr;
+        row.lowRate = lowRate;
         this.notificationSvc.showSnackBar(d.message);
         this.created.emit(true);
       },
       e => {
-        console.log(e);
+        console.error(e);
         this.notificationSvc.showSnackBar(e.message);
       }
     );
@@ -214,11 +208,10 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
   sendAttack(row): any {
     this.baskervilleSvc.sendAttack(row.id).subscribe(
       d => {
-        console.log(d);
         this.notificationSvc.showSnackBar(d.message);
       },
       e => {
-        console.log(e);
+        console.error(e);
         this.notificationSvc.showSnackBar(e.message);
       }
     );
@@ -238,13 +231,13 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
       d => {
         const envelop = d as Envelop;
         this.notificationSvc.showSnackBar(envelop.message);
-        console.log(envelop.data);
         this.baskervilleSvc.resultsBehaviorSubj.next(new Results(envelop.data));
         this.baskervilleSvc.inProgress = false;
       },
       e => {
         this.notificationSvc.showSnackBar(e.message);
         this.baskervilleSvc.inProgress = false;
+        console.error(e);
       }
     );
   }

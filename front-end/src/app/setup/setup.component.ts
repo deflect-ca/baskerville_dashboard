@@ -46,7 +46,7 @@ export class SetupComponent implements OnInit {
       .subscribe(
         data => {
           if (data.success) {
-            console.log('data', data);
+            console.log('data', data); // todo: save organization details to set registered to true
           } else {
             this.error = data.message;
             this.loading = false;

@@ -71,7 +71,6 @@ export class LoginComponent implements OnInit {
         data => {
           if (data.success) {
             this.authSvc.setSession(data.data);
-            console.log('data', data);
             this.userSvc.setUser(new User(data.data));
 
             this.notificationSvc.registerToUserSocket(this.userSvc.getUser().uuid).subscribe(
@@ -103,7 +102,6 @@ export class LoginComponent implements OnInit {
         const env = d as Envelop;
         if (env.success) {
           this.authSvc.setSession(env.data);
-          console.log('env', env);
 
           this.userSvc.setUser(new User(env.data));
           this.router.navigate([this.returnUrl]);

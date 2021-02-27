@@ -22,7 +22,6 @@ export class UserService {
   }
   setUser(user: User): void {
     this.currentUser = user;
-    console.log('User is set!', this.currentUser );
     this.currentUserChanged.next(user ? user.email : 'test');
   }
   getUser(): User | any {
@@ -59,12 +58,10 @@ export class UserService {
       .pipe(tap(res => this.setUser), shareReplay(1));
   }
   createUser(userData): any {
-    console.log('userData', userData);
     return this.http.post<Envelop>(environment.baseApiUrl + '/admin/users', userData)
       .pipe(tap(res => console.info('Created user:', res), shareReplay(1)));
   }
   updateUser(userData): any {
-    console.log('userData', userData);
     return this.http.put<Envelop>(environment.baseApiUrl + `/admin/users/${userData['id']}`, userData)
       .pipe(tap(res => console.info('Updated user:', res)), shareReplay(1));
   }

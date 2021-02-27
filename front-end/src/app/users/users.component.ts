@@ -54,7 +54,6 @@ export class UsersComponent implements OnInit {
     this.userSvc.usersBehaviorSubj.subscribe(
       data => {
         console.debug(data);
-        console.log('resultsBehaviorSubj DATA', data)
         this.displayedColumns = data.data.length > 0 ? Object.keys(data.data[0]) : [];
         this.dataColumns = this.displayedColumns;
         if (this.dataColumns.length > 0){

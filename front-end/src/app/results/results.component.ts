@@ -39,8 +39,7 @@ export class ResultsComponent implements OnInit, AfterViewInit{
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
       this.currentId = params.get('id');
-      this.rsFilter.appId = this.currentId;
-      console.log(this.currentId);  // todo: needs safeguarding
+      this.rsFilter.appId = this.currentId; // todo: needs safeguarding
     });
   }
   ngAfterViewInit(): void {
@@ -55,7 +54,6 @@ export class ResultsComponent implements OnInit, AfterViewInit{
       d => {
         this.envelop = d as Envelop;
         this.notificationSvc.showSnackBar(this.envelop.message);
-        console.log(new Results(this.envelop.data));
         this.baskervilleSvc.resultsBehaviorSubj.next(new Results(this.envelop.data));
         this.baskervilleSvc.inProgress = false;
       },
@@ -72,7 +70,6 @@ export class ResultsComponent implements OnInit, AfterViewInit{
       d => {
         this.envelop = d as Envelop;
         this.notificationSvc.showSnackBar(this.envelop.message);
-        console.log(new Results(this.envelop.data));
         this.baskervilleSvc.resultsBehaviorSubj.next(new Results(this.envelop.data));
         this.baskervilleSvc.inProgress = false;
       },
@@ -89,29 +86,26 @@ export class ResultsComponent implements OnInit, AfterViewInit{
       d => {
         this.envelop = d as Envelop;
         this.notificationSvc.showSnackBar(this.envelop.message);
-        console.log(this.envelop.data);
         this.baskervilleSvc.resultsBehaviorSubj.next(new Results(this.envelop.data));
         this.baskervilleSvc.inProgress = false;
       },
       e => {
         this.notificationSvc.showSnackBar(e.message);
         this.baskervilleSvc.inProgress = false;
+        console.error(e)
       }
     );
   }
   prepareFilter(): RequestSetFilter {
-    console.log(this.range.controls);
     this.rsFilter.start = this.range.controls.start.value?.toLocaleDateString();
     this.rsFilter.stop = this.range.controls.end.value?.toLocaleDateString();
     this.rsFilter.prediction = BotToLabels[this.rsFilter.prediction];
-    console.log(this.rsFilter);
     return this.rsFilter;
   }
   userIsGuest(): boolean {
     return this.userSvc.getUser().category === UserCategoryEnum.guest;
   }
   handleFileInput(files: FileList): void {
-    console.log(files);
 
     if (!files || files.length === 0) {
       this.error = 'No file selected.';
@@ -125,10 +119,8 @@ export class ResultsComponent implements OnInit, AfterViewInit{
     }
     this.inProgress = true;
     this.error = null;
-    console.log(this.baskervilleSvc)
     this.baskervilleSvc.uploadCsv(files).subscribe(data => {
         const env = data as Envelop;
-        console.log(env);
         this.rsFilter.file = env.data.filename;
         this.notificationSvc.showSnackBar(env.message);
       },

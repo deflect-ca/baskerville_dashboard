@@ -66,7 +66,6 @@ export class FeedbackComponent implements OnInit {
     this.stepper.next();
   }
   feedbackChange(e: boolean): void {
-    console.log('feedbackChange, ', e)
     this.submitted = false;
     this.inProgress = false;
   }
@@ -76,7 +75,6 @@ export class FeedbackComponent implements OnInit {
     this.baskervilleSvc.setInProgress(this.inProgress);
     this.baskervilleSvc.sumbitToBaskerville().subscribe(
       data => {
-        console.log(data);
         this.notificationSvc.showSnackBar(data.message);
         this.submitted = true;
         this.inProgress = false;

@@ -15,19 +15,19 @@ export class FeedbackContextComponent implements OnInit {
   contextFormGroup: FormGroup;
   range: FormGroup;
   reasons = FeedbackContextTypeEnum;
-  selectedReason = FeedbackContextTypeEnum.attack;
-  selectedDescription = FeedbackContextTypeEnum.attack;
+  selectedReason: FeedbackContextTypeEnum.attack;
+  selectedDescription = '';
   constructor(
     private formBuilder: FormBuilder,
     private baskervilleSvc: BaskervilleService,
     private notificationSvc: NotificationService
   ) {
-    this.feedbackContextVM = this.feedbackContextVM || new FeedbackContextVM({});
-    this.selectedReason = this.reasons.attack;
-    this.selectedDescription = this.feedbackContextVM.feedbackContextTypeToDescr[this.selectedReason];
   }
 
   ngOnInit(): void {
+    this.feedbackContextVM = this.feedbackContextVM || new FeedbackContextVM({});
+    // this.selectedReason = this.reasons.attack;
+    // this.selectedDescription = this.feedbackContextVM.feedbackContextTypeToDescr[this.selectedReason];
     this.range = new FormGroup({
       start: new FormControl(),
       stop: new FormControl()
@@ -42,7 +42,6 @@ export class FeedbackContextComponent implements OnInit {
     });
   }
   reasonChange(e): void {
-    console.log(e);
     console.warn(this.contextFormGroup.controls.reason.value);
     this.selectedReason = this.reasons[this.contextFormGroup.controls.reason.value.replace(' ', '_')];
     this.selectedDescription = this.feedbackContextVM.feedbackContextTypeToDescr[this.selectedReason];
@@ -56,10 +55,8 @@ export class FeedbackContextComponent implements OnInit {
       stop: c.stop.value?.toLocaleDateString(),
       notes: c.notes.value,
     };
-    console.log(data);
     this.baskervilleSvc.setFeedbackContent(data).subscribe(
       d => {
-        console.log(d);
         this.baskervilleSvc.selectedFeedback = new FeedbackContext(d.data);
         this.created.emit(true);
         this.notificationSvc.showSnackBar(d.message);

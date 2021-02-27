@@ -2,3 +2,7 @@
   /*display: none;*/
   /*opacity: 0;*/
 }
+
+.submit-card > mat-card-content {
+  padding-left: 22vw;
+}
