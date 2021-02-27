@@ -1,9 +1,57 @@
-# baskerville_dashboard
-A dashboard for the Baskerville project: setup, labelling and feedback
+# Baskerville Dashboard
+A dashboard for the Baskerville project: setup, labelling and feedback.
 
 ## How it works
 
 ## How to set up and run
+
+### The backend
+To have a fully functional Baskerville Dashboard you need to have Baskerville installed and set up. You will need a Baskerville config to continue.
+To run the backend, rename the [`config.yaml.example`](backend/conf/config.yaml.example) and fill in the details:
+
+```yaml
+---
+APP_CONFIG:
+  PREFIX: '/api/1'  # if you change this, you'll need to change the baseApiUrl in the front-end `environment.ts`
+  SECRET_KEY: 'a very very secret key preferably through an env variable'  # e.g. like this !ENV ${NAME_OF_VAR}
+  SQLALCHEMY_COMMIT_ON_TEARDOWN: True
+  UPLOAD_FOLDER: '/path/to/uploads'  # should be the full path to static/uploads
+  JWT_SECRET_KEY: sosecret
+  JWT_DEFAULT_REALM: 'Login Required'
+  JWT_AUTH_HEADER_PREFIX: 'Bearer'
+  SECURITY_PASSWORD_SALT: 'salt'
+  FLASK_DEBUG: True
+  ADMIN_EMAIL: 'admin@email'    # the admin details
+  ADMIN_PASS: 'secret'
+  PIPELINE: 'irawlog'
+  BASKERVILLE_CONF: '/path/to/baskerville/conf/yaml'    # the path to your functional Baskerville setup
+  KAFKA_TOPICS:
+    - 'test.feedback'       # where test is the uuid of your organization, as provided to you by eq. It should be present in baskerville config.
+    - 'test.registration'   # you can use environment variables like: - !ENV '${ORG_UUID}.registration'
+```
+The next step is to run the flask app:
+```bash
+python app.py
+```
+The backend should be up and running on http://localhost:5000. You should be able to see `Baskerville-dashboard v0.0.1` in your browser.
+
+*Note: This is the dev server. For deployment, see the options [here](https://flask.palletsprojects.com/en/1.1.x/deploying/))*
+Make sure that the communication between the backend, your Baskerville deployment (Spark Cluster, Redis, Kafka, Postgres) and the Prediction Center (through Kafka)
+is allowed.
+
+### The front-end
+The front-end is developed with Angular (11.1.0 currently). 
+To run it:
+```bash
+# install packages
+npm install
+# run server
+ng serve
+```
+The website is served on http://localhost:4200
+
+To deploy it and serve it through an NGINX for example you can follow the steps [here](https://angular.io/guide/deployment)
+
 
 ## How to provide feedback
 1. Login with the admin account.
