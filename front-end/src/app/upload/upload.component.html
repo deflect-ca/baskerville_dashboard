@@ -1,0 +1,29 @@
+<mat-card class="upload-card mat-elevation-z5">
+  <mat-card-title>Upload your logs </mat-card-title>
+  <mat-card-content>
+    <mat-grid-list cols="1" rowHeight="40vh">
+       <mat-grid-tile>
+        <br>
+        <input #fileInput type="file" (change)="handleFileInput($event.target.files)" accept="application/json,.zip,.gzip,.tar,">
+          To use a sample,<button mat-button (click)="uploadTempLogs()" color="accent" class="temp-logs">click here</button>
+        <p>
+          <label class="red" *ngIf="error">{{error}}</label>
+        </p>
+
+         <mat-grid-tile-footer>
+          &nbsp;
+          <p>
+            Max size 50MB.
+            To see the supported log format, click <a href="https://github.com/equalitie/baskerville/blob/master/data/samples/log_schema.json" target="_blank">here</a>.
+            To see log samples, click<a href="https://github.com/equalitie/baskerville/blob/master/data/samples/test_data_1k.json" target="_blank">here</a>.
+          </p>
+
+        </mat-grid-tile-footer>
+      </mat-grid-tile>
+    </mat-grid-list>
+
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button (click)="startBaskerville()" [disabled]="!selectedFileName" color="primary">START BASKERVILLE</button>
+  </mat-card-actions>
+</mat-card>
