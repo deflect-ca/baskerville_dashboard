@@ -61,12 +61,3 @@ def get_spark_submit_command(config):
     conf_str = f'{"--conf ".join(config)}'
     return """
     """
-
-
-"""
-spark-submit --master spark://$SPARK_MASTER_HOST:7077 --jars ${BASKERVILLE_ROOT}/data/jars/spark-iforest-2.4.0.99.jar,${BASKERVILLE_ROOT}/data/jars/spark-streaming-kafka-0-8-assembly_2.11-2.4.0.jar,${BASKERVILLE_ROOT}/data/jars/postgresql-42.2.4.jar,${BASKERVILLE_ROOT}/data/jars/spark-redis_2.11-2.5.0-SNAPSHOT-jar-with-dependencies.jar --total-executor-cores=6 --conf spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=2g $BASKERVILLE_ROOT/src/baskerville/main.py postprocessing -c $BASKERVILLE_ROOT/conf/postprocessing.yaml
-
-spark-submit --master spark://$SPARK_MASTER_HOST:7077 --jars ${BASKERVILLE_ROOT}/data/jars/spark-iforest-2.4.0.99.jar,${BASKERVILLE_ROOT}/data/jars/spark-streaming-kafka-0-8-assembly_2.11-2.4.0.jar,${BASKERVILLE_ROOT}/data/jars/postgresql-42.2.4.jar,${BASKERVILLE_ROOT}/data/jars/spark-redis_2.11-2.5.0-SNAPSHOT-jar-with-dependencies.jar --total-executor-cores=4 --conf spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=2g $BASKERVILLE_ROOT/src/baskerville/main.py predicting -c $BASKERVILLE_ROOT/conf/predicting.yaml
-
-spark-submit --master spark://$SPARK_MASTER_HOST:7077 --jars ${BASKERVILLE_ROOT}/data/jars/spark-iforest-2.4.0.99.jar,${BASKERVILLE_ROOT}/data/jars/spark-streaming-kafka-0-8-assembly_2.11-2.4.0.jar,${BASKERVILLE_ROOT}/data/jars/postgresql-42.2.4.jar,${BASKERVILLE_ROOT}/data/jars/spark-redis_2.11-2.5.0-SNAPSHOT-jar-with-dependencies.jar --total-executor-cores=26 --conf spark.memory.offHeap.enabled=true --conf spark.memory.offHeap.size=10g $BASKERVILLE_ROOT/src/baskerville/main.py postprocessing -c $BASKERVILLE_ROOT/conf/preprocessing.yaml
-"""

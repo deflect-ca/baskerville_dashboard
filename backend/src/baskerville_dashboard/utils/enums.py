@@ -19,3 +19,4 @@ class FeedbackEnum(BaseStrEnum):
     bot = 'bot'
     not_bot = 'notbot'
     none = ''
+

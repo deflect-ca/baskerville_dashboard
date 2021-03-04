@@ -228,3 +228,4 @@ def delete_user(id):
         re.message = str(e)
         re.data = None
     return response_jsonified(re, code)
+

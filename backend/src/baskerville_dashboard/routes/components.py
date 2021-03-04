@@ -186,4 +186,3 @@ def component_restart(service_name):
         traceback.print_exc()
 
     return response_jsonified(re, code)
-
