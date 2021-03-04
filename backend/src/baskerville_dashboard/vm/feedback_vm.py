@@ -98,4 +98,3 @@ class FeedbackContextVM(object):
                 self.feedback_context_type_to_descr.items()
             }
         }
-

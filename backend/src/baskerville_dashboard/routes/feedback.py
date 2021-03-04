@@ -317,4 +317,3 @@ def banjax_kibana_url(rs):
     sort_ = "sort:!('@timestamp',desc)"
 
     return f'{root},{time})&_a=({index},{interval},{q},{sort_})'
-

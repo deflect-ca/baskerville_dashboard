@@ -35,3 +35,4 @@ setup(name='baskerville_dashboard',
           'baskerville_dashboard.vm',
       ],
       )
+

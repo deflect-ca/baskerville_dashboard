@@ -286,4 +286,3 @@ def app_details(app_id):
         code = 500
         traceback.print_exc()
     return response_jsonified(respose, code)
-

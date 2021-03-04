@@ -135,4 +135,3 @@ def consume_from_kafka(config, baskerville_config):
                 except SQLAlchemyError:
                     sm.session.rollback()
         time.sleep(0.1)
-
