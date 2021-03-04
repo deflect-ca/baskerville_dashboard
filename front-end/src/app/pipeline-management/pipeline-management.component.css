@@ -1,0 +1,12 @@
+.ngs-code-editor {
+  height: 60vh!important;
+}
+
+.spark-submit-cmd {
+  width: 70vw;
+  height: 80px;
+  background: black;
+  color: white;
+  padding: 5px;
+}
+

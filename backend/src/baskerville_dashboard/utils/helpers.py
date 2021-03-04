@@ -8,6 +8,7 @@ import re
 
 import eventlet
 from baskerville_dashboard.utils.kafka import get_kafka_producer
+from docker.errors import DockerException
 
 eventlet.monkey_patch()
 
@@ -76,8 +77,18 @@ BOT_NOT_BOT = {
     },
 }
 ALLOWED_FEEDBACK = {'bot', 'notbot'}
-DOCKER_CLIENT = docker.DockerClient()  # base_url='unix://var/run/docker.sock'
+DOCKER_CLIENT = None
 camel_case_pattern = re.compile(r'(?<!^)(?=[A-Z])')
+
+
+def get_docker_client():
+    global DOCKER_CLIENT
+    if not DOCKER_CLIENT:
+        try:
+            DOCKER_CLIENT = docker.DockerClient()
+        except DockerException:
+            print('Could not get DOCKER CLIENT')
+    return DOCKER_CLIENT
 
 
 def get_feedback_from_bot_not_bot(rs, bot_not_bot):
@@ -536,12 +547,12 @@ def is_compressed(file_path: str):
 
 def get_docker_ps():
     ps = [SerializableContainer(**c.__dict__) for c in
-          DOCKER_CLIENT.containers.list(all=True)]
+          get_docker_client().containers.list(all=True)]
     return ps
 
 
 def get_docker_container_status(container_name):
-    container = DOCKER_CLIENT.containers.get(container_name)
+    container = get_docker_client().containers.get(container_name)
     container_state = container.attrs['State']
     return container_state['Status']
 

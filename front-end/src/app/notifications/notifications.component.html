@@ -1,0 +1,4 @@
+<div class="terminal">
+  <pre *ngFor="let notification of notifications()">><span [ngClass]="notification.getColor()"> {{notification.message}}<a *ngIf="notification.url" [routerLink]="['/results', notification.url]">here</a></span></pre>
+</div>
+

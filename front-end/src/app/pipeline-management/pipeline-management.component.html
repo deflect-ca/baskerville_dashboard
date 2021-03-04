@@ -1,0 +1,16 @@
+<mat-card class="main-card mat-elevation-z5">
+  <mat-card-title>Pipelines</mat-card-title>
+  <mat-card-content>
+    <!--TODO: use tiles-->
+    <textarea class="spark-submit-cmd" [(ngModel)]="sparkSubmitCmd">spark-submit....</textarea>
+    <h4>Edit configuration:</h4>
+<ngs-code-editor
+  [theme]="theme"
+  [codeModel]="codeModel"
+  [options]="options"
+  (valueChanged)="onCodeChanged($event)"
+>
+</ngs-code-editor>
+  </mat-card-content>
+</mat-card>
+
