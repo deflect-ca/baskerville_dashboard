@@ -70,6 +70,7 @@ import { UserComponent } from './user/user.component';
 import { TryMenuComponent } from './try-menu/try-menu.component';
 import { SetupComponent } from './setup/setup.component';
 import { FeedbackContextComponent } from './feedback-context/feedback-context.component';
+import { HomeComponent } from './home/home.component';
 
 
 const socketConfig: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
@@ -77,7 +78,13 @@ const socketConfig: SocketIoConfig = { url: 'http://localhost:5000', options: {}
 const appRoutes: Routes = [
   { path: '',
     pathMatch: 'full',
-    redirectTo: 'try-baskerville' }, {
+    redirectTo: 'home'
+  }, {
+    path: 'home',
+    component: HomeComponent,
+    data: { title: 'Home' },
+    canActivate: [AuthGuard]
+  }, {
     path: 'try-baskerville',
     component: TryBaskervilleComponent,
     data: { title: 'Try Baskerville' },
@@ -206,6 +213,7 @@ const appRoutes: Routes = [
     TryMenuComponent,
     SetupComponent,
     FeedbackContextComponent,
+    HomeComponent,
   ],
   imports: [
     RouterModule.forRoot(
