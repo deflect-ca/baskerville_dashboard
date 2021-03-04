@@ -310,4 +310,3 @@ class ForgotPassword(object):
         #     except RuntimeError as e:
         #         msg.message = str(e)
         #         return jsonify(msg.to_dict()), 500
-
