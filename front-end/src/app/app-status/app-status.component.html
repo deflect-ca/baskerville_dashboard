@@ -1,0 +1,19 @@
+<mat-card class="info-status">
+  <mat-card-content>
+    <div *ngIf="activeAppId">
+        <label [title]="activeAppId">
+          Status of last run:&nbsp;
+          <span class="status" [ngClass]="{'green-bg':statusOK, 'red-bg': !statusOK}"
+                [title]="getAppStatusMessage()"></span>
+        </label>
+    </div>
+    <div *ngIf="!activeAppId">
+      <mat-label>No active apps running.</mat-label>
+    </div>
+  </mat-card-content>
+  <mat-card-actions *ngIf="activeAppId">
+    <a mat-button [routerLink]="['results', activeAppId]">Results</a>
+    <a mat-button [routerLink]="['logs', activeAppId]">Logs</a>
+  </mat-card-actions>
+</mat-card>
+

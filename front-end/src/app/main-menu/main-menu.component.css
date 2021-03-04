@@ -1,0 +1,8 @@
+.mat-badge-medium.mat-badge-above .mat-badge-content {
+  top: unset;
+  right: unset;
+}
+.menu-link {
+  align-content: start;
+}
+

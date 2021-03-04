@@ -1,0 +1,11 @@
+span.status {
+  background-color: grey;
+  vertical-align: middle;
+}
+
+.info-status {
+  position: absolute;
+  right: 0;
+  top: 0vh;
+}
+

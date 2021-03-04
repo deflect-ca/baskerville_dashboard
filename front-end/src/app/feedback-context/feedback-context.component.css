@@ -1,0 +1,8 @@
+.mat-stepper-horizontal {
+  margin-top: 8px;
+}
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
