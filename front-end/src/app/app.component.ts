@@ -1,13 +1,12 @@
-import {AfterViewInit, Component, NgModule, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, NgModule, ViewChild} from '@angular/core';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {BaskervilleService} from './_services/baskerville.service';
-import {Envelop, UserCategoryEnum} from './_models/models';
+import {Envelop} from './_models/models';
 import {UserService} from './_services/user.service';
 import {MatIconRegistry} from '@angular/material/icon';
 import {DomSanitizer} from '@angular/platform-browser';
 import {AuthService} from './_services/auth/auth.service';
 import {MatDrawer, MatSidenav, MatSidenavContainer} from '@angular/material/sidenav';
-import {MatDivider} from '@angular/material/divider';
 import {NotificationService} from './_services/notification.service';
 
 @NgModule({

@@ -1,22 +1,4 @@
 <mat-grid-list cols="1" rowHeight="4:1">
-<!--  <mat-grid-tile>
-    <div class="card-menu card-small" tabindex="0" routerLink="/upload" routerLinkActive="active">
-      <span matBadge="1" matBadgePosition="before" matBadgeOverlap="false" matBadgeSize="medium">&nbsp;</span>
-    <a routerLink="/upload" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}" >Upload Logs</a>
-    </div>
-  </mat-grid-tile>
-  <mat-grid-tile>
-    <div class="card-menu card-small" tabindex="1" routerLink="/try-baskerville" routerLinkActive="active">
-      <span matBadge="2" matBadgePosition="before" matBadgeOverlap="false" matBadgeSize="medium">&nbsp;</span>
-      <a routerLink="/try-baskerville" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Baskerville Logs</a>
-    </div>
-  </mat-grid-tile>
-  <mat-grid-tile>
-    <div class="card-menu card-small" tabindex="1" routerLink="/results" routerLinkActive="active">
-      <span matBadge="3" matBadgePosition="before" matBadgeOverlap="false" matBadgeSize="medium">&nbsp;</span>
-      <a routerLink="/results" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Results</a>
-    </div>
-  </mat-grid-tile>-->
   <mat-grid-tile  *ngIf="userIsGuest() || userIsAdmin()">
     <div class="card-menu card-small" tabindex="0" routerLink="/upload" routerLinkActive="active">
       <!--<span matBadge="1" matBadgePosition="before" matBadgeOverlap="false" matBadgeSize="medium">&nbsp;</span>-->
@@ -53,5 +35,4 @@
       <a routerLink="/feedback" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Feedback</a>
     </div>
   </mat-grid-tile>
-
 </mat-grid-list>

@@ -13,3 +13,4 @@ export class LabelAttacksComponent implements OnInit {
   }
 
 }
+

@@ -7,3 +7,4 @@ export function validFileSize(file: File): boolean {
 function sizeInMB(sizeInBytes): number{
   return sizeInBytes / 1024 / 1024;
 }
+

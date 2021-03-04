@@ -13,3 +13,4 @@ export class PipelinesComponent implements OnInit {
   }
 
 }
+

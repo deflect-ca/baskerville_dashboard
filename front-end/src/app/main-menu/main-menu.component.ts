@@ -24,3 +24,4 @@ export class MainMenuComponent implements OnInit {
   }
 
 }
+

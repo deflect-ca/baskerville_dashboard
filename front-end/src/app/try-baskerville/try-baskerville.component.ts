@@ -163,5 +163,3 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
     console.warn('this.inProgressSvc.inProgress', this.baskervilleSvc.inProgress);
   }
 }
-
-

@@ -75,3 +75,4 @@ export class UserService {
     return this.http.post<Envelop>(environment.baseApiUrl + `/admin/users/${id}/delete`, {}).pipe(shareReplay());
   }
 }
+

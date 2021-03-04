@@ -32,3 +32,4 @@ describe('AttacksTableComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

@@ -23,3 +23,4 @@ describe('LogsComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

@@ -32,3 +32,4 @@ describe('ResultsTableComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

@@ -63,3 +63,4 @@ export class SetupComponent implements OnInit {
     return `${this.user.uuid} is ${notOrBlank}registered`;
   }
 }
+

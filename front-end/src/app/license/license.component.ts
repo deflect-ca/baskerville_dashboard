@@ -13,3 +13,4 @@ export class LicenseComponent implements OnInit {
   }
 
 }
+

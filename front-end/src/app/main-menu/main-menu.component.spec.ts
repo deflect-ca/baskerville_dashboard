@@ -23,3 +23,4 @@ describe('MainMenuComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

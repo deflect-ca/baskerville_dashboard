@@ -263,3 +263,4 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     return false;
   }
 }
+

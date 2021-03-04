@@ -23,3 +23,4 @@ describe('StatsComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

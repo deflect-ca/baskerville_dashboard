@@ -23,3 +23,4 @@ describe('PageNotFoundComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

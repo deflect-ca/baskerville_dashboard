@@ -52,3 +52,4 @@ export class PipelineManagementComponent implements OnInit, AfterViewInit {
     this.codeModel.value = this.data.message;
   }
 }
+

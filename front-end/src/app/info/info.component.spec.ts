@@ -23,3 +23,4 @@ describe('InfoComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

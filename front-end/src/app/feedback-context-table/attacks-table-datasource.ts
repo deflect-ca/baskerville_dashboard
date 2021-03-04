@@ -71,13 +71,13 @@ export class AttacksTableDataSource extends DataSource<AttacksTableItem> {
    *  Called when the table is being destroyed. Use this function, to clean up
    * any open connections or free any held resources that were set up during connect.
    */
-  disconnect() {}
+  disconnect(): void {}
 
   /**
    * Paginate the data (client-side). If you're using server-side pagination,
    * this would be replaced by requesting the appropriate data from the server.
    */
-  private getPagedData(data: AttacksTableItem[]) {
+  private getPagedData(data: AttacksTableItem[]): AttacksTableItem[] {
     const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
     return data.splice(startIndex, this.paginator.pageSize);
   }
@@ -86,7 +86,7 @@ export class AttacksTableDataSource extends DataSource<AttacksTableItem> {
    * Sort the data (client-side). If you're using server-side sorting,
    * this would be replaced by requesting the appropriate data from the server.
    */
-  private getSortedData(data: AttacksTableItem[]) {
+  private getSortedData(data: AttacksTableItem[]): AttacksTableItem[] {
     if (!this.sort.active || this.sort.direction === '') {
       return data;
     }
@@ -103,6 +103,6 @@ export class AttacksTableDataSource extends DataSource<AttacksTableItem> {
 }
 
 /** Simple sort comparator for example ID/Name columns (for client-side sorting). */
-function compare(a: string | number, b: string | number, isAsc: boolean) {
+function compare(a: string | number, b: string | number, isAsc: boolean): number {
   return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
 }

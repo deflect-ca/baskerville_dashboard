@@ -53,13 +53,7 @@
       <label class="red" *ngIf="error">{{error}}</label>
     </p>
   </div>
- <!-- <div class="mat-action-row mat-elevation-z0">
-    <mat-label>Submit your feedback to ISAC</mat-label>
-    <input type="checkbox" [checked]="rsFilter.submit">
-  </div>-->
   <button mat-button color="primary" (click)="submit()">SEARCH</button>
-  <!--<button mat-button color="accent" (click)="attackPanel=!attackPanel">FEEDBACK CONTEXT</button>
-  <button mat-button color="accent" (click)="submitFeedback()">SUBMIT FEEDBACK</button>-->
 </div>
 
 <app-feedback-context *ngIf="attackPanel"></app-feedback-context>

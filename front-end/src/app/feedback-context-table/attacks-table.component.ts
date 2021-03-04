@@ -28,3 +28,5 @@ export class AttacksTableComponent implements AfterViewInit, OnInit {
     this.table.dataSource = this.dataSource;
   }
 }
+
+

@@ -12,18 +12,6 @@ export class ComponentManagementComponent implements OnInit {
 
   constructor(private baskervilleSvc: BaskervilleService) {
     this.availableComponents = [];
-    // this.availableComponents.push(new DockerComponent({
-    //   serviceName: 'postgres',
-    //   description: 'The database: Postgres with the Timescaledb extension'
-    // }));
-    // this.availableComponents.push(new DockerComponent({
-    //   serviceName: 'kafka',
-    //   description: 'For Baskerville to have access to the logs'
-    // }));
-    // this.availableComponents.push(new DockerComponent({
-    //   serviceName: 'redis',
-    //   description: 'For sensitive data caching'
-    // }));
   }
 
   ngOnInit(): void {

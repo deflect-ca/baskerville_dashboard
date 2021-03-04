@@ -26,8 +26,6 @@ export class FeedbackContextComponent implements OnInit {
 
   ngOnInit(): void {
     this.feedbackContextVM = this.feedbackContextVM || new FeedbackContextVM({});
-    // this.selectedReason = this.reasons.attack;
-    // this.selectedDescription = this.feedbackContextVM.feedbackContextTypeToDescr[this.selectedReason];
     this.range = new FormGroup({
       start: new FormControl(),
       stop: new FormControl()

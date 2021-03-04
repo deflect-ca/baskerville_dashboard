@@ -60,3 +60,4 @@ export class AppStatusComponent implements OnInit {
     this.activeAppId = this.baskervilleSvc.getActiveAppId();
   }
 }
+

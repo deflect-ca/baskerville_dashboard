@@ -81,3 +81,4 @@ export class UsersComponent implements OnInit {
     this.dataSource.numPages = Math.ceil(e.pageSize / this.dataSource.numResults);
   }
 }
+

@@ -13,3 +13,4 @@ export class LogsComponent implements OnInit {
   }
 
 }
+

@@ -30,3 +30,4 @@ export class NotificationsComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustHtml(notification.innerHtml);
   }
 }
+

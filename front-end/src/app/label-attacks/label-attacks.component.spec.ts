@@ -23,3 +23,4 @@ describe('LabelAttacksComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

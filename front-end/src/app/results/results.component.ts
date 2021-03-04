@@ -131,3 +131,4 @@ export class ResultsComponent implements OnInit, AfterViewInit{
       });
   }
 }
+
