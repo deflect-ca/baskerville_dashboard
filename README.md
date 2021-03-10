@@ -3,6 +3,8 @@ A dashboard for the Baskerville project: setup, labelling and feedback
 
 ## How it works
 
+![How it works](data/img/How%20it%20works.png?raw=true "How it works")
+
 ## How to set up and run
 
 ### The backend
