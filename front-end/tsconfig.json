@@ -16,7 +16,8 @@
       "es2018",
       "dom"
     ],
-    "types": ["node"]
+    "types" : ["node"],
+    "typeRoots": [ "../node_modules/@types" ]
   }
 }
 
