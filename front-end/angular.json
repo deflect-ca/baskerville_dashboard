@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "untitled": {
+    "baskerville_dashboard_frontend": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -68,18 +68,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "untitled:build"
+            "browserTarget": "baskerville_dashboard_frontend:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "untitled:build:production"
+              "browserTarget": "baskerville_dashboard_frontend:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "untitled:build"
+            "browserTarget": "baskerville_dashboard_frontend:build"
           }
         },
         "test": {
@@ -118,18 +118,18 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "untitled:serve"
+            "devServerTarget": "baskerville_dashboard_frontend:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "untitled:serve:production"
+              "devServerTarget": "baskerville_dashboard_frontend:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "untitled",
+  "defaultProject": "baskerville_dashboard_frontend",
   "cli": {
     "analytics": "466b0425-92b2-4342-88b1-dfaf9718442b"
   }
