@@ -24,14 +24,13 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v2
-      - run: cd front-end
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.5
         with:
           # Version Spec of the version to use.  Examples: 12.x, 10.15.1, >=10.15.0
           node-version: 14.8.0
           token: ${{ secrets.ACCESS_TOKEN }} # optional, default is ${{ github.token }}
-      - run: npm install
+      - run: cd front-end && ls -la && npm install
       - name: Angular Deploy gh-pages Actions
         uses: AhsanAyaz/angular-deploy-gh-pages-actions@v1.3.1
         with:
