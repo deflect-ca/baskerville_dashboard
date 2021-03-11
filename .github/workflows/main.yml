@@ -31,6 +31,7 @@ jobs:
           node-version: 14.8.0
           token: ${{ secrets.ACCESS_TOKEN }} # optional, default is ${{ github.token }}
       # - run: cd front-end && ls -la && npm install
+      - run: export API_BASE_URL=${{secrets.API_BASE_URL}} && export SOCKET_URL=${{secrets.SOCKET_URL}} && cd front-end && npm install && npm run config
       - name: Angular Deploy gh-pages Actions
         uses: AhsanAyaz/angular-deploy-gh-pages-actions@v1.3.1
         with:
