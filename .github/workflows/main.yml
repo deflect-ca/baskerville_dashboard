@@ -39,5 +39,5 @@ jobs:
           build_configuration: production # The build environment for the app. please look configurations in your angular.json
           base_href: /baskerville_dashboard/   # make sure this corresponds to https://<your_username>.github.io/<base_href>/
           deploy_branch: gh-pages # The branch the action should deploy to.
-          angular_dist_build_folder: dist/baskerville_dashboard_frontend # The folder where your project is supposed to be after running ng build by the action.
+          angular_dist_build_folder: ./front-end/dist/baskerville_dashboard_frontend # The folder where your project is supposed to be after running ng build by the action.
           angular_project_dir: ./front-end
