@@ -8,6 +8,7 @@ const colors = require('colors');
 require('dotenv').config();
 // `environment.ts` file structure
 const envConfigFile = `export const environment = {
+   production: true,
    baseApiUrl: '${process.env.API_BASE_URL}',
    socketUrl: '${process.env.SOCKET_URL}',
    maxFileSize: 50,
