@@ -3,14 +3,14 @@
 #
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
+import eventlet
+eventlet.monkey_patch()
 import json
 import re
 
-import eventlet
 from baskerville_dashboard.utils.kafka import get_kafka_producer
 from docker.errors import DockerException
 
-eventlet.monkey_patch()
 
 from baskerville.db.dashboard_models import User, Organization
 from baskerville.models.config import KafkaConfig
@@ -321,7 +321,8 @@ def get_socket_io():
     from flask_socketio import SocketIO
     try:
         return SocketIO(
-            message_queue='redis://0.0.0.0:6379', async_mode='threading'
+            message_queue='redis://0.0.0.0:6379',
+            async_mode='threading'
         )
     except Exception:
         traceback.print_exc()
@@ -335,7 +336,7 @@ class ReadLogs(Thread):
     def __init__(self, org_uuid, full_path):
         self.org_uuid = org_uuid
         self.full_path = full_path
-        self.socket_io = get_socket_io()
+        self.socketio = get_socket_io()
         self._stop_event = Event()
         super(ReadLogs, self).__init__()
 
