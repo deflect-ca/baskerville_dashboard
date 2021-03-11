@@ -30,7 +30,7 @@ jobs:
           # Version Spec of the version to use.  Examples: 12.x, 10.15.1, >=10.15.0
           node-version: 14.8.0
           token: ${{ secrets.ACCESS_TOKEN }} # optional, default is ${{ github.token }}
-      - run: cd front-end && ls -la && npm install
+      # - run: cd front-end && ls -la && npm install
       - name: Angular Deploy gh-pages Actions
         uses: AhsanAyaz/angular-deploy-gh-pages-actions@v1.3.1
         with:
