@@ -172,8 +172,9 @@ const appRoutes: Routes = [
     path: 'login',
     component: LoginComponent,
     data: { title: 'Login' },
-  },
-  { path: '**', component: PageNotFoundComponent },
+  }
+  // ,
+  // { path: '**', component: PageNotFoundComponent },
 ];
 
 @NgModule({
