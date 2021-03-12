@@ -8,6 +8,8 @@ import traceback
 import uuid
 
 import eventlet
+from redis import Redis
+
 eventlet.monkey_patch()
 
 from baskerville_dashboard.auth import Auth
@@ -193,6 +195,7 @@ def create_app(config=None, environment=None):
     sm.set_session(Session)
     sm.set_engine(engine)
     app_config = config.get('APP_CONFIG')
+    app_config['SESSION_REDIS'] = Redis(host=REDIS_HOST, password=REDIS_PASS)
     add_start_up_data(app_config, baskerville_conf)
     set_up_kafka_thread(app_config, baskerville_conf)
 
