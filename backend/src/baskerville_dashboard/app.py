@@ -40,6 +40,7 @@ KAFKA_CONSUMER_THREAD = None
 REDIS_HOST = os.environ.get('REDIS_HOST', '0.0.0.0')
 REDIS_PASS = os.environ.get('REDIS_PASS', '')
 REDIS_URL = f'redis://:{REDIS_PASS}@{REDIS_HOST}:6379'
+redis_instance = Redis(host=REDIS_HOST, password=REDIS_PASS)
 
 
 def import_db_models():
@@ -195,7 +196,7 @@ def create_app(config=None, environment=None):
     sm.set_session(Session)
     sm.set_engine(engine)
     app_config = config.get('APP_CONFIG')
-    app_config['SESSION_REDIS'] = Redis(host=REDIS_HOST, password=REDIS_PASS)
+    app_config['SESSION_REDIS'] = redis_instance.client()
     add_start_up_data(app_config, baskerville_conf)
     set_up_kafka_thread(app_config, baskerville_conf)
 
