@@ -40,7 +40,9 @@ ACTIVE_APPS = {}
 KAFKA_CONSUMER_THREAD = None
 REDIS_HOST = os.environ.get('REDIS_HOST', '0.0.0.0')
 REDIS_PASS = os.environ.get('REDIS_PASS', '')
-REDIS_URL = f'redis://:{REDIS_PASS}@{REDIS_HOST}:6379'
+if REDIS_PASS:
+    REDIS_PASS = f':{REDIS_PASS}@'
+REDIS_URL = f'redis://{REDIS_PASS}{REDIS_HOST}:6379'
 
 
 def import_db_models():
