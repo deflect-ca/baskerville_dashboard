@@ -319,15 +319,16 @@ def get_baskerville_config():
 
 def get_socket_io():
     from flask_socketio import SocketIO
+    from baskerville_dashboard.app import REDIS_URL
     try:
         return SocketIO(
-            message_queue='redis://0.0.0.0:6379',
+            message_queue=REDIS_URL,
             async_mode='threading'
         )
     except Exception:
         traceback.print_exc()
         return SocketIO(
-            message_queue='redis://0.0.0.0:6379',
+            message_queue=REDIS_URL,
             async_mode='eventlet'
         )
 

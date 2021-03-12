@@ -3,18 +3,18 @@
 #
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
-import asyncio
+import os
 import traceback
 import uuid
 
 import eventlet
-import uuid as uuid
+eventlet.monkey_patch()
+
 from baskerville_dashboard.auth import Auth
 from baskerville_dashboard.db.manager import SessionManager
 from baskerville.util.enums import UserCategoryEnum
 from baskerville_dashboard.utils.kafka import consume_from_kafka
 
-eventlet.monkey_patch()
 import atexit
 
 from baskerville.db import set_up_db
@@ -28,13 +28,16 @@ from flask_session import Session
 
 HOST = 'http://127.0.0.1:5000'
 client = None
-SECRET_KEY = "changeme"
 SESSION_TYPE = 'redis'
+SECRET_KEY = 'secret'
 engine = None
 limiter = None
 logger = get_logger(__name__)
 ACTIVE_APPS = {}
 KAFKA_CONSUMER_THREAD = None
+REDIS_HOST = os.environ.get('REDIS_HOST', '0.0.0.0')
+REDIS_PASS = os.environ.get('REDIS_PASS', '')
+REDIS_URL = f'redis://:{REDIS_PASS}@{REDIS_HOST}:6379'
 
 
 def import_db_models():
@@ -224,7 +227,7 @@ CORS(
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
-    message_queue='redis://0.0.0.0:6379',
+    message_queue=REDIS_URL,
     async_mode='eventlet', logger=True, engineio_logger=True
 )
 
