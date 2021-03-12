@@ -196,7 +196,7 @@ def create_app(config=None, environment=None):
     sm.set_session(Session)
     sm.set_engine(engine)
     app_config = config.get('APP_CONFIG')
-    app_config['SESSION_REDIS'] = redis_instance.client()
+    app_config['SESSION_REDIS'] = redis_instance
     add_start_up_data(app_config, baskerville_conf)
     set_up_kafka_thread(app_config, baskerville_conf)
 
