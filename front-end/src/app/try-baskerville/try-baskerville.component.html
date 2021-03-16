@@ -2,14 +2,14 @@
   <!--<app-try-menu></app-try-menu>-->
   <mat-vertical-stepper [linear]="false" #stepper>
     <mat-step>
-      <ng-template matStepLabel>Upload your logs or use the sample logs</ng-template>
+      <ng-template matStepLabel><a href="try-baskerville/#upload">Upload your logs or use the sample logs</a></ng-template>
       <app-upload [stepper]="stepper"></app-upload>
       <div>
         <button mat-button matStepperNext>Next</button>
       </div>
     </mat-step>
     <mat-step>
-      <ng-template matStepLabel>Baskerville output</ng-template>
+      <ng-template matStepLabel><a href="try-baskerville/#logs">Baskerville output</a></ng-template>
       <app-logs></app-logs>
       <!--<button mat-raised-button (click)="cancelRun()" id="cancel-run">Cancel</button>-->
       <div>
@@ -18,7 +18,7 @@
       </div>
     </mat-step>
     <mat-step>
-      <ng-template matStepLabel>Results</ng-template>
+      <ng-template matStepLabel><a href="try-baskerville/#results">Results</a></ng-template>
       <app-results></app-results>
       <button mat-button matStepperPrevious>Back</button>
     </mat-step>

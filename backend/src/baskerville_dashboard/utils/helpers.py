@@ -400,15 +400,17 @@ class SerializableContainer(Container, SerializableMixin):
     }
 
     def get_service_name(self):
-        return self.attrs['Config']['Labels']['com.docker.compose.service']
+        return self.attrs['Config']['Labels'].get(
+            'com.docker.compose.service', {}
+        )
 
-    def get_status_setails(self):
+    def get_status_details(self):
         return self.attrs['State']
 
     def to_dict(self, cols=()):
         d = {
             'service_name': self.get_service_name(),
-            'state_details': self.get_status_setails()
+            'state_details': self.get_status_details()
         }
         d.update({
             c: getattr(self, c) for c in dir(self)
