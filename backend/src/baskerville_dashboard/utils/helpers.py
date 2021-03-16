@@ -40,7 +40,7 @@ ALLOWED_EXTENSIONS = {'json', 'zip', 'gzip', 'tar'}
 COMPRESSION_EXTENSIONS = {'zip', 'gzip', 'tar'}
 REVERSE_LABELS = {e.name: e.value for e in LabelEnum}
 ALLOWED_COLS = [
-    'id', 'ip', 'target', 'target_original', 'start', 'stop',
+    'id', 'ip', 'uuid_request_set', 'target', 'target_original', 'start', 'stop',
     'num_requests', 'prediction', 'score'
 ]
 FILTER = {
@@ -461,11 +461,14 @@ def get_rss(
         data_dict = [{
             k: v for k, v in zip(ALLOWED_COLS, r)
         } for r in data]
+        # todo: join
         feedback = sm.session.query(Feedback)
         if not user.is_admin:
             feedback = feedback.filter(Feedback.id_user == user.id)
         feedback.filter(
-            Feedback.uuid_request_set.in_([d.uuid_request_set for d in data])).all()
+            Feedback.uuid_request_set.in_(
+                [d[ALLOWED_COLS.index('uuid_request_set')] for d in data])
+        ).all()
         feedback_to_rs = {f.uuid_request_set: f.feedback for f in feedback}
 
         if feedback_to_rs:

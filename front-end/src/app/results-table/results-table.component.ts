@@ -54,7 +54,6 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     ) {}
 
   ngOnInit(): void {
-    console.warn(this.router.url)
     this.resultsFeedback = this.router.url === '/feedback';
     this.dataSource = new ResultsTableDataSource();
     this.selection = new SelectionModel<RequestSet>(allowMultiSelect, initialSelection);
@@ -71,6 +70,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
         this.displayedColumns = data.data.length > 0 ? Object.keys(data.data[0]) : [];
         this.dataColumns = this.displayedColumns;
         if (this.dataColumns.length > 0){
+          this.dataColumns.splice(this.dataColumns.indexOf('feedback'), 1)
           this.displayedColumns = this.displayedColumns.concat(rightCols);
           this.displayedColumns.unshift('Select');
         }

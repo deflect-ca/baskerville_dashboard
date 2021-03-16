@@ -108,7 +108,7 @@ def get_all_results():
 
 @results_app.route('/results/<app_id>', methods=['POST'])
 @login_required
-def get_results(app_id):
+def get_results(app_id: str):
     from flask import session
     _q_filter = get_qparams(request)
     re = ResponseEnvelope()
@@ -120,6 +120,8 @@ def get_results(app_id):
     try:
         sm = SessionManager()
         org_uuid = session['org_uuid']
+        if app_id.startswith(org_uuid):
+            app_id = app_id.replace(f'{org_uuid}_', '', 1)
         ip_file_name = request.args.get('file')
         user = get_user_by_org_uuid(org_uuid)
         if not user:
@@ -128,15 +130,9 @@ def get_results(app_id):
             re.message = 'No user found'
             return response_jsonified(re, code)
         runtime_q = sm.session.query(Runtime)
-        app_data = get_active_app(app_id)
-        if not app_data:
-            runtime = runtime_q.filter(
-                Runtime.file_name.like(f'%{app_id}%')
-            ).first()
-        else:
-            runtime = runtime_q.filter_by(
-                file_name=app_data['file_path']
-            ).first()
+        runtime = runtime_q.filter(
+            Runtime.file_name.like(f'%{app_id}%')
+        ).first()
         if runtime:
             if ip_file_name:
                 ip_list = get_ip_list(ip_file_name, org_uuid)
