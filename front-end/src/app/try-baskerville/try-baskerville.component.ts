@@ -9,6 +9,10 @@ import {filter} from 'rxjs/operators';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {UserService} from '../_services/user.service';
 import {MatStepper} from '@angular/material/stepper';
+import {UploadComponent} from '../upload/upload.component';
+import {NotificationsComponent} from '../notifications/notifications.component';
+import {LogsComponent} from '../logs/logs.component';
+import {ResultsComponent} from '../results/results.component';
 
 @Component({
   selector: 'app-try-baskerville',
@@ -76,12 +80,23 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
       );
     }
   }
-
+  cancelRun(): void {
+    this.baskervilleSvc.cancelRun().subscribe(
+      (data: Envelop) => {
+        this.notificationSvc.showSnackBar(data.message);
+      },
+      error => {
+        console.error(error);
+        this.notificationSvc.showSnackBar(error.msg);
+      }
+    );
+  }
   setNotificationsForAppId(): void {
     this.activeAppId = this.baskervilleSvc.getActiveAppId();
     if (this.activeAppId) {
-      this.notificationSvc.getAppLog(this.activeAppId).subscribe(
+      this.notificationSvc.getAppLog(this.userSvc.getUser()?.uuid).subscribe(
         d => {
+          console.log(d)
           this.notificationSvc.addNotification(
             d,
             d.indexOf('ERROR') > -1 ? NotificationType.error : NotificationType.basic

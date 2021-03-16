@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {validFileSize} from '../_models/helpers';
 import {environment} from '../../environments/environment';
 import {Envelop, NotificationType} from '../_models/models';
@@ -13,6 +13,8 @@ import {UserService} from '../_services/user.service';
   styleUrls: ['./upload.component.css']
 })
 export class UploadComponent implements OnInit {
+  @Input() stepper;
+  name = 'upload';
   activeAppId = null;
   error: string = null;
   uploadResults: Envelop = null;
@@ -66,7 +68,7 @@ export class UploadComponent implements OnInit {
     );
   }
   startBaskerville(): any{
-    // stepper.next();
+    this.stepper.next();
     this.notificationSvc.showSnackBar(this.selectedFileName);
     this.baskervilleSvc.tryBaskerville(this.userSvc.getUser().uuid, this.selectedFileName).subscribe(
       d => {
@@ -77,7 +79,7 @@ export class UploadComponent implements OnInit {
         //
         this.notificationSvc.addNotification(results.message, NotificationType.success);
         this.notificationSvc.sendToSelf(this.activeAppId, 'Starting Baskerville...');
-        this.router.navigate(['try-baskerville', this.activeAppId]);
+        // this.router.navigate(['try-baskerville', this.activeAppId]);
         // this.setNotificationsForAppId();
       },
       e => {

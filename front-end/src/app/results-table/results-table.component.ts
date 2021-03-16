@@ -16,6 +16,7 @@ import {
 } from '../_models/models';
 import {NotificationService} from '../_services/notification.service';
 import {SelectionModel} from '@angular/cdk/collections';
+import {Router} from '@angular/router';
 
 const initialSelection = [];
 const allowMultiSelect = true;
@@ -40,6 +41,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
   unsure = Labels.unknown;
   allSelected = false;
   allInQSelected = false;
+  resultsFeedback = false;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = [];
@@ -48,9 +50,12 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
   constructor(
     private baskervilleSvc: BaskervilleService,
     private notificationSvc: NotificationService,
+    private router: Router
     ) {}
 
   ngOnInit(): void {
+    console.warn(this.router.url)
+    this.resultsFeedback = this.router.url === '/feedback';
     this.dataSource = new ResultsTableDataSource();
     this.selection = new SelectionModel<RequestSet>(allowMultiSelect, initialSelection);
     this.setData();
@@ -58,12 +63,16 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
   setData(): void {
     this.baskervilleSvc.resultsBehaviorSubj.subscribe(
       data => {
+        this.allSelected = false;
+        let rightCols = ['Result'];
+        if (this.resultsFeedback) {
+          rightCols.push('Feedback');
+        }
         this.displayedColumns = data.data.length > 0 ? Object.keys(data.data[0]) : [];
         this.dataColumns = this.displayedColumns;
         if (this.dataColumns.length > 0){
-          this.displayedColumns = this.displayedColumns.concat(['Result', 'Feedback']);
+          this.displayedColumns = this.displayedColumns.concat(rightCols);
           this.displayedColumns.unshift('Select');
-          // this.displayedColumns.splice(this.displayedColumns.indexOf('feedback'), 1);
         }
         this.dataSource.data = data.data as any;
         this.dataSource.pageSize = data.pageSize || 50;
@@ -233,6 +242,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
         this.notificationSvc.showSnackBar(envelop.message);
         this.baskervilleSvc.resultsBehaviorSubj.next(new Results(envelop.data));
         this.baskervilleSvc.inProgress = false;
+        this.allSelected = false;
       },
       e => {
         this.notificationSvc.showSnackBar(e.message);

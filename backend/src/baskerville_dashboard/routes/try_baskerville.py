@@ -35,10 +35,10 @@ def upload_temp_file():
     filename = 'test_data_1k.json'
     try:
         from baskerville_dashboard.app import app
-        client_uuid = session['org_uuid']
+        org_uuid = session['org_uuid']
         file_uuid = str(uuid.uuid4())
         temp_filename = f'{file_uuid}_{secure_filename(filename)}'
-        folder = os.path.join(app.config['UPLOAD_FOLDER'], client_uuid)
+        folder = os.path.join(app.config['UPLOAD_FOLDER'], org_uuid)
         full_path = os.path.join(folder, temp_filename)
         Path(folder).mkdir(parents=True, exist_ok=True)
         with open(os.path.join(get_default_data_path(), filename)) as f_temp:
@@ -46,14 +46,14 @@ def upload_temp_file():
                 f_upload.write(''.join(f_temp.readlines()))
         response.message = f'Sample logs uploaded successfully.'
         response.data = {
-            'org_uuid': client_uuid,
+            'org_uuid': org_uuid,
             'filename': temp_filename,
             'results': url_for(
                 'results_app.get_results',
-                app_id=file_uuid,
+                app_id=f'{org_uuid}_{temp_filename}',
             )
         }
-    except Exception as e:
+    except Exception:
         traceback.print_exc()
         response.message = 'Could not upload sample logs.'
         code = 500
@@ -77,10 +77,10 @@ def upload_file():
             return response_jsonified(response, code)
         if file and allowed_file(file.filename):
             from baskerville_dashboard.app import app
-            client_uuid = session['org_uuid']
+            org_uuid = session['org_uuid']
             file_uuid = str(uuid.uuid4())
             filename = f'{file_uuid}_{secure_filename(file.filename)}'
-            folder = os.path.join(app.config['UPLOAD_FOLDER'], client_uuid)
+            folder = os.path.join(app.config['UPLOAD_FOLDER'], org_uuid)
             full_path = os.path.join(folder, filename)
             Path(folder).mkdir(parents=True, exist_ok=True)
             file.save(full_path)
@@ -93,11 +93,11 @@ def upload_file():
 
             response.message = f'Logs uploaded successfully.'
             response.data = {
-                'org_uuid': client_uuid,
+                'org_uuid': org_uuid,
                 'filename': filename,
                 'results': url_for(
                     'results_app.get_results',
-                    app_id=file_uuid,
+                    app_id=f'{org_uuid}_{filename}',
                 )
             }
     except Exception as e:
@@ -145,6 +145,7 @@ def start_baskerville_for():
     config['engine']['raw_log']['paths'] = [spark_file_path]
     config['engine']['logpath'] = log_path
     config['engine']['id_client'] = org_uuid
+    config['spark']['app_name'] = app_name
     config_errors = validate_config(config)
 
     if config_errors:
@@ -169,7 +170,7 @@ def start_baskerville_for():
             from baskerville_dashboard.app import socketio
             t = ReadLogs(org_uuid, log_path)
 
-            ACTIVE_APPS[org_uuid] = {
+            ACTIVE_APPS[app_name] = {
                 'process': p,
                 'log_thread': t,
                 'file_path': full_path,
@@ -182,15 +183,15 @@ def start_baskerville_for():
             }
 
             # register(org_uuid)
-            ACTIVE_APPS[org_uuid]['process'].start()
-            ACTIVE_APPS[org_uuid]['log_thread'].start()
+            ACTIVE_APPS[app_name]['process'].start()
+            ACTIVE_APPS[app_name]['log_thread'].start()
             re.success = True
             re.message = f'Application {app_name} submitted successfully'
             re.data = {
                 'app_name': app_name,
-                'app_id': org_uuid
+                'app_id': app_name
             }
-            session['app_id'] = app_name
+            session['app_name'] = app_name
 
         except Exception as e:
             traceback.print_exc()
@@ -280,6 +281,28 @@ def app_details(app_id):
             details = app_data['details']
             details['running'] = app_data['process'].is_alive()
         respose.data = details
+    except Exception as e:
+        respose.success = False
+        respose.message = str(e)
+        code = 500
+        traceback.print_exc()
+    return response_jsonified(respose, code)
+
+
+@try_baskerville_app.route('/try/app/<app_id>/cancel', methods=['GET'])
+@login_required
+def cancel_app(app_id):
+    code = 200
+    respose = ResponseEnvelope()
+    try:
+        app_data = get_active_app(app_id)
+        respose.success = True
+        respose.message = f'The data for app_id: {app_id}'
+        if app_data:
+            if app_data['process'].is_alive():
+                app_data['process'].terminate()
+                app_data['process'].join()
+                respose.data = f'Successfully stopped Baskerville for {app_id}'
     except Exception as e:
         respose.success = False
         respose.message = str(e)

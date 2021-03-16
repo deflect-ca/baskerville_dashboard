@@ -14,6 +14,7 @@ import {environment} from '../../environments/environment';
   styleUrls: ['./results.component.css']
 })
 export class ResultsComponent implements OnInit, AfterViewInit{
+  name = 'results';
   envelop: Envelop = null;
   rsFilter: RequestSetFilter;
   currentId = '';

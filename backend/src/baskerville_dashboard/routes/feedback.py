@@ -5,7 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 import traceback
 
-from baskerville.util.enums import FeedbackContextTypeEnum
+from baskerville.util.enums import FeedbackContextTypeEnum, LabelEnum
 from baskerville_dashboard.auth import login_required
 from baskerville_dashboard.db.manager import SessionManager
 from baskerville.db.dashboard_models import Feedback, FeedbackContext
@@ -222,7 +222,7 @@ def set_feedback_for(context_id, rs_id, feedback_str):
         feedback.low_rate = request.get_json().get('lowRate')
         feedback.features = rs.features
         feedback.score = rs.score
-        feedback.attack_prediction = rs.attack_prediction or 42
+        feedback.attack_prediction = rs.attack_prediction or LabelEnum.unknown
         feedback.feedback = feedback_str
         if not updated:
             sm.session.add(feedback)

@@ -1,4 +1,8 @@
 .try-menu {
   margin: 3px;
+  background-color: #2196f3;
+  position: fixed;
+  top: 50px;
+  left: 300px;
 }
 

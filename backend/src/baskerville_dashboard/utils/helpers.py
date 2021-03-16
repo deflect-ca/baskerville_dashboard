@@ -12,7 +12,7 @@ from baskerville_dashboard.utils.kafka import get_kafka_producer
 from docker.errors import DockerException
 
 
-from baskerville.db.dashboard_models import User, Organization
+from baskerville.db.dashboard_models import User, Organization, Feedback
 from baskerville.models.config import KafkaConfig
 from baskerville.util.enums import FeedbackEnum
 from baskerville_dashboard.vm.feedback_vm import FeedbackVM
@@ -204,7 +204,7 @@ def follow_file(file_path, timeout=150):
                 if not_line > timeout:
                     break
                 not_line += 1
-                time.sleep(0.1)  # Sleep briefly
+                time.sleep(1)  # Sleep briefly
                 continue
             not_line = 0
             yield line
@@ -349,10 +349,11 @@ class ReadLogs(Thread):
 
     def follow(self):
         import time
-        line = '-- not started --'
+        line = '-- waiting...'
         while not os.path.exists(self.full_path):
+            self.socketio.emit(self.org_uuid, line)
             time.sleep(1)
-        for line in follow_file(self.full_path, timeout=200):
+        for line in follow_file(self.full_path, timeout=300):
             self.socketio.emit(self.org_uuid, line)
 
         self.socketio.emit(self.org_uuid, '--end--')
@@ -460,16 +461,16 @@ def get_rss(
         data_dict = [{
             k: v for k, v in zip(ALLOWED_COLS, r)
         } for r in data]
-        # feedback = sm.session.query(Feedback)
-        # if not user.is_admin:
-        #     feedback = feedback.filter(Feedback.id_user == user.uuid)
-        # feedback.filter(
-        #     Feedback.uuid_request_set.in_([d.uuid_request_set for d in data])).all()
-        # feedback_to_rs = {f.uuid_request_set: f.feedback for f in feedback}
-        #
-        # if feedback_to_rs:
-        #     for rs in data_dict:
-        #         rs['feedback'] = str(feedback_to_rs.get(rs['id']))
+        feedback = sm.session.query(Feedback)
+        if not user.is_admin:
+            feedback = feedback.filter(Feedback.id_user == user.id)
+        feedback.filter(
+            Feedback.uuid_request_set.in_([d.uuid_request_set for d in data])).all()
+        feedback_to_rs = {f.uuid_request_set: f.feedback for f in feedback}
+
+        if feedback_to_rs:
+            for rs in data_dict:
+                rs['feedback'] = str(feedback_to_rs.get(rs['id']))
 
         # todo: model:
         return {
