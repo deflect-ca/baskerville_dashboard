@@ -293,8 +293,6 @@ def start_local_baskerville(config, pipeline, **kwargs):
     try:
         for k, v in kwargs.items():
             os.environ[k] = f'{v}'
-        config['database']['username'] = 'postgres'
-        config['database']['password'] = 'secret'
         baskerville_engine = BaskervilleAnalyticsEngine(
             pipeline,
             config
