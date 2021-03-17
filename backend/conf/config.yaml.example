@@ -16,3 +16,10 @@ APP_CONFIG:
   KAFKA_TOPICS:
     - 'test.feedback'       # where test is the uuid of your organization, as provided to you by eq. It should be present in baskerville config.
     - 'test.registration'   # you can use environment variables like: - !ENV '${ORG_UUID}.registration'
+
+USERS:
+  - user:
+    username: 'someusername'
+    password: 'somepass1$'
+    category: 'User'
+    organization: 'test'

@@ -141,6 +141,37 @@ def add_admin_user(config, session, baskerville_config):
         traceback.print_exc()
 
 
+def add_extra_users(config, session):
+    from baskerville.db.dashboard_models import User, UserCategory, Organization
+    org = session.query(Organization).filter_by(name='Guest Org.').first()
+    category = session.query(UserCategory).filter_by(
+            category=str(UserCategoryEnum.user)
+        ).first()
+    new_user = False
+    try:
+        for u in config.get('USERS'):
+            print(u)
+            user = session.query(User).filter_by(username=u['username']).first()
+            if not user:
+                user = User()
+                new_user = True
+            user.username = u['username']
+            user.email = u.get('email', f'{user.username}@email')
+            user.password_hash = user.hash_password(u['password'])
+            user.is_active = True
+            user.is_admin = False
+            user.id_organization = user.id_organization or org.id
+            user.organization = org
+            user.id_category = category.id
+            user.category = category
+            if new_user:
+                session.add(user)
+            session.commit()
+    except Exception:
+        session.rollback()
+        traceback.print_exc()
+
+
 def add_user_categories(session):
     from baskerville.db.dashboard_models import UserCategory
     for attr in dir(UserCategoryEnum):
@@ -201,6 +232,7 @@ def create_app(config=None, environment=None):
     app.config['SESSION_REDIS'] = redis.from_url(REDIS_URL)
     add_start_up_data(app_config, baskerville_conf)
     set_up_kafka_thread(app_config, baskerville_conf)
+    add_extra_users(config, sm.session)
 
     from baskerville_dashboard.routes.feedback import feedback_app
     from baskerville_dashboard.routes.stats import stats_app
