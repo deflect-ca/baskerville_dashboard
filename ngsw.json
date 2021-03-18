@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1616081787923,
+  "timestamp": 1616082148996,
   "index": "baskerville_dashboard/index.html",
   "assetGroups": [
     {
@@ -13,8 +13,8 @@
       "urls": [
         "baskerville_dashboard/favicon.ico",
         "baskerville_dashboard/index.html",
-        "baskerville_dashboard/main-es2015.92e59765918bcbdf6344.js",
-        "baskerville_dashboard/main-es5.92e59765918bcbdf6344.js",
+        "baskerville_dashboard/main-es2015.44e25c4eed7ed582a6d5.js",
+        "baskerville_dashboard/main-es5.44e25c4eed7ed582a6d5.js",
         "baskerville_dashboard/manifest.webmanifest",
         "baskerville_dashboard/polyfills-es2015.0de07fbd362f6ad17652.js",
         "baskerville_dashboard/polyfills-es5.cc053d1adec1969fb935.js",
@@ -69,9 +69,9 @@
     "baskerville_dashboard/assets/icons/icon-96x96.png": "3914125a4b445bf111c5627875fc190f560daa41",
     "baskerville_dashboard/assets/icons/icons8-bot-100.png": "d2b965091b2e2fa8eefe0271b9d5b5eb477f0d22",
     "baskerville_dashboard/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "baskerville_dashboard/index.html": "b96f036956d4bfa0ca51ff56e783b89cfb60084b",
-    "baskerville_dashboard/main-es2015.92e59765918bcbdf6344.js": "10bdb4f13ff4cc8fba6d760b7eaa0ba7fbc1fea3",
-    "baskerville_dashboard/main-es5.92e59765918bcbdf6344.js": "828771129e61bee418c7dedd69a475a7e869dd78",
+    "baskerville_dashboard/index.html": "16bd987e6b23fdc54b10b908ad627e6ff84bf648",
+    "baskerville_dashboard/main-es2015.44e25c4eed7ed582a6d5.js": "f719c6a5c26ab341de03fc804177dc6f73f28eeb",
+    "baskerville_dashboard/main-es5.44e25c4eed7ed582a6d5.js": "19711d4b4ef2e7118224d4bd16603cc4ac93fd68",
     "baskerville_dashboard/manifest.webmanifest": "42e07fc7d33bce0fb247a20f123b0d42f6c729f0",
     "baskerville_dashboard/polyfills-es2015.0de07fbd362f6ad17652.js": "df01fd39b1d299d9a14dd4c049aa9933d8d06a45",
     "baskerville_dashboard/polyfills-es5.cc053d1adec1969fb935.js": "7283bd0e09ccb15d3a9ee172e3cf1fe7c66eaa4e",
