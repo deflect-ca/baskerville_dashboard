@@ -24,7 +24,7 @@
       <a routerLink="/users" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Users</a>
     </div>
   </mat-grid-tile>
-  <mat-grid-tile *ngIf="userIsAdmin() or !userIsGuest()">
+  <mat-grid-tile *ngIf="!userIsGuest()">
     <div class="card-menu card-small" tabindex="5" routerLink="/stats" routerLinkActive="active">
       <a routerLink="/stats" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Stats</a>
     </div>
