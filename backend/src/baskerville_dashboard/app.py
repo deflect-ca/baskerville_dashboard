@@ -3,18 +3,21 @@
 #
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
-import asyncio
+import os
 import traceback
 import uuid
 
 import eventlet
-import uuid as uuid
+import redis
+from redis import Redis
+
+eventlet.monkey_patch()
+
 from baskerville_dashboard.auth import Auth
 from baskerville_dashboard.db.manager import SessionManager
 from baskerville.util.enums import UserCategoryEnum
 from baskerville_dashboard.utils.kafka import consume_from_kafka
 
-eventlet.monkey_patch()
 import atexit
 
 from baskerville.db import set_up_db
@@ -28,13 +31,18 @@ from flask_session import Session
 
 HOST = 'http://127.0.0.1:5000'
 client = None
-SECRET_KEY = "changeme"
 SESSION_TYPE = 'redis'
+SECRET_KEY = 'secret'
 engine = None
 limiter = None
 logger = get_logger(__name__)
 ACTIVE_APPS = {}
 KAFKA_CONSUMER_THREAD = None
+REDIS_HOST = os.environ.get('REDIS_HOST', '0.0.0.0')
+REDIS_PASS = os.environ.get('REDIS_PASS', '')
+if REDIS_PASS:
+    REDIS_PASS = f':{REDIS_PASS}@'
+REDIS_URL = f'redis://{REDIS_PASS}{REDIS_HOST}:6379'
 
 
 def import_db_models():
@@ -133,6 +141,37 @@ def add_admin_user(config, session, baskerville_config):
         traceback.print_exc()
 
 
+def add_extra_users(config, session):
+    from baskerville.db.dashboard_models import User, UserCategory, Organization
+    org = session.query(Organization).filter_by(name='Guest Org.').first()
+    category = session.query(UserCategory).filter_by(
+            category=str(UserCategoryEnum.user)
+        ).first()
+    new_user = False
+    try:
+        for u in config.get('USERS'):
+            print(u)
+            user = session.query(User).filter_by(username=u['username']).first()
+            if not user:
+                user = User()
+                new_user = True
+            user.username = u['username']
+            user.email = u.get('email', f'{user.username}@email')
+            user.password_hash = user.hash_password(u['password'])
+            user.is_active = True
+            user.is_admin = False
+            user.id_organization = user.id_organization or org.id
+            user.organization = org
+            user.id_category = category.id
+            user.category = category
+            if new_user:
+                session.add(user)
+            session.commit()
+    except Exception:
+        session.rollback()
+        traceback.print_exc()
+
+
 def add_user_categories(session):
     from baskerville.db.dashboard_models import UserCategory
     for attr in dir(UserCategoryEnum):
@@ -190,8 +229,10 @@ def create_app(config=None, environment=None):
     sm.set_session(Session)
     sm.set_engine(engine)
     app_config = config.get('APP_CONFIG')
+    app.config['SESSION_REDIS'] = redis.from_url(REDIS_URL)
     add_start_up_data(app_config, baskerville_conf)
     set_up_kafka_thread(app_config, baskerville_conf)
+    add_extra_users(config, sm.session)
 
     from baskerville_dashboard.routes.feedback import feedback_app
     from baskerville_dashboard.routes.stats import stats_app
@@ -224,7 +265,7 @@ CORS(
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
-    message_queue='redis://0.0.0.0:6379',
+    message_queue=REDIS_URL,
     async_mode='eventlet', logger=True, engineio_logger=True
 )
 

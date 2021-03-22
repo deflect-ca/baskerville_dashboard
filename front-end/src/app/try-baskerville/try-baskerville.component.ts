@@ -9,6 +9,10 @@ import {filter} from 'rxjs/operators';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {UserService} from '../_services/user.service';
 import {MatStepper} from '@angular/material/stepper';
+import {UploadComponent} from '../upload/upload.component';
+import {NotificationsComponent} from '../notifications/notifications.component';
+import {LogsComponent} from '../logs/logs.component';
+import {ResultsComponent} from '../results/results.component';
 
 @Component({
   selector: 'app-try-baskerville',
@@ -25,7 +29,11 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
   browserRefresh = false;
   uploadFileFormGroup: FormGroup;
   getLogsFormGroup: FormGroup;
-
+  stepToFragment = {
+    upload: 0,
+    logs: 1,
+    results: 2,
+  };
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -66,7 +74,7 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
     if (this.activeAppId) {
       this.baskervilleSvc.getAppStatus().subscribe(
         d => {
-          const running = d.data?.running === true
+          const running = d.data?.running === true;
           this.baskervilleSvc.setInProgress(running);
           this.notificationSvc.showSnackBar(`App ${this.baskervilleSvc.activeAppId} is currently ${running ? '' : 'NOT'} running`);
           },
@@ -75,12 +83,27 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
         }
       );
     }
+    this.route.fragment.subscribe(
+      (fragments) => {
+        this.stepper.selectedIndex = this.stepToFragment[fragments];
+      }
+    );
   }
-
+  cancelRun(): void {
+    this.baskervilleSvc.cancelRun().subscribe(
+      (data: Envelop) => {
+        this.notificationSvc.showSnackBar(data.message);
+      },
+      error => {
+        console.error(error);
+        this.notificationSvc.showSnackBar(error.msg);
+      }
+    );
+  }
   setNotificationsForAppId(): void {
     this.activeAppId = this.baskervilleSvc.getActiveAppId();
     if (this.activeAppId) {
-      this.notificationSvc.getAppLog(this.activeAppId).subscribe(
+      this.notificationSvc.getAppLog(this.userSvc.getUser()?.uuid).subscribe(
         d => {
           this.notificationSvc.addNotification(
             d,

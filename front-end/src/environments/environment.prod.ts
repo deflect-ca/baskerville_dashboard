@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  baseApiUrl: `'${process.env.API_BASE_URL}'/api/1`,
-  socketUrl: `${process.env.API_BASE_URL}`,
+  baseApiUrl: 'http://127.0.0.1:5000/api/1',
+  socketUrl: 'http://127.0.0.1:5000',
   maxFileSize: 50,
   submitMethod: 'local'
 };

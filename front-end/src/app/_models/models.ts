@@ -19,7 +19,6 @@ export class User {
 
   constructor(options?: any) {
     options = JSONCamelCase.convert(options) || {};
-    console.info('Options after', options);
     this.id = options.id || null;
     this.username = options.username || null;
     this.email = options.email || null;

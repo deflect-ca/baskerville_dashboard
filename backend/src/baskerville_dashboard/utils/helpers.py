@@ -12,7 +12,7 @@ from baskerville_dashboard.utils.kafka import get_kafka_producer
 from docker.errors import DockerException
 
 
-from baskerville.db.dashboard_models import User, Organization
+from baskerville.db.dashboard_models import User, Organization, Feedback
 from baskerville.models.config import KafkaConfig
 from baskerville.util.enums import FeedbackEnum
 from baskerville_dashboard.vm.feedback_vm import FeedbackVM
@@ -40,7 +40,7 @@ ALLOWED_EXTENSIONS = {'json', 'zip', 'gzip', 'tar'}
 COMPRESSION_EXTENSIONS = {'zip', 'gzip', 'tar'}
 REVERSE_LABELS = {e.name: e.value for e in LabelEnum}
 ALLOWED_COLS = [
-    'id', 'ip', 'target', 'target_original', 'start', 'stop',
+    'id', 'ip', 'uuid_request_set', 'target', 'target_original', 'start', 'stop',
     'num_requests', 'prediction', 'score'
 ]
 FILTER = {
@@ -204,7 +204,7 @@ def follow_file(file_path, timeout=150):
                 if not_line > timeout:
                     break
                 not_line += 1
-                time.sleep(0.1)  # Sleep briefly
+                time.sleep(1)  # Sleep briefly
                 continue
             not_line = 0
             yield line
@@ -293,8 +293,6 @@ def start_local_baskerville(config, pipeline, **kwargs):
     try:
         for k, v in kwargs.items():
             os.environ[k] = f'{v}'
-        config['database']['username'] = 'postgres'
-        config['database']['password'] = 'secret'
         baskerville_engine = BaskervilleAnalyticsEngine(
             pipeline,
             config
@@ -319,15 +317,16 @@ def get_baskerville_config():
 
 def get_socket_io():
     from flask_socketio import SocketIO
+    from baskerville_dashboard.app import REDIS_URL
     try:
         return SocketIO(
-            message_queue='redis://0.0.0.0:6379',
+            message_queue=REDIS_URL,
             async_mode='threading'
         )
     except Exception:
         traceback.print_exc()
         return SocketIO(
-            message_queue='redis://0.0.0.0:6379',
+            message_queue=REDIS_URL,
             async_mode='eventlet'
         )
 
@@ -348,10 +347,11 @@ class ReadLogs(Thread):
 
     def follow(self):
         import time
-        line = '-- not started --'
+        line = '-- waiting...'
         while not os.path.exists(self.full_path):
+            self.socketio.emit(self.org_uuid, line)
             time.sleep(1)
-        for line in follow_file(self.full_path, timeout=200):
+        for line in follow_file(self.full_path, timeout=300):
             self.socketio.emit(self.org_uuid, line)
 
         self.socketio.emit(self.org_uuid, '--end--')
@@ -398,15 +398,17 @@ class SerializableContainer(Container, SerializableMixin):
     }
 
     def get_service_name(self):
-        return self.attrs['Config']['Labels']['com.docker.compose.service']
+        return self.attrs['Config']['Labels'].get(
+            'com.docker.compose.service', {}
+        )
 
-    def get_status_setails(self):
+    def get_status_details(self):
         return self.attrs['State']
 
     def to_dict(self, cols=()):
         d = {
             'service_name': self.get_service_name(),
-            'state_details': self.get_status_setails()
+            'state_details': self.get_status_details()
         }
         d.update({
             c: getattr(self, c) for c in dir(self)
@@ -459,16 +461,19 @@ def get_rss(
         data_dict = [{
             k: v for k, v in zip(ALLOWED_COLS, r)
         } for r in data]
-        # feedback = sm.session.query(Feedback)
-        # if not user.is_admin:
-        #     feedback = feedback.filter(Feedback.id_user == user.uuid)
-        # feedback.filter(
-        #     Feedback.uuid_request_set.in_([d.uuid_request_set for d in data])).all()
-        # feedback_to_rs = {f.uuid_request_set: f.feedback for f in feedback}
-        #
-        # if feedback_to_rs:
-        #     for rs in data_dict:
-        #         rs['feedback'] = str(feedback_to_rs.get(rs['id']))
+        # todo: join
+        feedback = sm.session.query(Feedback)
+        if not user.is_admin:
+            feedback = feedback.filter(Feedback.id_user == user.id)
+        feedback.filter(
+            Feedback.uuid_request_set.in_(
+                [d[ALLOWED_COLS.index('uuid_request_set')] for d in data])
+        ).all()
+        feedback_to_rs = {f.uuid_request_set: f.feedback for f in feedback}
+
+        if feedback_to_rs:
+            for rs in data_dict:
+                rs['feedback'] = str(feedback_to_rs.get(rs['id']))
 
         # todo: model:
         return {

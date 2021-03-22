@@ -1,40 +1,25 @@
-<!--<div class="try-baskerville">
+<div class="try-baskerville">
   <mat-vertical-stepper [linear]="false" #stepper>
-    <mat-step [stepControl]="uploadFileFormGroup">
-      <form [formGroup]="uploadFileFormGroup">
-        <ng-template matStepLabel>Upload your logs <br><mat-hint>Max size 50MB</mat-hint></ng-template>
-        <input #fileInput type="file" formControlName="fileInput" (change)="handleFileInput($event.target.files)" accept="application/json,.zip,.gzip,.tar,">
-
-        <p>
-          <label class="red" *ngIf="error">{{error}}</label>
-        </p>
-          <button mat-raised-button matStepperNext (click)="startBaskerville(stepper)" [disabled]="!selectedFileName" color="primary">START BASKERVILLE</button>
-
-      </form>
+    <mat-step id="upload">
+      <ng-template matStepLabel><a href="try-baskerville/#upload">Upload your logs or use the sample logs</a></ng-template>
+      <app-upload [stepper]="stepper"></app-upload>
+      <div>
+        <button mat-button matStepperNext>Next</button>
+      </div>
     </mat-step>
-    <mat-step [stepControl]="getLogsFormGroup">
-      <ng-template matStepLabel>Running Baskerville...</ng-template>
-      <app-notifications></app-notifications>
+    <mat-step id="logs">
+      <ng-template matStepLabel><a href="try-baskerville/#logs">Baskerville output</a></ng-template>
+      <app-logs></app-logs>
+      <!--<button mat-raised-button (click)="cancelRun()" id="cancel-run">Cancel</button>-->
       <div>
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button matStepperNext>Next</button>
-        &lt;!&ndash;<button mat-button (click)="stepper.reset()">Reset</button>&ndash;&gt;
       </div>
     </mat-step>
-    <mat-step>
-      <ng-template matStepLabel>Done</ng-template>
-      <p>Your results can be found <a [routerLink]="['/results', activeAppId]">here</a></p>
-      <div>
-        <button mat-button matStepperPrevious>Back</button>
-
-      </div>
+    <mat-step id="results">
+      <ng-template matStepLabel><a href="try-baskerville/#results">Results</a></ng-template>
+      <app-results></app-results>
+      <button mat-button matStepperPrevious>Back</button>
     </mat-step>
   </mat-vertical-stepper>
-</div>-->
-
-<mat-card class="logs mat-elevation-z5">
-  <mat-card-title>Running Baskerville...</mat-card-title>
-  <mat-card-content>
-    <app-notifications></app-notifications>
-  </mat-card-content>
-</mat-card>
+</div>

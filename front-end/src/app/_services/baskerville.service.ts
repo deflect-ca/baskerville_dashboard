@@ -25,6 +25,12 @@ export class BaskervilleService {
     // this.setInProgress(this.activeAppId !== null);
   }
 
+  cancelRun(): Observable<object> {
+    return this.http.post(
+      environment.baseApiUrl + `/try/app/${this.getActiveAppId()}/cancel`,
+      {}
+      );
+  }
   uploadLogs(files: FileList): Observable<object> {
     const formData: FormData = new FormData();
     formData.append('file',  files[0], files[0].name);

@@ -118,8 +118,11 @@ class Auth(object):
         password = data.get('password', '')
         user = self.session.query(User).filter_by(email=email).first()
         if user is None:
-            msg.message = "Invalid username/ password"
-            return json.dumps(msg.to_dict()), 401
+            # todo: change default variable name
+            user = self.session.query(User).filter_by(username=email).first()
+            if user is None:
+                msg.message = "Invalid username/ password"
+                return json.dumps(msg.to_dict()), 401
         # check_password_hash(user.password_hash, password)
         if not user.is_active:
             msg.message = "Account deactivated. Please, contact the admins."

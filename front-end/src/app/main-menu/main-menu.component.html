@@ -1,7 +1,6 @@
 <mat-grid-list cols="1" rowHeight="4:1">
-  <mat-grid-tile  *ngIf="userIsGuest() || userIsAdmin()">
-    <div class="card-menu card-small" tabindex="0" routerLink="/upload" routerLinkActive="active">
-      <!--<span matBadge="1" matBadgePosition="before" matBadgeOverlap="false" matBadgeSize="medium">&nbsp;</span>-->
+  <mat-grid-tile>
+    <div class="card-menu card-small" tabindex="0" routerLink="/try-baskerville" routerLinkActive="active">
       <a routerLink="/try" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}" >Try Baskerville</a>
     </div>
   </mat-grid-tile>
@@ -25,12 +24,12 @@
       <a routerLink="/users" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Users</a>
     </div>
   </mat-grid-tile>
-  <mat-grid-tile *ngIf="userIsAdmin()">
+  <mat-grid-tile *ngIf="!userIsGuest()">
     <div class="card-menu card-small" tabindex="5" routerLink="/stats" routerLinkActive="active">
       <a routerLink="/stats" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Stats</a>
     </div>
   </mat-grid-tile>
-  <mat-grid-tile *ngIf="!userIsGuest()">
+  <mat-grid-tile>
     <div class="card-menu card-small" tabindex="6" routerLink="/feedback" routerLinkActive="active">
       <a routerLink="/feedback" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Feedback</a>
     </div>

@@ -33,6 +33,15 @@ def stats():
         rs_benign_count = sm.session.query(RequestSet).filter(
             RequestSet.prediction == LabelEnum.benign.value
         ).count()
+        false_positives = sm.session.query(RequestSet).filter(
+            RequestSet.challenged == 1
+        ).filter(RequestSet.challenge_passed == 1).count()
+        true_positives = sm.session.query(RequestSet).filter(
+            RequestSet.challenged == 1
+        ).filter(RequestSet.challenge_passed == 0).count()
+        rs_benign_count = sm.session.query(RequestSet).filter(
+            RequestSet.prediction == LabelEnum.benign.value
+        ).count()
         banjax_rs_sync = sm.session.query(RequestSet).filter(
             RequestSet.id_banjax != None
         ).count()
@@ -47,12 +56,14 @@ def stats():
         data = OrderedDict([
             ('# of request sets in the database', rs_count),
             ('# of runtimes in the database', runtimes_count),
+            ('# of false positives', false_positives),
+            ('# of true positives', true_positives),
             ('# of request sets labeled as malicious', rs_malicious_count),
             ('# of request sets labeled as benign', rs_benign_count),
             ('# of request sets that have been cross-referenced with Banjax bans', banjax_rs_sync),
             ('# of synced Banjax bans', banjax_sync),
-            ('Correct predictions according to Banjax results', f'{banjax_rs_common} / {banjax_rs_sync}'),
-            ('Curernt accuracy (Banjax)', f'{current_accuracy}%')
+            # ('Correct predictions according to Banjax results', f'{banjax_rs_common} / {banjax_rs_sync}'),
+            # ('Curernt accuracy (Banjax)', f'{current_accuracy}%')
         ])
         response.success = True
         response.message = 'General Stats'

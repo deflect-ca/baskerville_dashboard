@@ -11,7 +11,7 @@
   <table mat-table class="full-width-table" matSort  matSortDisableClear matSortDirection="desc" aria-label="Elements"  multiTemplateDataRows [dataSource]="dataSource.data">
     <ng-container matColumnDef="Select" *ngIf="dataSource.data.length > 0">
       <th mat-header-cell *matHeaderCellDef>
-        <input id="masterToggle" type="checkbox" (change)="masterToggle()">
+        <input id="masterToggle" type="checkbox" (change)="masterToggle()" [checked]="allSelected">
         <div *ngIf="isAllSelected()">
           <button mat-icon-button color="primary" (click)="sendPositiveFeedback(row)"><mat-icon aria-hidden="false" aria-label="correct" title="Correct">check</mat-icon></button>
           <button mat-icon-button color="warn" (click)="sendNegativeFeedback(row)"><mat-icon aria-hidden="false" aria-label="incorrect" title="Incorrect">close</mat-icon></button>

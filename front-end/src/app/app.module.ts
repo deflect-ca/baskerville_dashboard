@@ -90,12 +90,7 @@ const appRoutes: Routes = [
     data: { title: 'Try Baskerville' },
     canActivate: [AuthGuard]
   }, {
-    path: 'components',
-    component: ComponentManagementComponent,
-    data: { title: 'Component Management' },
-    canActivate: [AuthGuard]
-  }, {
-    path: 'upload',
+    path: 'try-baskerville/upload',
     component: UploadComponent,
     data: { title: 'Upload Logs' },
     canActivate: [AuthGuard]
@@ -105,14 +100,14 @@ const appRoutes: Routes = [
     data: { title: 'Try Baskerville' },
     canActivate: [AuthGuard]
   }, {
-    path: 'label-attacks',
-    component: LabelAttacksComponent,
-    data: { title: 'Label Attacks' },
+    path: 'try-baskerville/results/:id',
+    component: ResultsComponent,
+    data: { title: 'Results' },
     canActivate: [AuthGuard]
   }, {
-    path: 'feedback',
-    component: FeedbackComponent,
-    data: { title: 'Feedback' },
+    path: 'try-baskerville/results',
+    component: ResultsComponent,
+    data: { title: 'Results' },
     canActivate: [AuthGuard]
   }, {
     path: 'results/:id',
@@ -125,6 +120,21 @@ const appRoutes: Routes = [
     data: { title: 'Results' },
     canActivate: [AuthGuard]
   }, {
+    path: 'components',
+    component: ComponentManagementComponent,
+    data: { title: 'Component Management' },
+    canActivate: [AuthGuard]
+  }, {
+    path: 'label-attacks',
+    component: LabelAttacksComponent,
+    data: { title: 'Label Attacks' },
+    canActivate: [AuthGuard]
+  }, {
+    path: 'feedback',
+    component: FeedbackComponent,
+    data: { title: 'Feedback' },
+    canActivate: [AuthGuard]
+  },{
     path: 'pipelines',
     component: PipelinesComponent,
     data: { title: 'Pipelines' },
