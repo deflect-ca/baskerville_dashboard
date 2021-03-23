@@ -120,6 +120,12 @@ export class BaskervilleService {
   loadConfig(pipelineName: string): any {
     return this.http.get(environment.baseApiUrl + `/pipeline/config/${pipelineName}`);
   }
+  retrain(config: string): any {
+    const data = {
+      config
+    };
+    return this.http.post(environment.baseApiUrl + '/retrain', data);
+  }
   sendFeedback(feedback, rsId, lowRate?): any {
     lowRate = lowRate || false;
     const body = {

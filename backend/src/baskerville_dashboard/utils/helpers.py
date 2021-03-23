@@ -3,7 +3,11 @@
 #
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
+from datetime import datetime
+
 import eventlet
+from baskerville_dashboard.vm.retrain_vm import RetrainVm
+
 eventlet.monkey_patch()
 import json
 import re
@@ -13,7 +17,7 @@ from docker.errors import DockerException
 
 
 from baskerville.db.dashboard_models import User, Organization, Feedback
-from baskerville.models.config import KafkaConfig
+from baskerville.models.config import KafkaConfig, TrainingConfig
 from baskerville.util.enums import FeedbackEnum
 from baskerville_dashboard.vm.feedback_vm import FeedbackVM
 from docker.models.containers import Container
@@ -120,6 +124,10 @@ def get_baskerville_config_path():
     # return os.path.join(get_default_conf_path(), 'baskerville_conf.yaml')
 
 
+def get_training_config_path():
+    return os.path.join(get_default_data_path(), 'training_config.sample.yaml')
+
+
 def get_current_baskerville_config():
     return parse_config(
         get_baskerville_config_path()
@@ -170,13 +178,6 @@ def submit_feedback_vm(feedback_vm: FeedbackVM):
     return True
 
 
-# def update_feedback_context():
-#     from flask import session
-#     from baskerville_dashboard.utils.helpers import get_socket_io
-#     socket_io = get_socket_io()
-#     socket_io.emit(session['org_uuid'], 'Feedback submitted successfully')
-
-
 def submit_feedback_one_by_one(feedback_list):
     try:
         kafka_config = get_current_baskerville_config().get('kafka')
@@ -192,6 +193,32 @@ def submit_feedback_one_by_one(feedback_list):
         return False
     return True
 
+
+def submit_training(retrain_vm: RetrainVm, retrain_topic='retrain'):
+    from kafka.errors import KafkaError
+    try:
+        kafka_config = KafkaConfig(
+            get_current_baskerville_config().get('kafka')
+        ).validate()
+        publisher = get_kafka_producer(kafka_config)
+        publisher.send(
+            retrain_topic,
+            bytes(
+                json.dumps(
+                    retrain_vm.to_dict(), default=str
+                ).encode('utf-8')
+            )
+        )
+        publisher.flush()
+        return True
+    except KafkaError as ke:
+        traceback.print_exc()
+        if isinstance(ke, NoBrokersAvailable):
+            raise ke
+    except Exception:
+        traceback.print_exc()
+        return False
+    return True
 
 def follow_file(file_path, timeout=150):
     not_line = 0

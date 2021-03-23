@@ -1,0 +1,53 @@
+training:
+    model: 'baskerville.models.anomaly_model.AnomalyModel'
+    data_parameters:
+      #training_days: 30
+      from_date: '2020-11-11 00:00:00'
+      to_date: '2020-11-11 00:10:00'
+      max_samples_per_host: 5000
+    model_parameters:
+      threshold: 0.45
+      max_samples: 1000
+      #contamination: 0.1
+      num_trees: 300
+      max_depth: 10
+      max_features: 1.0
+      #approximate_quantile_relative_error: 0.4
+      features:
+        - host
+        - country
+        - host_country
+        - request_rate
+        - css_to_html_ratio
+        - image_to_html_ratio
+        - js_to_html_ratio
+        # - minutes_total
+        - path_depth_average
+        - path_depth_variance
+        - payload_size_average
+        - payload_size_log_average
+        - request_interval_average
+        - request_interval_variance
+        # - request_total
+        - response4xx_to_request_ratio
+        - top_page_to_request_ratio
+        - unique_path_rate
+        - unique_path_to_request_ratio
+        - unique_query_rate
+        - unique_query_to_unique_path_ratio
+        - unique_ua_rate
+    cv_params:
+      threshold:
+        - 0.4
+        - 0.5
+      max_samples:
+        - 1000
+        - 100
+        - 500
+      num_trees:
+        - 100
+        - 500
+        - 1000
+      max_depth:
+        - 5
+        - 10

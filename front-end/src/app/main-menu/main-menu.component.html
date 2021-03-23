@@ -29,6 +29,11 @@
       <a routerLink="/stats" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Stats</a>
     </div>
   </mat-grid-tile>
+  <mat-grid-tile *ngIf="userIsAdmin()">
+    <div class="card-menu card-small" tabindex="5" routerLink="/retrain" routerLinkActive="active">
+      <a routerLink="/retrain" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Re-train</a>
+    </div>
+  </mat-grid-tile>
   <mat-grid-tile>
     <div class="card-menu card-small" tabindex="6" routerLink="/feedback" routerLinkActive="active">
       <a routerLink="/feedback" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Feedback</a>

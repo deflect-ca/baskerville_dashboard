@@ -71,6 +71,9 @@ import { TryMenuComponent } from './try-menu/try-menu.component';
 import { SetupComponent } from './setup/setup.component';
 import { FeedbackContextComponent } from './feedback-context/feedback-context.component';
 import { HomeComponent } from './home/home.component';
+import { RetrainComponent } from './retrain/retrain.component';
+import { EditorComponent } from './editor/editor.component';
+import { NotificationsListComponent } from './notifications-list/notifications-list.component';
 
 
 const socketConfig: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
@@ -175,6 +178,10 @@ const appRoutes: Routes = [
     data: { title: 'Baskerville Logs' },
     canActivate: [AuthGuard]
   }, {
+    path: 'retrain',
+    component: RetrainComponent,
+    data: { title: 'Re-train' },
+  }, {
     path: 'register',
     component: RegisterComponent,
     data: { title: 'Register' },
@@ -224,6 +231,9 @@ const appRoutes: Routes = [
     SetupComponent,
     FeedbackContextComponent,
     HomeComponent,
+    RetrainComponent,
+    EditorComponent,
+    NotificationsListComponent,
   ],
   imports: [
     RouterModule.forRoot(

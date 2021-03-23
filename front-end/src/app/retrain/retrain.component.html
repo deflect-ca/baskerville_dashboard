@@ -1,0 +1,15 @@
+<div class="mat-elevation-z8">
+  <mat-card>
+    <mat-card-header><h2>Re-train</h2></mat-card-header>
+    <mat-card-content style="width: 50vw;">
+      <mat-label>Save best model</mat-label>
+      <input type=checkbox>
+      <div *ngIf="codeModel">
+        <app-editor [codeModel]="codeModel" ></app-editor>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button (click)="onSubmit()">RE-TRAIN</button>
+    </mat-card-actions>
+  </mat-card>
+</div>
