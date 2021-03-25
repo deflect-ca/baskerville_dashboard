@@ -19,3 +19,10 @@ class FeedbackEnum(BaseStrEnum):
     bot = 'bot'
     not_bot = 'notbot'
     none = ''
+
+
+class NotificationKind(BaseStrEnum):
+    error = 'error'
+    warn = 'warn'
+    info = 'info'
+    debug = 'debug'

@@ -137,7 +137,12 @@ const appRoutes: Routes = [
     component: FeedbackComponent,
     data: { title: 'Feedback' },
     canActivate: [AuthGuard]
-  },{
+  }, {
+    path: 'notifications',
+    component: NotificationsListComponent,
+    data: { title: 'Notifications' },
+    canActivate: [AuthGuard]
+  }, {
     path: 'pipelines',
     component: PipelinesComponent,
     data: { title: 'Pipelines' },

@@ -242,6 +242,7 @@ def create_app(config=None, environment=None):
     from baskerville_dashboard.routes.pipeline_management import pipeline_management_app
     from baskerville_dashboard.routes.components import components_app
     from baskerville_dashboard.routes.retrain import retrain_app
+    from baskerville_dashboard.routes.notifications import notifications_app
 
     app.register_blueprint(feedback_app, url_prefix=url_prefix)
     app.register_blueprint(stats_app, url_prefix=url_prefix)
@@ -251,6 +252,7 @@ def create_app(config=None, environment=None):
     app.register_blueprint(pipeline_management_app, url_prefix=url_prefix)
     app.register_blueprint(components_app, url_prefix=url_prefix)
     app.register_blueprint(retrain_app, url_prefix=url_prefix)
+    app.register_blueprint(notifications_app, url_prefix=url_prefix)
 
     return app
 

@@ -10,14 +10,16 @@ class RetrainVm(object):
     training_config: str
     uuid_organization: str
 
-    def __init__(self, tc: str, uuid_organization: str):
+    def __init__(self, tc: str, uuid_organization: str, pw_uuid: str):
         self.training_config = tc
         self.uuid_organization = uuid_organization
         self.timestamp = datetime.utcnow()
+        self.pw_uuid = pw_uuid
 
     def to_dict(self):
         return {
             'timestamp': self.timestamp,
+            'uuid': self.pw_uuid,
             'uuid_organization': self.uuid_organization,
             'training_config': self.training_config,
         }

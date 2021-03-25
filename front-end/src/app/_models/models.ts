@@ -57,13 +57,22 @@ export enum NotificationType {
 }
 
 export class Notification {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  severity: string;
   kind: NotificationType = NotificationType.info;
   message = '';
   url: string = '';
 
   constructor(props) {
+    props = JSONCamelCase.convert(props);
+    this.id = props.id;
     this.kind = props.kind || NotificationType.unknown;
     this.message = props.message || '_';
+    this.createdAt = props.createdAt || '';
+    this.updatedAt = props.updatedAt || '';
+    this.severity = props.severity || '';
     this.url = props.url || '';
   }
   getColor(): string {
