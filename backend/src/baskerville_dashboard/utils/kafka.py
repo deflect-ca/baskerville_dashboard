@@ -87,7 +87,7 @@ def consume_from_kafka(config, baskerville_config):
         baskerville_config['kafka'], config.get('KAFKA_TOPICS')
     )
     import time
-    # todo:
+    # todo: handle all this in different functions / models
     for cr in kafka_consumer:
         if cr.value:
             if cr.topic == 'test.feedback':
@@ -167,7 +167,6 @@ def consume_from_kafka(config, baskerville_config):
                     sm.session.rollback()
             if cr.topic == 'test.retrain':
                 try:
-                    print('>>>>>>>>>> test.retrain cr.value', cr.value)
                     uuid_organization = cr.value['uuid_organization']
                     print(uuid_organization)
                     uuid = cr.value['uuid']
@@ -177,7 +176,6 @@ def consume_from_kafka(config, baskerville_config):
                     from baskerville.db.dashboard_models import PendingWork
                     pw = sm.session.query(PendingWork).filter_by(
                         uuid=uuid).first()
-                    print('>>> PW', pw)
                     if pw:
                         pw.success = success
                         pw.pending = pending
@@ -187,13 +185,11 @@ def consume_from_kafka(config, baskerville_config):
                         notification.uuid_organization = uuid_organization
                         notification.severity = NotificationKind.info.value
                         sm.session.add(notification)
-                        print('saving pw and notification')
                         sm.session.commit()
                         socketio.emit(
                             uuid_organization,
                             message
                         )
-                        print('???', notification.id, pw.id)
                     else:
                         message = f'Could not find pending work ' \
                             f'uuid={uuid}'
