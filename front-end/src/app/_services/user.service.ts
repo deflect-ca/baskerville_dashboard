@@ -13,7 +13,7 @@ export class UserService {
   private currentUser: User;
   private currentUserChanged;
   public currentUserChanged$;
-  users = new Results();
+  users = new Results<User>();
   usersBehaviorSubj = new BehaviorSubject(this.users);
 
   constructor(private http: HttpClient) {
@@ -34,12 +34,10 @@ export class UserService {
     return this.currentUser;
   }
   userIsAdmin(): boolean {
-    const user = this.getUser();
-    return user ? user.category === UserCategoryEnum.admin : false;
+    return this.getUser()?.category === UserCategoryEnum.admin;
   }
   userIsGuest(): boolean {
-    const user = this.getUser();
-    return user ? user.category === UserCategoryEnum.guest : false;
+    return this.getUser()?.category === UserCategoryEnum.guest;
   }
   getAllUsers(): any {
     return this.http.get<Envelop>(environment.baseApiUrl + '/users').pipe(shareReplay());
@@ -48,9 +46,12 @@ export class UserService {
     return this.http.get<Envelop>(environment.baseApiUrl + '/users/categories').pipe(shareReplay());
   }
   getUserById(id: number): any {
-    const url = environment.baseApiUrl + '/admin/users/' + id;
+    const url = environment.baseApiUrl + '/users/' + id;
     return this.http.get<Envelop>(url)
-      .pipe(tap(res => console.info('Got user:', res)), shareReplay(1));
+      .pipe(
+        tap(res => console.info('Got user:', res)),
+        shareReplay(1)
+      );
   }
   getUserProfileByUserId(id: number): any {
     const url = environment.baseApiUrl +  + `/users/${id}/profile`;
@@ -58,21 +59,21 @@ export class UserService {
       .pipe(tap(res => this.setUser), shareReplay(1));
   }
   createUser(userData): any {
-    return this.http.post<Envelop>(environment.baseApiUrl + '/admin/users', userData)
+    return this.http.post<Envelop>(environment.baseApiUrl + '/users', userData)
       .pipe(tap(res => console.info('Created user:', res), shareReplay(1)));
   }
   updateUser(userData): any {
-    return this.http.put<Envelop>(environment.baseApiUrl + `/admin/users/${userData['id']}`, userData)
+    return this.http.put<Envelop>(environment.baseApiUrl + `/users/${userData.id}`, userData)
       .pipe(tap(res => console.info('Updated user:', res)), shareReplay(1));
   }
   activateUser(id): any {
-    return this.http.post<Envelop>(environment.baseApiUrl + `/admin/users/${id}/activate`, {}).pipe(shareReplay());
+    return this.http.post<Envelop>(environment.baseApiUrl + `/users/${id}/activate`, {}).pipe(shareReplay());
   }
   deactivateUser(id): any {
-    return this.http.post<Envelop>(environment.baseApiUrl + `/admin/users/${id}/deactivate`, {}).pipe(shareReplay());
+    return this.http.post<Envelop>(environment.baseApiUrl + `/users/${id}/deactivate`, {}).pipe(shareReplay());
   }
   deleteUser(id): any {
-    return this.http.post<Envelop>(environment.baseApiUrl + `/admin/users/${id}/delete`, {}).pipe(shareReplay());
+    return this.http.post<Envelop>(environment.baseApiUrl + `/users/${id}/delete`, {}).pipe(shareReplay());
   }
 }
 

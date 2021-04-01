@@ -74,6 +74,8 @@ import { HomeComponent } from './home/home.component';
 import { RetrainComponent } from './retrain/retrain.component';
 import { EditorComponent } from './editor/editor.component';
 import { NotificationsListComponent } from './notifications-list/notifications-list.component';
+import { MessagesComponent } from './messages/messages.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 
 const socketConfig: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
@@ -82,6 +84,11 @@ const appRoutes: Routes = [
   { path: '',
     pathMatch: 'full',
     redirectTo: 'home'
+  }, {
+    path: 'dashboard',
+    component: DashboardComponent,
+    data: { title: 'Dashboard' },
+    canActivate: [AuthGuard]
   }, {
     path: 'home',
     component: HomeComponent,
@@ -138,9 +145,9 @@ const appRoutes: Routes = [
     data: { title: 'Feedback' },
     canActivate: [AuthGuard]
   }, {
-    path: 'notifications',
-    component: NotificationsListComponent,
-    data: { title: 'Notifications' },
+    path: 'messages',
+    component: MessagesComponent,
+    data: { title: 'Messages' },
     canActivate: [AuthGuard]
   }, {
     path: 'pipelines',
@@ -239,6 +246,8 @@ const appRoutes: Routes = [
     RetrainComponent,
     EditorComponent,
     NotificationsListComponent,
+    MessagesComponent,
+    DashboardComponent,
   ],
   imports: [
     RouterModule.forRoot(

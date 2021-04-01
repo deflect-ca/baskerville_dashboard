@@ -1,6 +1,6 @@
 <div class="mat-elevation-z8">
   <mat-card>
-    <mat-card-header><h2>Users</h2></mat-card-header>
+    <mat-card-header><h2>Messages</h2></mat-card-header>
     <mat-card-content>
       <table mat-table class="full-width-table" matSort  matSortDisableClear matSortDirection="desc" aria-label="Elements"  multiTemplateDataRows [dataSource]="dataSource.data">
         <ng-container *ngFor="let col of dataColumns; let i=index;" [matColumnDef]="col">
@@ -12,7 +12,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{bot: row['prediction']!==benign, 'not-bot': row['prediction']===benign, 'checked': row['isSelected']}"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"m></tr>
 
       </table>
 

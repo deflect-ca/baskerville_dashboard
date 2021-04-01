@@ -7,7 +7,7 @@ import asyncio
 import json
 import traceback
 
-from baskerville.db.dashboard_models import Notification
+from baskerville.db.dashboard_models import Message, PendingWork
 from baskerville.models.config import KafkaConfig
 from baskerville_dashboard.utils.enums import NotificationKind
 from kafka import KafkaProducer
@@ -101,7 +101,7 @@ def consume_from_kafka(config, baskerville_config):
                         if fc:
                             message = f'Updated feedback context {fc.id} to not pending'
                             fc.pending = not cr.value['success']
-                            notification = Notification()
+                            notification = Message()
                             notification.message = message
                             notification.uuid_organization = fc.uuid_organization
                             notification.severity = NotificationKind.error.value
@@ -113,7 +113,7 @@ def consume_from_kafka(config, baskerville_config):
                             )
                         else:
                             message = f'Could not find fc {fc_id}'
-                            notification = Notification()
+                            notification = Message()
                             notification.message = message
                             notification.uuid_organization = fc.uuid_organization
                             notification.severity = NotificationKind.error.value
@@ -140,7 +140,7 @@ def consume_from_kafka(config, baskerville_config):
                         org.registered = not cr.value['success']
                         message = f'Organization {uuid_organization} ' \
                                   f'is now registered'
-                        notification = Notification()
+                        notification = Message()
                         notification.message = message
                         notification.uuid_organization = uuid_organization
                         notification.severity = NotificationKind.info.value
@@ -153,7 +153,7 @@ def consume_from_kafka(config, baskerville_config):
                     else:
                         message = f'Could not find organization ' \
                             f'uuid={uuid_organization}'
-                        notification = Notification()
+                        notification = Message()
                         notification.message = message
                         notification.uuid_organization = uuid_organization
                         notification.severity = NotificationKind.error.value
@@ -168,38 +168,34 @@ def consume_from_kafka(config, baskerville_config):
             if cr.topic == 'test.retrain':
                 try:
                     uuid_organization = cr.value['uuid_organization']
-                    print(uuid_organization)
-                    uuid = cr.value['uuid']
+                    pw_uuid = cr.value['uuid']
                     success = cr.value['success']
                     pending = cr.value['pending']
                     message = cr.value['message']
-                    from baskerville.db.dashboard_models import PendingWork
+
+                    notification = Message()
+                    notification.message = message
+                    notification.uuid_organization = uuid_organization
+
                     pw = sm.session.query(PendingWork).filter_by(
-                        uuid=uuid).first()
+                        uuid=pw_uuid
+                    ).first()
+
                     if pw:
                         pw.success = success
                         pw.pending = pending
+                        notification.id_user = pw.id_user
                         pw.logs = message + pw.logs if pw.logs else message
-                        notification = Notification()
-                        notification.message = message
-                        notification.uuid_organization = uuid_organization
                         notification.severity = NotificationKind.info.value
-                        sm.session.add(notification)
-                        sm.session.commit()
-                        socketio.emit(
-                            uuid_organization,
-                            message
-                        )
                     else:
                         message = f'Could not find pending work ' \
-                            f'uuid={uuid}'
-                        notification = Notification()
-                        notification.message = message
-                        notification.uuid_organization = uuid_organization
+                            f'pw_uuid={pw_uuid}'
                         notification.severity = NotificationKind.error.value
-                        sm.session.add(notification)
-                        sm.session.commit()
-                        socketio.emit(uuid_organization, message)
+
+                    sm.session.add(notification)
+                    sm.session.commit()
+
+                    socketio.emit(uuid_organization, message)
                 except KeyError:
                     traceback.print_exc()
                 except SQLAlchemyError:

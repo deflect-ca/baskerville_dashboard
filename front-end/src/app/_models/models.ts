@@ -149,8 +149,8 @@ export class RequestSet {
   isSelected: boolean;
 }
 
-export class Results {
-  data: RequestSet[];
+export class Results<T> {
+  data: T[];
   numPages: number = 0;
   currentPage: number = 0;
   pageSize: number = 25;
@@ -159,7 +159,7 @@ export class Results {
   constructor(props?) {
     props = props || {};
     props = JSONCamelCase.convert(props);
-    this.data = props.data as RequestSet[] || [];
+    this.data = props.data as T[] || [];
     this.numPages = props.numPages || [];
     this.currentPage = props.currentPage || 0;
     this.pageSize = props.pageSize || 25;

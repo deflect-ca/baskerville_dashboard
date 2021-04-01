@@ -12,7 +12,7 @@ export class BaskervilleService {
   activeAppId: string = null;
   inProgress = false;
   statusOK = false;
-  results = new Results();
+  results = new Results<RequestSet>();
   appIsActive = false;
   selectedFeedback: FeedbackContext;
 

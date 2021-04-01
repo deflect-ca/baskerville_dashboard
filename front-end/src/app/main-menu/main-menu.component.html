@@ -29,19 +29,24 @@
       <a routerLink="/stats" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Stats</a>
     </div>
   </mat-grid-tile>
-  <mat-grid-tile *ngIf="userIsAdmin()">
-    <div class="card-menu card-small" tabindex="5" routerLink="/notifications" routerLinkActive="active">
-      <a routerLink="/notifications" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Notifications</a>
+  <mat-grid-tile>
+    <div class="card-menu card-small" tabindex="6" routerLink="/messages" routerLinkActive="active">
+      <a routerLink="/messages" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Messages</a>
     </div>
   </mat-grid-tile>
   <mat-grid-tile *ngIf="userIsAdmin()">
-    <div class="card-menu card-small" tabindex="5" routerLink="/retrain" routerLinkActive="active">
+    <div class="card-menu card-small" tabindex="7" routerLink="/retrain" routerLinkActive="active">
       <a routerLink="/retrain" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Re-train</a>
     </div>
   </mat-grid-tile>
   <mat-grid-tile>
-    <div class="card-menu card-small" tabindex="6" routerLink="/feedback" routerLinkActive="active">
+    <div class="card-menu card-small" tabindex="8" routerLink="/feedback" routerLinkActive="active">
       <a routerLink="/feedback" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Feedback</a>
     </div>
   </mat-grid-tile>
+<!--  <mat-grid-tile>
+    <div class="card-menu card-small" tabindex="9" routerLink="/dashboard" routerLinkActive="active">
+      <a routerLink="/dashboard" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Dashboard</a>
+    </div>
+  </mat-grid-tile>-->
 </mat-grid-list>

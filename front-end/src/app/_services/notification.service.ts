@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Envelop, Notification, NotificationType} from '../_models/models';
+import {Notification, NotificationType, Results} from '../_models/models';
 import {map} from 'rxjs/operators';
 import {Socket} from 'ngx-socket-io';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -7,7 +7,7 @@ import {environment} from '../../environments/environment';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {UserService} from './user.service';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable()
 export class MainSocket extends Socket {
@@ -26,6 +26,8 @@ export class NotificationService {
   currentNotification: Notification;
   registeredToUserSocket = false;
   registeredAppToUser = {};
+  messages = new Results<Notification>();
+  messagesBehaviorSubj = new BehaviorSubject(this.messages);
 
   constructor(
     private socket: MainSocket,
@@ -39,8 +41,8 @@ export class NotificationService {
         this.addNotification('', NotificationType.basic);
       }
   }
-  loadAllNotifications(): Observable<object> {
-    return this.http.get(environment.baseApiUrl + '/notifications');
+  loadAllMessages(): Observable<object> {
+    return this.http.get(environment.baseApiUrl + '/messages');
   }
   loadNotifications(): void {
     const notifications = JSON.parse(localStorage.getItem('notifications')) || [];
