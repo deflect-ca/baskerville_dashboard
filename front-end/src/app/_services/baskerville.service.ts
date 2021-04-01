@@ -12,7 +12,7 @@ export class BaskervilleService {
   activeAppId: string = null;
   inProgress = false;
   statusOK = false;
-  results = new Results();
+  results = new Results<RequestSet>();
   appIsActive = false;
   selectedFeedback: FeedbackContext;
 
@@ -119,6 +119,12 @@ export class BaskervilleService {
   }
   loadConfig(pipelineName: string): any {
     return this.http.get(environment.baseApiUrl + `/pipeline/config/${pipelineName}`);
+  }
+  retrain(config: string): any {
+    const data = {
+      config
+    };
+    return this.http.post(environment.baseApiUrl + '/retrain', data);
   }
   sendFeedback(feedback, rsId, lowRate?): any {
     lowRate = lowRate || false;

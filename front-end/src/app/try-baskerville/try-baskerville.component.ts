@@ -85,6 +85,7 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
     }
     this.route.fragment.subscribe(
       (fragments) => {
+        fragments = fragments || 'upload';
         this.stepper.selectedIndex = this.stepToFragment[fragments];
       }
     );

@@ -1,0 +1,16 @@
+<mat-card class="main-card mat-elevation-z5">
+  <mat-card-title>Notifications</mat-card-title>
+  <mat-card-content>
+  <table>
+    <thead></thead>
+    <tbody>
+      <tr *ngFor="let n of notificationsList">
+        <td>{{n.id}}</td>
+        <td>{{n.message}}</td>
+        <td>{{n.createdAt}}</td>
+      </tr>
+    </tbody>
+  </table>
+  </mat-card-content>
+</mat-card>
+

@@ -71,6 +71,11 @@ import { TryMenuComponent } from './try-menu/try-menu.component';
 import { SetupComponent } from './setup/setup.component';
 import { FeedbackContextComponent } from './feedback-context/feedback-context.component';
 import { HomeComponent } from './home/home.component';
+import { RetrainComponent } from './retrain/retrain.component';
+import { EditorComponent } from './editor/editor.component';
+import { NotificationsListComponent } from './notifications-list/notifications-list.component';
+import { MessagesComponent } from './messages/messages.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 
 const socketConfig: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
@@ -79,6 +84,11 @@ const appRoutes: Routes = [
   { path: '',
     pathMatch: 'full',
     redirectTo: 'home'
+  }, {
+    path: 'dashboard',
+    component: DashboardComponent,
+    data: { title: 'Dashboard' },
+    canActivate: [AuthGuard]
   }, {
     path: 'home',
     component: HomeComponent,
@@ -134,7 +144,12 @@ const appRoutes: Routes = [
     component: FeedbackComponent,
     data: { title: 'Feedback' },
     canActivate: [AuthGuard]
-  },{
+  }, {
+    path: 'messages',
+    component: MessagesComponent,
+    data: { title: 'Messages' },
+    canActivate: [AuthGuard]
+  }, {
     path: 'pipelines',
     component: PipelinesComponent,
     data: { title: 'Pipelines' },
@@ -174,6 +189,10 @@ const appRoutes: Routes = [
     component: LogsComponent,
     data: { title: 'Baskerville Logs' },
     canActivate: [AuthGuard]
+  }, {
+    path: 'retrain',
+    component: RetrainComponent,
+    data: { title: 'Re-train' },
   }, {
     path: 'register',
     component: RegisterComponent,
@@ -224,6 +243,11 @@ const appRoutes: Routes = [
     SetupComponent,
     FeedbackContextComponent,
     HomeComponent,
+    RetrainComponent,
+    EditorComponent,
+    NotificationsListComponent,
+    MessagesComponent,
+    DashboardComponent,
   ],
   imports: [
     RouterModule.forRoot(
