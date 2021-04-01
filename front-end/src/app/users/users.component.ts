@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {Filter, Labels, RequestSet, User} from '../_models/models';
 import {UserService} from '../_services/user.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -13,18 +13,15 @@ import {NotificationService} from '../_services/notification.service';
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
-export class UsersComponent implements OnInit {
+export class UsersComponent implements OnInit, AfterViewInit {
   @Input() filter: Filter;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatTable) table: MatTable<RequestSet>;
+  @ViewChild(MatTable) table: MatTable<User>;
   pageEvent: PageEvent;
   dataSource: UsersTableDataSource;
   selection: SelectionModel<User>;
   multipleSelectedItems = false;
-  benign = Labels.benign;
-  malicious = Labels.malicious;
-  unsure = Labels.unknown;
   allSelected = false;
   allInQSelected = false;
   users: Array<User> = [];
@@ -39,7 +36,9 @@ export class UsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataSource = new UsersTableDataSource();
-    // this.selection = new SelectionModel<RequestSet>(allowMultiSelect, initialSelection);
+    this.getUsers();
+  }
+  ngAfterViewInit(): void {
     this.setData();
   }
   getUsers(): void {
@@ -57,9 +56,7 @@ export class UsersComponent implements OnInit {
         this.displayedColumns = data.data.length > 0 ? Object.keys(data.data[0]) : [];
         this.dataColumns = this.displayedColumns;
         if (this.dataColumns.length > 0){
-          this.displayedColumns = this.displayedColumns.concat(['Result', 'Feedback']);
-          this.displayedColumns.unshift('Select');
-          // this.displayedColumns.splice(this.displayedColumns.indexOf('feedback'), 1);
+          // this.displayedColumns.splice(this.displayedColumns.indexOf('Select'), 1);
         }
         this.dataSource.data = data.data as any;
         this.dataSource.pageSize = data.pageSize || 50;

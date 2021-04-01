@@ -57,13 +57,22 @@ export enum NotificationType {
 }
 
 export class Notification {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  severity: string;
   kind: NotificationType = NotificationType.info;
   message = '';
   url: string = '';
 
   constructor(props) {
+    props = JSONCamelCase.convert(props);
+    this.id = props.id;
     this.kind = props.kind || NotificationType.unknown;
     this.message = props.message || '_';
+    this.createdAt = props.createdAt || '';
+    this.updatedAt = props.updatedAt || '';
+    this.severity = props.severity || '';
     this.url = props.url || '';
   }
   getColor(): string {
@@ -140,8 +149,8 @@ export class RequestSet {
   isSelected: boolean;
 }
 
-export class Results {
-  data: RequestSet[];
+export class Results<T> {
+  data: T[];
   numPages: number = 0;
   currentPage: number = 0;
   pageSize: number = 25;
@@ -150,7 +159,7 @@ export class Results {
   constructor(props?) {
     props = props || {};
     props = JSONCamelCase.convert(props);
-    this.data = props.data as RequestSet[] || [];
+    this.data = props.data as T[] || [];
     this.numPages = props.numPages || [];
     this.currentPage = props.currentPage || 0;
     this.pageSize = props.pageSize || 25;

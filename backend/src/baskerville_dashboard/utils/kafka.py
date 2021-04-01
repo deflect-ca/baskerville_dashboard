@@ -5,8 +5,11 @@
 # LICENSE file in the root directory of this source tree.
 import asyncio
 import json
+import traceback
 
+from baskerville.db.dashboard_models import Message, PendingWork
 from baskerville.models.config import KafkaConfig
+from baskerville_dashboard.utils.enums import NotificationKind
 from kafka import KafkaProducer
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -84,6 +87,7 @@ def consume_from_kafka(config, baskerville_config):
         baskerville_config['kafka'], config.get('KAFKA_TOPICS')
     )
     import time
+    # todo: handle all this in different functions / models
     for cr in kafka_consumer:
         if cr.value:
             if cr.topic == 'test.feedback':
@@ -95,20 +99,34 @@ def consume_from_kafka(config, baskerville_config):
                         from baskerville.db.dashboard_models import FeedbackContext
                         fc = sm.session.query(FeedbackContext).filter_by(id=fc_id).first()
                         if fc:
+                            message = f'Updated feedback context {fc.id} to not pending'
                             fc.pending = not cr.value['success']
+                            notification = Message()
+                            notification.message = message
+                            notification.uuid_organization = fc.uuid_organization
+                            notification.severity = NotificationKind.error.value
+                            sm.session.add(notification)
                             sm.session.commit()
                             socketio.emit(
                                 cr.value['uuid_organization'],
-                                f'Updated feedback context {fc.id} to not pending'
+                                message
                             )
                         else:
+                            message = f'Could not find fc {fc_id}'
+                            notification = Message()
+                            notification.message = message
+                            notification.uuid_organization = fc.uuid_organization
+                            notification.severity = NotificationKind.error.value
+                            sm.session.add(notification)
+                            sm.session.commit()
                             socketio.emit(
                                 cr.value['uuid_organization'],
-                                f'Could not find fc {fc_id}'
+                                message
                             )
                 except KeyError:
-                    pass
+                    traceback.print_exc()
                 except SQLAlchemyError:
+                    traceback.print_exc()
                     sm.session.rollback()
             if cr.topic == 'test.register':
                 try:
@@ -120,18 +138,67 @@ def consume_from_kafka(config, baskerville_config):
                         uuid=uuid_organization).first()
                     if org:
                         org.registered = not cr.value['success']
+                        message = f'Organization {uuid_organization} ' \
+                                  f'is now registered'
+                        notification = Message()
+                        notification.message = message
+                        notification.uuid_organization = uuid_organization
+                        notification.severity = NotificationKind.info.value
+                        sm.session.add(notification)
                         sm.session.commit()
                         socketio.emit(
                             uuid_organization,
-                            f'Organization {uuid_organization} '
-                            f'is now registered'
+                            message
                         )
                     else:
-                        t = f'Could not find organization ' \
+                        message = f'Could not find organization ' \
                             f'uuid={uuid_organization}'
-                        socketio.emit(uuid_organization, t)
+                        notification = Message()
+                        notification.message = message
+                        notification.uuid_organization = uuid_organization
+                        notification.severity = NotificationKind.error.value
+                        sm.session.add(notification)
+                        sm.session.commit()
+                        socketio.emit(uuid_organization, message)
                 except KeyError:
-                    pass
+                    traceback.print_exc()
                 except SQLAlchemyError:
+                    traceback.print_exc()
+                    sm.session.rollback()
+            if cr.topic == 'test.retrain':
+                try:
+                    uuid_organization = cr.value['uuid_organization']
+                    pw_uuid = cr.value['uuid']
+                    success = cr.value['success']
+                    pending = cr.value['pending']
+                    message = cr.value['message']
+
+                    notification = Message()
+                    notification.message = message
+                    notification.uuid_organization = uuid_organization
+
+                    pw = sm.session.query(PendingWork).filter_by(
+                        uuid=pw_uuid
+                    ).first()
+
+                    if pw:
+                        pw.success = success
+                        pw.pending = pending
+                        notification.id_user = pw.id_user
+                        pw.logs = message + pw.logs if pw.logs else message
+                        notification.severity = NotificationKind.info.value
+                    else:
+                        message = f'Could not find pending work ' \
+                            f'pw_uuid={pw_uuid}'
+                        notification.severity = NotificationKind.error.value
+
+                    sm.session.add(notification)
+                    sm.session.commit()
+
+                    socketio.emit(uuid_organization, message)
+                except KeyError:
+                    traceback.print_exc()
+                except SQLAlchemyError:
+                    traceback.print_exc()
                     sm.session.rollback()
         time.sleep(0.1)

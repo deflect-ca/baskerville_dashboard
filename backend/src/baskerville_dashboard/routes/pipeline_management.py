@@ -3,7 +3,7 @@ import traceback
 
 from baskerville_dashboard.auth import login_required
 from baskerville_dashboard.utils.helpers import ResponseEnvelope, \
-    response_jsonified, get_baskerville_config_path
+    response_jsonified, get_baskerville_config_path, get_training_config_path
 from flask import Blueprint, request
 
 pipeline_management_app = Blueprint('pipeline_management_app', __name__)
@@ -18,13 +18,26 @@ CMD = {
 @login_required
 def get_config(pipeline_name):
     re = ResponseEnvelope()
-    re.success = True
-    re.data = ''
-    code = 200
+
     try:
-        with open(get_baskerville_config_path(), 'r+') as ifile:
-            lines = ifile.readlines()
-            re.data = ''.join(lines)
+        file_name = ''
+        if pipeline_name == 'preprocessing':
+            file_name = get_baskerville_config_path()
+
+        elif pipeline_name == 'retrain':
+            file_name = get_training_config_path()
+        else:
+            code = 400
+            re.message = f'Could not find configuration ' \
+                         f'for pipeline name {pipeline_name}.'
+
+        if file_name:
+            with open(file_name, 'r+') as ifile:
+                lines = ifile.readlines()
+                re.data = ''.join(lines)
+            re.success = True
+            code = 200
+
     except Exception as e:
         re.success = False
         re.message = str(e)

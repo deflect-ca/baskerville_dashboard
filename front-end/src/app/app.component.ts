@@ -57,11 +57,13 @@ export class AppComponent implements AfterViewInit{
         this.baskervilleSvc.setInProgress(false);
       }
     );
-    const uuid = this.userSvc.getUser().uuid;
-    this.notificationSvc.registerUUID(uuid).subscribe(
-      d => {this.notificationSvc.showSnackBar(d); },
-      e => {this.notificationSvc.showSnackBar(e); }
-    );
+    const uuid = this.userSvc.getUser()?.uuid;
+    if (uuid){
+      this.notificationSvc.registerUUID(uuid).subscribe(
+        d => {this.notificationSvc.showSnackBar(d); },
+        e => {this.notificationSvc.showSnackBar(e); }
+      );
+    }
     // this.notificationSvc.sendToSelf(uuid, 'Welcome - subscribed to notifications ');
   }
   getStatus(): boolean {
