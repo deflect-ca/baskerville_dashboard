@@ -17,7 +17,7 @@ tests_require = [
 ]
 
 setup(name='baskerville_dashboard',
-      version='0.1.0',
+      version='0.2.0',
       description='Baskerville Dashboard Backend',
       long_description=long_description,
       tests_require=tests_require,
