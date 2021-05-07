@@ -222,7 +222,7 @@ def set_feedback_for(context_id, rs_id, feedback_str):
         feedback.low_rate = request.get_json().get('lowRate')
         feedback.features = rs.features
         feedback.score = rs.score
-        feedback.attack_prediction = rs.attack_prediction or LabelEnum.unknown
+        feedback.attack_prediction = rs.attack_prediction or LabelEnum.unknown.value
         feedback.feedback = feedback_str
         if not updated:
             sm.session.add(feedback)
