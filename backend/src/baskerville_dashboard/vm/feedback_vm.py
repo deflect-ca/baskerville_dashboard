@@ -6,7 +6,7 @@
 from typing import List, Type
 
 from baskerville.db.dashboard_models import SubmittedFeedback, FeedbackContext, \
-    Feedback
+    Feedback, User
 from baskerville.db.models import Attack, RequestSet
 from baskerville.util.enums import FeedbackContextTypeEnum, \
     FEEDBACK_CONTEXT_TO_DESCRIPTION, BaseStrEnum
@@ -79,9 +79,15 @@ class FeedbackContextVM(object):
     feedback_context_type: Type[FeedbackContextTypeEnum]
     feedback_context_type_to_descr: dict
 
+    def __init__(self, user: User):
+        self.user = user
+
     def process(self):
         sm = SessionManager()
-        self.feedback_contexts = sm.session.query(FeedbackContext).all()
+        fcq = sm.session.query(FeedbackContext)
+        if not self.user.is_admin:
+            fcq = fcq.filter_by(id_user=self.user.id)
+        self.feedback_contexts = fcq.all()
         self.feedback_context_type = FeedbackContextTypeEnum
         self.feedback_context_type_to_descr = FEEDBACK_CONTEXT_TO_DESCRIPTION
 

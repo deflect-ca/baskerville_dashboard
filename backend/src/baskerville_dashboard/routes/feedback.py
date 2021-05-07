@@ -24,6 +24,7 @@ ES_HOST = ''
 
 @feedback_app.route('/feedback/context', methods=('GET',))
 @login_required
+@resolve_user
 def get_feedback_context_details():
     """
     Get all available feedback context, feedback context type and respective
@@ -34,7 +35,7 @@ def get_feedback_context_details():
     sm = SessionManager()
     code = 200
     try:
-        re.data = FeedbackContextVM().to_dict()
+        re.data = FeedbackContextVM(request.user).to_dict()
         re.success = True
         re.message = 'Feedback context details'
     except Exception as e:
