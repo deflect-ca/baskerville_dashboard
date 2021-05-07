@@ -7,7 +7,8 @@ import jwt
 import uuid as uuid
 
 from baskerville.util.enums import UserCategoryEnum
-from baskerville_dashboard.utils.helpers import ResponseEnvelope
+from baskerville_dashboard.utils.helpers import ResponseEnvelope, \
+    get_user_by_org_uuid, response_jsonified
 from flask import current_app as app, session
 from baskerville_dashboard.db.manager import SessionManager
 from baskerville.db.dashboard_models import User, UserCategory, Organization
@@ -313,3 +314,20 @@ class ForgotPassword(object):
         #     except RuntimeError as e:
         #         msg.message = str(e)
         #         return jsonify(msg.to_dict()), 500
+
+
+def resolve_user(f):
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        from flask import request
+        user = get_user_by_org_uuid(session['org_uuid'])
+        request.re = ResponseEnvelope()
+        if not user:
+            code = 404
+            request.re.success = False
+            request.re.message = 'No user found'
+            return response_jsonified(request.re, code)
+        request.user = user
+        return f(*args, **kwargs)
+    return decorated_function

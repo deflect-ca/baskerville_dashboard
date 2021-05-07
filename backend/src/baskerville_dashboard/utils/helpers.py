@@ -590,7 +590,7 @@ def get_docker_container_status(container_name):
     return container_state['Status']
 
 
-def get_user_by_org_uuid(org_uuid):
+def get_user_by_org_uuid(org_uuid) -> User:
     from flask import session
     sm = SessionManager()
     org_uuid = org_uuid or session.get('user_uuid')

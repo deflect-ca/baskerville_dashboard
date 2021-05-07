@@ -6,7 +6,7 @@
 import traceback
 
 from baskerville.util.enums import FeedbackContextTypeEnum, LabelEnum
-from baskerville_dashboard.auth import login_required
+from baskerville_dashboard.auth import login_required, resolve_user
 from baskerville_dashboard.db.manager import SessionManager
 from baskerville.db.dashboard_models import Feedback, FeedbackContext
 from baskerville_dashboard.utils.helpers import ResponseEnvelope, \
@@ -48,6 +48,7 @@ def get_feedback_context_details():
 
 @feedback_app.route('/feedback/context/<id>', methods=('GET',))
 @login_required
+@resolve_user
 def get_feedback_context_by_id(id):
     """
     Get a specific feedback context by id
@@ -58,7 +59,17 @@ def get_feedback_context_by_id(id):
     sm = SessionManager()
     code = 200
     try:
-        re.data = sm.session.query(FeedbackContext).filter_by(id=id).first()
+        feedback_context_q = sm.session.query(
+            FeedbackContext
+        ).filter_by(id=id)
+        if not request.user.is_admin:
+            feedback_context_q = feedback_context_q.filter_by(
+                uuid_organization=request.user.organization.uuid
+            ).filter_by(
+                id_user=request.user.id
+            )
+        re.data = feedback_context_q.first()
+
         if not re.data:
             code = 404
             raise ValueError(f'Could not find feedback context with id {id}')
@@ -76,6 +87,7 @@ def get_feedback_context_by_id(id):
 
 @feedback_app.route('/feedback/context', methods=('POST',))
 @login_required
+@resolve_user
 def save_feedback_context():
     re = ResponseEnvelope()
     sm = SessionManager()
@@ -86,6 +98,7 @@ def save_feedback_context():
         fc = FeedbackContext()
         fc.reason = FeedbackContextTypeEnum[data['reason'].replace(' ', '_')]
         fc.uuid_organization = session['org_uuid']
+        fc.id_user = request.user.id
         fc.reason_descr = data['reason_descr']
         fc.start = data['start']
         fc.stop = data['stop']
@@ -183,6 +196,7 @@ def bulk_feedback(context_id, feedback_str):
 
 @feedback_app.route('/feedback/<context_id>/<rs_id>/<feedback_str>', methods=('POST', 'PUT'))
 @login_required
+@resolve_user
 def set_feedback_for(context_id, rs_id, feedback_str):
     sm = SessionManager()
     re = ResponseEnvelope()
@@ -200,10 +214,7 @@ def set_feedback_for(context_id, rs_id, feedback_str):
 
         if not rs:
             raise Exception('No such request-set')
-        user = get_user_by_org_uuid(session['org_uuid'])
-        if not user:
-            raise Exception('No user found.')
-
+        user = request.user
         feedback = sm.session.query(Feedback).filter_by(
             uuid_request_set=rs.uuid_request_set
         ).filter_by(id_user=user.id).first()
@@ -243,6 +254,7 @@ def set_feedback_for(context_id, rs_id, feedback_str):
 
 @feedback_app.route('/feedback/submit/<context_id>', methods=('POST',))
 @login_required
+@resolve_user
 def submit_feedback_for(context_id):
     _q_filter = get_qparams(request)
     sm = SessionManager()
@@ -251,7 +263,7 @@ def submit_feedback_for(context_id):
     ip_list = None
     data = request.get_json()
     try:
-        user = get_user_by_org_uuid(session['org_uuid'])
+        user = request.user
         fc = sm.session.query(FeedbackContext).filter_by(id=context_id).first()
         if not fc:
             print('TODO: could not find Feedback Context')
