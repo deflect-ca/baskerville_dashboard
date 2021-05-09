@@ -6,6 +6,7 @@
 import traceback
 
 from baskerville.util.enums import FeedbackContextTypeEnum, LabelEnum
+from baskerville.util.helpers import get_logger
 from baskerville_dashboard.auth import login_required, resolve_user
 from baskerville_dashboard.db.manager import SessionManager
 from baskerville.db.dashboard_models import Feedback, FeedbackContext
@@ -20,6 +21,8 @@ from baskerville.db.models import RequestSet
 feedback_app = Blueprint('feedback_app', __name__)
 
 ES_HOST = ''
+
+logger = get_logger(__name__, output_file='baskerville_dashboard.log')
 
 
 @feedback_app.route('/feedback/context', methods=('GET',))
@@ -68,6 +71,9 @@ def get_feedback_context_by_id(id):
                 uuid_organization=request.user.organization.uuid
             ).filter_by(
                 id_user=request.user.id
+            )
+            logger.debug(
+                f'User {request.user.id} is not admin, filtering feedback_context'
             )
         re.data = feedback_context_q.first()
 
@@ -136,7 +142,7 @@ def bulk_feedback(context_id, feedback_str):
         data = request.get_json()
         errors = []
         succeeded = []
-        user = get_user_by_org_uuid(session['org_uuid'])
+        user = get_user_by_org_uuid(session['org_uuid'], session['user_id'])
         if not user:
             code = 404
             re.success = False

@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, NgModule, ViewChild} from '@angular/core';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {BaskervilleService} from './_services/baskerville.service';
-import {Envelop} from './_models/models';
+import {Envelop, NotificationType} from './_models/models';
 import {UserService} from './_services/user.service';
 import {MatIconRegistry} from '@angular/material/icon';
 import {DomSanitizer} from '@angular/platform-browser';
@@ -47,24 +47,33 @@ export class AppComponent implements AfterViewInit{
     this.startTimer();
   }
   ngAfterViewInit(): void {
-    this.baskervilleSvc.getAppStatus().subscribe(
-      d => {
-        const running = d.data?.running === true;
-        this.baskervilleSvc.setInProgress(running);
-        this.notificationSvc.showSnackBar(`App ${this.baskervilleSvc.activeAppId} is currently ${running ? '' : 'NOT'} running`);
-      },
-      e => {
-        this.baskervilleSvc.setInProgress(false);
-      }
-    );
-    const uuid = this.userSvc.getUser()?.uuid;
-    if (uuid){
-      this.notificationSvc.registerUUID(uuid).subscribe(
-        d => {this.notificationSvc.showSnackBar(d); },
-        e => {this.notificationSvc.showSnackBar(e); }
+    // this.baskervilleSvc.getAppStatus().subscribe(
+    //   d => {
+    //     const running = d.data?.running === true;
+    //     this.baskervilleSvc.setInProgress(running);
+    //     this.notificationSvc.showSnackBar(`App ${this.baskervilleSvc.activeAppId} is currently ${running ? '' : 'NOT'} running`);
+    //   },
+    //   e => {
+    //     this.baskervilleSvc.setInProgress(false);
+    //   }
+    // );
+    const channel = this.userSvc.getUserChannel();
+    if (channel){
+      console.warn(`this.userSvc.getUserChannel()`, channel);
+      this.notificationSvc.registerChannel(channel).subscribe(
+        d => {
+          this.notificationSvc.addNotification(
+            d,
+            d.indexOf('ERROR') > -1 ? NotificationType.error : NotificationType.basic
+          );
+          this.notificationSvc.showSnackBar(d);
+          },
+        e => {
+          this.notificationSvc.showSnackBar(e);
+        }
       );
     }
-    // this.notificationSvc.sendToSelf(uuid, 'Welcome - subscribed to notifications ');
+    // this.notificationSvc.sendToSelf(channel, 'Welcome - subscribed to notifications ');
   }
   getStatus(): boolean {
     return this.baskervilleSvc.getStatus().subscribe(

@@ -47,6 +47,7 @@ export class UploadComponent implements OnInit {
         this.uploadResults = data as Envelop;
         this.selectedFileName = this.uploadResults.data.filename;
         this.notificationSvc.showSnackBar(this.uploadResults.message);
+        this.error = '';
       },
       e => {
         this.notificationSvc.showSnackBar(e.message, NotificationType.error);
@@ -59,6 +60,7 @@ export class UploadComponent implements OnInit {
       data => {this.uploadResults = data as Envelop;
                this.selectedFileName = this.uploadResults.data.filename;
                this.notificationSvc.showSnackBar(this.uploadResults.message);
+               this.error = '';
         },
       e => {
         this.notificationSvc.showSnackBar(e.message, NotificationType.error);
@@ -78,7 +80,7 @@ export class UploadComponent implements OnInit {
         this.activeAppId = this.baskervilleSvc.activeAppId;
         //
         this.notificationSvc.addNotification(results.message, NotificationType.success);
-        this.notificationSvc.sendToSelf(this.activeAppId, 'Starting Baskerville...');
+        this.notificationSvc.sendToSelf(this.userSvc.getUserChannel(), 'Starting Baskerville...');
         // this.router.navigate(['try-baskerville', this.activeAppId]);
         // this.setNotificationsForAppId();
       },

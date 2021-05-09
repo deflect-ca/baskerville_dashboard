@@ -26,6 +26,7 @@ def create_token(user):
     """
     payload = {
         'sub': user.organization.uuid,
+        'id': user.id,
         'iat': datetime.utcnow(),
         'exp': datetime.utcnow() + timedelta(days=1),
         'scope': 'admin' if user.is_admin else 'user',
@@ -65,6 +66,7 @@ def login_required(f):
             response.status_code = 401
             return response
         session['org_uuid'] = payload['sub']
+        session['user_id'] = payload['id']
 
         return f(*args, **kwargs)
 
@@ -321,8 +323,8 @@ def resolve_user(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         from flask import request
-        user = get_user_by_org_uuid(session['org_uuid'])
         request.re = ResponseEnvelope()
+        user = get_user_by_org_uuid(session['org_uuid'], session['user_id'])
         if not user:
             code = 404
             request.re.success = False

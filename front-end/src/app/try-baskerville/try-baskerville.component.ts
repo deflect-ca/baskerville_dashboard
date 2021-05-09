@@ -171,7 +171,7 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
         this.activeAppId = this.baskervilleSvc.activeAppId;
         //
         this.notificationSvc.addNotification(results.message, NotificationType.success);
-        this.notificationSvc.sendToSelf(this.activeAppId, 'Starting Baskerville...');
+        this.notificationSvc.sendToSelf(this.userSvc.getUserChannel(), 'Starting Baskerville...');
         this.setNotificationsForAppId();
       },
       e => {

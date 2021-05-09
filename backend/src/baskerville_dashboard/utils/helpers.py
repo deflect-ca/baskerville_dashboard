@@ -3,9 +3,12 @@
 #
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
+from concurrent.futures import Future
 from datetime import datetime
 
 import eventlet
+import psutil
+from baskerville.db.models import Runtime, RequestSet
 from baskerville_dashboard.vm.retrain_vm import RetrainVm
 
 eventlet.monkey_patch()
@@ -15,9 +18,8 @@ import re
 from baskerville_dashboard.utils.kafka import get_kafka_producer
 from docker.errors import DockerException
 
-
 from baskerville.db.dashboard_models import User, Organization, Feedback
-from baskerville.models.config import KafkaConfig, TrainingConfig
+from baskerville.models.config import KafkaConfig
 from baskerville.util.enums import FeedbackEnum
 from baskerville_dashboard.vm.feedback_vm import FeedbackVM
 from docker.models.containers import Container
@@ -33,9 +35,10 @@ from threading import Thread, Event
 import docker
 from flask import abort
 from baskerville_dashboard.db.manager import SessionManager
-from baskerville.util.helpers import parse_config, SerializableMixin
+from baskerville.util.helpers import parse_config, SerializableMixin, \
+    get_logger
 from baskerville.util.enums import LabelEnum
-from baskerville.db.models import RequestSet, Runtime
+
 
 KAFKA_PRODUCER = None
 KAFKA_CONSUMER = None
@@ -44,7 +47,8 @@ ALLOWED_EXTENSIONS = {'json', 'zip', 'gzip', 'tar'}
 COMPRESSION_EXTENSIONS = {'zip', 'gzip', 'tar'}
 REVERSE_LABELS = {e.name: e.value for e in LabelEnum}
 ALLOWED_COLS = [
-    'id', 'ip', 'uuid_request_set', 'target', 'target_original', 'start', 'stop',
+    'id', 'ip', 'uuid_request_set', 'target', 'target_original', 'start',
+    'stop',
     'num_requests', 'prediction', 'score'
 ]
 FILTER = {
@@ -83,6 +87,8 @@ BOT_NOT_BOT = {
 ALLOWED_FEEDBACK = {'bot', 'notbot'}
 DOCKER_CLIENT = None
 camel_case_pattern = re.compile(r'(?<!^)(?=[A-Z])')
+
+logger = get_logger(__name__, output_file='baskerville_dashboard.log')
 
 
 def get_docker_client():
@@ -219,6 +225,7 @@ def submit_training(retrain_vm: RetrainVm, retrain_topic='retrain'):
         traceback.print_exc()
         return False
     return True
+
 
 def follow_file(file_path, timeout=150):
     not_line = 0
@@ -359,8 +366,8 @@ def get_socket_io():
 
 
 class ReadLogs(Thread):
-    def __init__(self, org_uuid, full_path):
-        self.org_uuid = org_uuid
+    def __init__(self, user_channel, full_path):
+        self.user_channel = user_channel
         self.full_path = full_path
         self.socketio = get_socket_io()
         self._stop_event = Event()
@@ -376,16 +383,41 @@ class ReadLogs(Thread):
         import time
         line = '-- waiting...'
         while not os.path.exists(self.full_path):
-            self.socketio.emit(self.org_uuid, line)
+            self.socketio.emit(self.user_channel, line)
             time.sleep(1)
         for line in follow_file(self.full_path, timeout=300):
-            self.socketio.emit(self.org_uuid, line)
+            self.socketio.emit(self.user_channel, line)
 
-        self.socketio.emit(self.org_uuid, '--end--')
+        self.socketio.emit(self.user_channel, '--end--')
         self.socketio.emit('message', '--end--')
 
     def run(self):
         self.follow()
+
+
+def is_process_running(p):
+    if isinstance(p, Future):
+        return p.running()
+    else:
+        if hasattr(p, 'name'):
+            name = p.name()
+            for proc in psutil.process_iter():
+                print(proc.name())
+                if proc.name() == name:
+                    print("have")
+                    return True
+                else:
+                    print("Dont have")
+        # else:
+        #     p = psutil.Process(pid)
+    print('No process info...')
+    return False
+
+
+def process_details(app_data):
+    details = app_data['details']
+    details['running'] = is_process_running(details['process'])
+    return details
 
 
 class ResponseEnvelope(SerializableMixin):
@@ -463,8 +495,10 @@ def get_rss(
     if id_runtime:
         rs_q = rs_q.filter(RequestSet.id_runtime == id_runtime)
     if not id_runtime and not user.is_admin:
+        logger.debug(f'Filtering runtimes for user.id:{user.id}')
         # admins can see everything, for everyone else, filter
         runtime_ids = [r.id for r in get_user_runtimes(user)]
+        logger.debug(f'Runtime ids: {runtime_ids}')
         rs_q = rs_q.filter(RequestSet.id_runtime.in_(runtime_ids))
     if ip:
         rs_q = rs_q.filter(RequestSet.ip == ip)
@@ -590,15 +624,21 @@ def get_docker_container_status(container_name):
     return container_state['Status']
 
 
-def get_user_by_org_uuid(org_uuid) -> User:
+def get_user_by_org_uuid(org_uuid, user_id) -> User:
     from flask import session
     sm = SessionManager()
     org_uuid = org_uuid or session.get('user_uuid')
     if org_uuid:
         org = sm.session.query(Organization).filter_by(
             uuid=org_uuid).first()
-        return sm.session.query(User).filter_by(
-            id_organization=org.id).first()
+        if org:
+            user = sm.session.query(User).filter_by(
+                id=user_id
+            ).filter_by(
+                id_organization=org.id
+            ).first()
+            logger.debug(f'User: {user.username} {user.id}')
+            return user
     return None
 
 

@@ -33,6 +33,10 @@ export class UserService {
     }
     return this.currentUser;
   }
+  getUserChannel(): string {
+    const user = this.getUser();
+    return user ? user.uuid + '_' + user.id: null;
+  }
   userIsAdmin(): boolean {
     return this.getUser()?.category === UserCategoryEnum.admin;
   }
