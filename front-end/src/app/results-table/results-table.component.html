@@ -17,7 +17,7 @@
           <button mat-icon-button color="warn" (click)="sendNegativeFeedback(row)"><mat-icon aria-hidden="false" aria-label="incorrect" title="Incorrect">close</mat-icon></button>
           <button mat-icon-button color="basic" class="active-low-rate" (click)="sendNegativeFeedback(row, true)"><span class="material-icons" [ngClass]="{'active-low-rate': row.lowRate}">slow_motion_video</span></button>
         </div>
-        <mat-checkbox (change)="$event ? masterToggle() : null"
+        <mat-checkbox (change)="handleCheckboxChange($event)"
                       [checked]="selection.hasValue() && isAllSelected()"
                       [indeterminate]="selection.hasValue() && !isAllSelected()">
         </mat-checkbox>

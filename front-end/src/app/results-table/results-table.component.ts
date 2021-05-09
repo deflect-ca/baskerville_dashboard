@@ -92,7 +92,8 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     this.table.dataSource = this.dataSource;
   }
   toggle(row): void{
-    row.isSelected = !row.isSelected;
+    row.isSelected = this.allSelected? this.allSelected : !row.isSelected;
+    this.multipleSelected();
   }
   isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
@@ -102,18 +103,26 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
   multipleSelected(): boolean {
     let numSelected = 0;
     this.dataSource.data.forEach(row => {
-      numSelected += +row.isSelected;
+      numSelected += +row.isSelected || 0;
       if (numSelected > 1) return;
     });
     this.multipleSelectedItems = numSelected > 1;
+    // console.warn('this.multipleSelectedItems', this.multipleSelectedItems, numSelected)
     return this.multipleSelectedItems;
   }
+  handleCheckboxChange(event): void {
+    console.info('handleCheckboxChange')
+    console.warn(event);
+    if (event) {
+      this.masterToggle();
+    }
+  }
   masterToggle(): void {
+    this.allSelected = !this.allSelected;
     this.dataSource.data.forEach(row => {
       this.toggle(row);
       // this.selection.select(row)
     });
-    this.allSelected = !this.allSelected;
   }
   getSelected(): RequestSet[] {
     const selectedIds = [];
