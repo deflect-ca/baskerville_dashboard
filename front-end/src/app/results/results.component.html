@@ -31,9 +31,10 @@
     <mat-select [(value)]="rsFilter.prediction">
       <mat-option value="">All</mat-option>
       <!--TODO: properly align options-->
-      <mat-option value="bot"><img width="25" height="25" src="/assets/icons/BOT.png" alt="Bot">Bot </mat-option>
-      <mat-option value="notbot"><img width="25" height="25" src="/assets/icons/NOTBOT.png" alt="Not Bot">Not Bot </mat-option>
-      <mat-option value="unknown">Unknown </mat-option>
+      <mat-option value="bot"><img width="25" height="25" src="/assets/icons/BOT.png" alt="Bot">
+        <label class="filter-label">Bot </label></mat-option>
+      <mat-option value="notbot"><img width="25" height="25" src="/assets/icons/NOTBOT.png" alt="Not Bot"><label class="filter-label">Not Bot</label></mat-option>
+      <mat-option value="unknown"><label class="filter-label">Unknown</label></mat-option>
     </mat-select>
   </mat-form-field>
   <mat-form-field appearance="">
@@ -41,9 +42,9 @@
     <mat-select [(value)]="rsFilter.feedback">
       <mat-option value="">All</mat-option>
       <!--TODO: properly align options-->
-      <mat-option value="bot"><img width="25" height="25" src="/assets/icons/BOT.png" alt="Bot">Bot </mat-option>
+     <!-- <mat-option value="bot"><img width="25" height="25" src="/assets/icons/BOT.png" alt="Bot">Bot </mat-option>
       <mat-option value="notbot"><img width="25" height="25" src="/assets/icons/NOTBOT.png" alt="Not Bot">Not Bot </mat-option>
-      <mat-option value="unknown">Unknown </mat-option>
+      <mat-option value="unknown">Unknown </mat-option>-->
     </mat-select>
   </mat-form-field>
   <div class="mat-action-row mat-elevation-z0">
@@ -59,5 +60,5 @@
 <app-feedback-context *ngIf="attackPanel"></app-feedback-context>
 
 <div class="mat-action-row" *ngIf="envelop?.data">
-  <app-results-table [rsFilter]="rsFilter"></app-results-table>
+  <app-results-table [rsFilter]="rsFilter" [feedbackContextId]="feedbackContextId"></app-results-table>
 </div>

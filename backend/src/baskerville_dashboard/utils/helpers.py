@@ -49,7 +49,7 @@ REVERSE_LABELS = {e.name: e.value for e in LabelEnum}
 ALLOWED_COLS = [
     'id', 'ip', 'uuid_request_set', 'target', 'target_original', 'start',
     'stop',
-    'num_requests', 'prediction', 'score'
+    'num_requests', 'prediction', 'score', 'low_rate_attack'
 ]
 FILTER = {
     'page': 0,
@@ -399,8 +399,10 @@ def is_process_running(p):
     if isinstance(p, Future):
         return p.running()
     else:
+        if hasattr(p, 'is_alive'):
+            return p.is_alive()
         if hasattr(p, 'name'):
-            name = p.name()
+            name = p.name
             for proc in psutil.process_iter():
                 print(proc.name())
                 if proc.name() == name:
@@ -416,7 +418,7 @@ def is_process_running(p):
 
 def process_details(app_data):
     details = app_data['details']
-    details['running'] = is_process_running(details['process'])
+    details['running'] = is_process_running(app_data['process'])
     return details
 
 
@@ -486,7 +488,7 @@ def get_user_runtimes(user: User):
 
 def get_rss(
         ip, target, start, stop, prediction, size, page,
-        id_runtime=None, user=None, ip_list=None
+        id_runtime=None, user=None, ip_list=None, id_feedback_context=None
 ):
     sm = SessionManager()
     rs_q = sm.session.query(
@@ -524,17 +526,26 @@ def get_rss(
         } for r in data]
         # todo: join
         feedback = sm.session.query(Feedback)
-        if not user.is_admin:
-            feedback = feedback.filter(Feedback.id_user == user.id)
+        if id_feedback_context:
+            feedback = feedback.filter(
+                Feedback.id_feedback_context == id_feedback_context
+            )
         feedback.filter(
+            Feedback.id_user == user.id
+        ).filter(
             Feedback.uuid_request_set.in_(
                 [d[ALLOWED_COLS.index('uuid_request_set')] for d in data])
         ).all()
-        feedback_to_rs = {f.uuid_request_set: f.feedback for f in feedback}
+        feedback_to_rs = {
+            f.uuid_request_set: (f.feedback, f.low_rate)
+            for f in feedback
+        }
 
         if feedback_to_rs:
             for rs in data_dict:
-                rs['feedback'] = str(feedback_to_rs.get(rs['id']))
+                fb, lr = feedback_to_rs.get(rs['uuid_request_set'], (None, 0))
+                rs['feedback'] = str(fb)
+                rs['low_rate_feedback'] = lr
 
         # todo: model:
         return {

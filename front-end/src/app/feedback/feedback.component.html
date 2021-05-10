@@ -35,7 +35,7 @@
       </mat-step>
       <mat-step>
         <ng-template matStepLabel>Filter out the request sets and provide feedback</ng-template>
-          <app-results (change)="feedbackChange($event)"></app-results>
+          <app-results (change)="feedbackChange($event)" [feedbackContextId]="selectedFeedbackContext?.id"></app-results>
           <div>
             <button mat-button matStepperPrevious>Back</button>
             <button mat-button matStepperNext>Next</button>

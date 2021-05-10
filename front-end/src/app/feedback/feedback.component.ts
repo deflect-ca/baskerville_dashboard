@@ -81,7 +81,7 @@ export class FeedbackComponent implements OnInit {
         this.baskervilleSvc.setInProgress(this.inProgress);
       },
       e => {
-        this.notificationSvc.showSnackBar(e.message);
+        this.notificationSvc.showSnackBar(e.error.message);
         this.submitted = false;
         this.inProgress = false;
         this.baskervilleSvc.setInProgress(this.inProgress);

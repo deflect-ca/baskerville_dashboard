@@ -150,6 +150,7 @@ def bulk_feedback(context_id, feedback_str):
             return response_jsonified(re, code)
 
         for id in data['rss']:
+            local_created = False
             rs = sm.session.query(RequestSet).filter_by(id=id).first()
             if not rs:
                 errors.append(id)
@@ -164,6 +165,7 @@ def bulk_feedback(context_id, feedback_str):
             else:
                 feedback = Feedback()
                 created += 1
+                local_created = True
             feedback.uuid_request_set = rs.uuid_request_set
             feedback.id_feedback_context = context_id
             feedback.id_user = user.id
@@ -177,7 +179,7 @@ def bulk_feedback(context_id, feedback_str):
             feedback.score = rs.score
             feedback.attack_prediction = rs.attack_prediction or 42
             feedback.feedback = feedback_str
-            if not updated:
+            if local_created:
                 sm.session.add(feedback)
         if not errors:
             sm.session.commit()
@@ -293,7 +295,10 @@ def submit_feedback_for(context_id):
     except Exception as e:
         traceback.print_exc()
         re.success = False
-        re.message = str(e)
+        message = str(e)
+        if 'NoBrokersAvailable' in message:
+            message = 'Kafka: NoBrokersAvailable. Please try again later.'
+        re.message = message
         if code == 200:
             code = 500
 

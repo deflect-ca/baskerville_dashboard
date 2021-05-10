@@ -78,15 +78,20 @@ export class BaskervilleService {
   sumbitToBaskerville(): Observable<any> {
     return this.http.post( environment.baseApiUrl + `/feedback/submit/${this.selectedFeedback.id}`, {});
   }
-  getResults(appId, filter?: Filter): any {
+  getResults(appId, filter?: Filter, feedbackContextId?: number): any {
     appId = appId || '';
+    console.log('selectedFeedbackContext', feedbackContextId);
     let url = environment.baseApiUrl + '/results';
+    if (feedbackContextId) {
+      url += '/by_context';
+    }
     if (appId) {url += `/${appId}`; }
     if (filter) {
       url += this.getFilterQ(filter);
     }
     const data = {
-      client_uuid: this.getUserId()
+      client_uuid: this.getUserId(),
+      feedbackContextId
     };
     return this.http.post(url, data);
   }
@@ -138,7 +143,7 @@ export class BaskervilleService {
   sendBulkFeedback(feedback, data): any {
     const body = {
       rss: data.rss,
-      lowRate: data.lowRate,
+      lowRate: data.lowRateAttack,
       client_uuid: this.getUserId()
     };
     return this.http.post(

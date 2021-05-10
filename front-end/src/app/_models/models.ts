@@ -147,6 +147,10 @@ export class RequestSet {
   score: number;
   anomalyScore: number;
   isSelected: boolean;
+  feedback: string;
+  lowRate: boolean;
+  lowRateFeedback: boolean;
+  lowRateAttack: boolean;
 }
 
 export class Results<T> {

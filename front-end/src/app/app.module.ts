@@ -105,6 +105,21 @@ const appRoutes: Routes = [
     data: { title: 'Upload Logs' },
     canActivate: [AuthGuard]
   }, {
+    path: 'try-baskerville/#upload',
+    component: TryBaskervilleComponent,
+    data: { title: 'Upload Logs' },
+    canActivate: [AuthGuard]
+  }, {
+    path: 'try-baskerville/#logs',
+    component: TryBaskervilleComponent,
+    data: { title: 'Baskerville Logs' },
+    canActivate: [AuthGuard]
+  },  {
+    path: 'try-baskerville/#results',
+    component: TryBaskervilleComponent,
+    data: { title: 'Results' },
+    canActivate: [AuthGuard]
+  }, {
     path: 'try-baskerville/:appId',
     component: TryBaskervilleComponent,
     data: { title: 'Try Baskerville' },
@@ -202,7 +217,8 @@ const appRoutes: Routes = [
     component: LoginComponent,
     data: { title: 'Login' },
   },
-  { path: '**', component: PageNotFoundComponent },
+  {path: '404', component: PageNotFoundComponent},
+  {path: '**', redirectTo: '/404'}
 ];
 
 @NgModule({

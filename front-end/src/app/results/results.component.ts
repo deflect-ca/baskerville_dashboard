@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
 import {BaskervilleService} from '../_services/baskerville.service';
 import {BotToLabels, Envelop, RequestSetFilter, NotificationType, RequestSet, Results, UserCategoryEnum} from '../_models/models';
 import {NotificationService} from '../_services/notification.service';
@@ -14,6 +14,7 @@ import {environment} from '../../environments/environment';
   styleUrls: ['./results.component.css']
 })
 export class ResultsComponent implements OnInit, AfterViewInit{
+  @Input() feedbackContextId: number;
   name = 'results';
   envelop: Envelop = null;
   rsFilter: RequestSetFilter;
@@ -42,6 +43,7 @@ export class ResultsComponent implements OnInit, AfterViewInit{
       this.currentId = params.get('id');
       this.rsFilter.appId = this.currentId; // todo: needs safeguarding
     });
+    this.feedbackContextId = this.baskervilleSvc.selectedFeedback?.id;
   }
   ngAfterViewInit(): void {
     if (this.currentId){
@@ -83,7 +85,8 @@ export class ResultsComponent implements OnInit, AfterViewInit{
   getResults(): any {
     this.baskervilleSvc.inProgress = true;
     this.rsFilter = this.prepareFilter();
-    this.baskervilleSvc.getResults(this.currentId, this.rsFilter).subscribe(
+    console.log('this.baskervilleSvc.selectedFeedback?.id', this.baskervilleSvc.selectedFeedback?.id);
+    this.baskervilleSvc.getResults(this.currentId, this.rsFilter, this.baskervilleSvc.selectedFeedback?.id).subscribe(
       d => {
         this.envelop = d as Envelop;
         this.notificationSvc.showSnackBar(this.envelop.message);
