@@ -4,7 +4,7 @@ Flask==1.1.2
 Flask-Cors==3.0.9
 Flask-Session==0.3.2
 Flask-SocketIO==4.3.2
-passlib==1.7.2
+passlib==1.7.4
 PyJWT==1.7.1
 PyYAML==3.12
 redis==3.5.3

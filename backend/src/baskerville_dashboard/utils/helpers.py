@@ -289,9 +289,9 @@ def get_active_apps():
 
 
 def get_active_processes():
-    from flask import g
-    if g and hasattr(g, 'ACTIVE_APPS'):
-        return {k: v.p for k, v in g.ACTIVE_APPS.items()}
+    from baskerville_dashboard.app import ACTIVE_APPS
+    if ACTIVE_APPS:
+        return {k: v.p for k, v in ACTIVE_APPS.items()}
     return {}
 
 
