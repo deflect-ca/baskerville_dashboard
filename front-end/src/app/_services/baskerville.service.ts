@@ -15,6 +15,7 @@ export class BaskervilleService {
   results = new Results<RequestSet>();
   appIsActive = false;
   selectedFeedback: FeedbackContext;
+  reSubmitSearch = true;
 
   resultsBehaviorSubj = new BehaviorSubject(this.results);
   constructor(
@@ -24,7 +25,16 @@ export class BaskervilleService {
     this.activeAppId = this.getActiveAppId();
     // this.setInProgress(this.activeAppId !== null);
   }
-
+  setSelectedFeedback(fb): void {
+    this.selectedFeedback = fb;
+    this.reSubmitSearch = true;
+  }
+  checkForSelectedFeedbackErrors(): string {
+    if (!this.selectedFeedback) {
+      return 'No feedback context selected. Please return to the first step and select one.';
+    }
+    return '';
+  }
   cancelRun(): Observable<object> {
     return this.http.post(
       environment.baseApiUrl + `/try/app/${this.getActiveAppId()}/cancel`,
@@ -82,9 +92,6 @@ export class BaskervilleService {
     appId = appId || '';
     console.log('selectedFeedbackContext', feedbackContextId);
     let url = environment.baseApiUrl + '/results';
-    if (feedbackContextId) {
-      url += '/by_context';
-    }
     if (appId) {url += `/${appId}`; }
     if (filter) {
       url += this.getFilterQ(filter);

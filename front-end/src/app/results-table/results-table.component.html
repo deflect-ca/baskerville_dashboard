@@ -1,4 +1,6 @@
+<mat-chip style="color:red" *ngIf="error"><mat-icon>error_outline</mat-icon>{{error}}</mat-chip>
 <div class="mat-elevation-z8">
+
   <div *ngIf="allSelected">
     <!--<mat-slide-toggle (click)="selectAllInQ()" [checked]="allInQSelected" color="primary">all in query</mat-slide-toggle>-->
     <!--<mat-label>Select all in query
@@ -28,7 +30,7 @@
     </ng-container>
     <ng-container *ngFor="let col of dataColumns; let i=index;" [matColumnDef]="col">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ col }} </th>
-      <td mat-cell *matCellDef="let element"  [title]="element[col]">{{ element[col]?.toString() | slice:-12}}{{element[col]?.toString()?.length > 15? '...': ''}}</td>
+      <td mat-cell *matCellDef="let element"  [title]="element[col]">{{ element[col]?.toString() | slice:0:12}}{{element[col]?.toString()?.length > 12? '...': ''}}</td>
     </ng-container>
     <ng-container matColumnDef="Feedback" *ngIf="dataSource.data.length > 0">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>

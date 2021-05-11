@@ -18,6 +18,9 @@
     </mat-step>
     <mat-step id="results">
       <ng-template matStepLabel><a href="try-baskerville/#results">Results</a></ng-template>
+      <p>
+        <mat-label *ngIf="activeAppId">To provide feedback for your results for <mat-basic-chip>{{activeAppId}}</mat-basic-chip>&nbsp;<a mat-raised-button routerLink="/feedback">CLICK HERE</a> </mat-label>
+      </p>
       <app-results></app-results>
       <button mat-button matStepperPrevious>Back</button>
     </mat-step>

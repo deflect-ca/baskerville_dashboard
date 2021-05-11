@@ -4,6 +4,7 @@ import {FeedbackContextVM, FeedbackContextTypeEnum, FeedbackContext} from '../_m
 import {BaskervilleService} from '../_services/baskerville.service';
 import {NotificationService} from '../_services/notification.service';
 import {MatStepper} from '@angular/material/stepper';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 
 @Component({
@@ -19,6 +20,7 @@ export class FeedbackComponent implements OnInit {
   feedbackContextVM: FeedbackContextVM;
   inProgress = false;
   submitted = false;
+  error = '';
   constructor(
     private formBuilder: FormBuilder,
     private baskervilleSvc: BaskervilleService,
@@ -56,13 +58,15 @@ export class FeedbackComponent implements OnInit {
     if (success){
       this.submitted = false;
       this.selectedFeedbackContext = this.baskervilleSvc.selectedFeedback;
+      this.baskervilleSvc.reSubmitSearch = true;
       this.stepper.next();
     }
   }
   fcChange(e: boolean): void {
     this.submitted = false;
-    this.baskervilleSvc.selectedFeedback = this.feedbackContextVM.idToFc[this.contextFormGroup.controls.fc.value];
+    this.baskervilleSvc.setSelectedFeedback(this.feedbackContextVM.idToFc[this.contextFormGroup.controls.fc.value]);
     this.selectedFeedbackContext = this.baskervilleSvc.selectedFeedback;
+    this.baskervilleSvc.reSubmitSearch = true;
     this.stepper.next();
   }
   feedbackChange(e: boolean): void {
@@ -70,6 +74,8 @@ export class FeedbackComponent implements OnInit {
     this.inProgress = false;
   }
   submitToBaskerville(): void {
+    this.error = this.baskervilleSvc.checkForSelectedFeedbackErrors();
+    if (this.error) return;
     this.submitted = true;
     this.inProgress = true;
     this.baskervilleSvc.setInProgress(this.inProgress);
@@ -79,9 +85,11 @@ export class FeedbackComponent implements OnInit {
         this.submitted = true;
         this.inProgress = false;
         this.baskervilleSvc.setInProgress(this.inProgress);
+        this.error = '';
       },
       e => {
         this.notificationSvc.showSnackBar(e.error.message);
+        this.error = e.error.message;
         this.submitted = false;
         this.inProgress = false;
         this.baskervilleSvc.setInProgress(this.inProgress);

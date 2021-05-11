@@ -84,49 +84,28 @@ def get_all_results():
     re.message = f'No results found.'
     code = 200
     ip_list = None
+    runtime = None
     try:
+        data = request.json
         org_uuid = session['org_uuid']
         ip_file_name = request.args.get('file')
-        user = request.user
-        if ip_file_name:
-            ip_list = get_ip_list(ip_file_name, org_uuid)
-        re.data = get_rss(**_q_filter, user=user, ip_list=ip_list)
-        re.message = f'The request sets for {">>"}'
-    except Exception as e:
-        sm.session.rollback()
-        re.success = False
-        re.message = str(e)
-        code = 500
-        traceback.print_exc()
-
-    return response_jsonified(re, code)
-
-
-@results_app.route('/results/by_context', methods=['POST'])
-@login_required
-@resolve_user
-def get_all_results_associate_with_feedback_context():
-    _q_filter = get_qparams(request)
-    re = ResponseEnvelope()
-    sm = SessionManager()
-    re.success = True
-    re.data = []
-    re.message = f'No results found.'
-    code = 200
-    ip_list = None
-    data = request.to_json()['data']
-    try:
-        org_uuid = session['org_uuid']
-        ip_file_name = request.args.get('file')
+        app_id = request.args.get('appId')
         context_id = data.get('feedbackContextId')
         user = request.user
         if ip_file_name:
             ip_list = get_ip_list(ip_file_name, org_uuid)
+        if app_id:
+            if app_id.startswith(org_uuid):
+                app_id = app_id.replace(f'{org_uuid}_', '', 1)
+            runtime = sm.session.query(Runtime).filter(
+            Runtime.file_name.like(f'%{app_id}%')
+        ).first()
         re.data = get_rss(
             **_q_filter,
             user=user,
             ip_list=ip_list,
-            id_feedback_context=context_id
+            id_feedback_context=context_id,
+            id_runtime=runtime.id if runtime else None
         )
         re.message = f'The request sets for {">>"}'
     except Exception as e:

@@ -18,8 +18,10 @@ export class ResultsComponent implements OnInit, AfterViewInit{
   name = 'results';
   envelop: Envelop = null;
   rsFilter: RequestSetFilter;
+  tryBaskerville = false;
   currentId = '';
   error = '';
+  reSubmitSearch = true;
   attackPanel = false;
   inProgress = false;
   selectedFile = null;
@@ -36,29 +38,61 @@ export class ResultsComponent implements OnInit, AfterViewInit{
     private activatedRoute: ActivatedRoute,
     ) {
     this.rsFilter = new RequestSetFilter();
+    this.error = '';
+    this.reSubmitSearch = this.baskervilleSvc.reSubmitSearch;
   }
 
   ngOnInit(): void {
+    this.error = '';
+    this.activatedRoute.url.subscribe(
+      d => {
+        console.log(d);
+        this.tryBaskerville = d[0].path.includes('try-baskerville');
+      },
+      e => {
+        console.error(e);
+        this.tryBaskerville = false;
+      }
+    );
     this.activatedRoute.paramMap.subscribe(params => {
       this.currentId = params.get('id');
       this.rsFilter.appId = this.currentId; // todo: needs safeguarding
     });
+    this.rsFilter.appId = this.baskervilleSvc.activeAppId;
     this.feedbackContextId = this.baskervilleSvc.selectedFeedback?.id;
+    this.reSubmitSearch = this.baskervilleSvc.reSubmitSearch;
   }
   ngAfterViewInit(): void {
+    this.error = '';
+    this.reSubmitSearch = this.baskervilleSvc.reSubmitSearch;
     if (this.currentId){
       this.submit();
     }
   }
+  checkForContextErrors(): void {
+    if (!this.tryBaskerville) {
+      this.error = this.baskervilleSvc.checkForSelectedFeedbackErrors();
+      if (this.error) return;
+      this.error = '';
+    }
+  }
   submit(): void {
+    this.reSubmitSearch = this.baskervilleSvc.reSubmitSearch;
+    this.checkForContextErrors();
     this.baskervilleSvc.inProgress = true;
     this.rsFilter = this.prepareFilter();
-    this.baskervilleSvc.getResults(this.currentId, this.rsFilter).subscribe(
+    this.baskervilleSvc.getResults(
+      this.currentId,
+      this.rsFilter,
+      this.baskervilleSvc.selectedFeedback?.id
+    ).subscribe(
       d => {
         this.envelop = d as Envelop;
         this.notificationSvc.showSnackBar(this.envelop.message);
         this.baskervilleSvc.resultsBehaviorSubj.next(new Results(this.envelop.data));
         this.baskervilleSvc.inProgress = false;
+        this.baskervilleSvc.reSubmitSearch = false;
+        this.reSubmitSearch = this.baskervilleSvc.reSubmitSearch;
       },
       e => {
         this.notificationSvc.showSnackBar(e.message);
@@ -85,7 +119,6 @@ export class ResultsComponent implements OnInit, AfterViewInit{
   getResults(): any {
     this.baskervilleSvc.inProgress = true;
     this.rsFilter = this.prepareFilter();
-    console.log('this.baskervilleSvc.selectedFeedback?.id', this.baskervilleSvc.selectedFeedback?.id);
     this.baskervilleSvc.getResults(this.currentId, this.rsFilter, this.baskervilleSvc.selectedFeedback?.id).subscribe(
       d => {
         this.envelop = d as Envelop;
@@ -96,7 +129,7 @@ export class ResultsComponent implements OnInit, AfterViewInit{
       e => {
         this.notificationSvc.showSnackBar(e.message);
         this.baskervilleSvc.inProgress = false;
-        console.error(e)
+        console.error(e);
       }
     );
   }

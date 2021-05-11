@@ -16,7 +16,7 @@ import {
 } from '../_models/models';
 import {NotificationService} from '../_services/notification.service';
 import {SelectionModel} from '@angular/cdk/collections';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 
 const initialSelection = [];
 const allowMultiSelect = true;
@@ -43,6 +43,8 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
   allSelected = false;
   allInQSelected = false;
   resultsFeedback = false;
+  error = '';
+  tryBaskerville = false;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = [];
@@ -51,10 +53,21 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
   constructor(
     private baskervilleSvc: BaskervilleService,
     private notificationSvc: NotificationService,
-    private router: Router
+    private router: Router,
+    private activatedRoute: ActivatedRoute
     ) {}
 
   ngOnInit(): void {
+    this.activatedRoute.url.subscribe(
+      d => {
+        console.log(d);
+        this.tryBaskerville = d[0].path.includes('try-baskerville');
+      },
+      e => {
+        console.error(e);
+        this.tryBaskerville = false;
+      }
+    );
     this.resultsFeedback = this.router.url === '/feedback';
     this.dataSource = new ResultsTableDataSource();
     this.selection = new SelectionModel<RequestSet>(allowMultiSelect, initialSelection);
@@ -150,7 +163,16 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     this.allInQSelected = !this.allInQSelected;
     return this.allInQSelected;
   }
+  checkForContextErrors(): void {
+    if (!this.tryBaskerville) {
+      this.error = this.baskervilleSvc.checkForSelectedFeedbackErrors();
+      if (this.error) return;
+      this.error = '';
+    }
+  }
   sendBulkPositiveFeedback(): any {
+    this.error = this.baskervilleSvc.checkForSelectedFeedbackErrors();
+    if (this.error) return;
     const data = this.getSelected();
     this.baskervilleSvc.sendBulkFeedback(FeedbackEnum.correct, data).subscribe(
       d => {
@@ -163,6 +185,8 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendBulkBotNotBotFeedback(botNotBot: string, lowRate?: boolean): any {
+    this.error = this.baskervilleSvc.checkForSelectedFeedbackErrors();
+    if (this.error) return;
     const data = {
       rss: this.getSelected(),
       lowRate: lowRate || false
@@ -180,6 +204,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendBulkNegativeFeedback(): any {
+    this.checkForContextErrors();
     const data = this.getSelected();
     this.baskervilleSvc.sendBulkFeedback(FeedbackReversedEnum[FeedbackEnum.incorrect], data).subscribe(
       d => {
@@ -193,6 +218,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendBulkAttack(): any {
+    this.checkForContextErrors();
     const data = this.getSelected();
     this.baskervilleSvc.sendBulkAttack(FeedbackEnum.correct, data).subscribe(
       d => {
@@ -205,6 +231,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendPositiveFeedback(row): any {
+    this.checkForContextErrors();
     const feedbackStr = 'notbot';  // this.botNotBotToFeedback(row.prediction, 'NOTBOT');
     this.baskervilleSvc.sendFeedback(
       feedbackStr, row.id, this.rsFilter.submit
@@ -221,6 +248,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendNegativeFeedback(row, lowRate?: boolean): any {
+    this.checkForContextErrors();
     const feedbackStr = 'bot';  // this.botNotBotToFeedback(row.prediction, 'BOT');
     this.baskervilleSvc.sendFeedback(
       feedbackStr, row.id, lowRate
@@ -239,6 +267,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendAttack(row): any {
+    this.checkForContextErrors();
     this.baskervilleSvc.sendAttack(row.id).subscribe(
       d => {
         this.notificationSvc.showSnackBar(d.message);
@@ -250,6 +279,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   getData(e): any {
+    this.checkForContextErrors();
     this.rsFilter.size = e.pageSize;
     this.rsFilter.page = e.pageIndex;
     this.getResults();
@@ -259,6 +289,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     this.dataSource.numPages = Math.ceil(e.pageSize / this.dataSource.numResults);
   }
   getResults(): any {
+    this.checkForContextErrors();
     this.baskervilleSvc.inProgress = true;
     this.baskervilleSvc.getResults(this.rsFilter.appId, this.rsFilter, this.feedbackContextId).subscribe(
       d => {

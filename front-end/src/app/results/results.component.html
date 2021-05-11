@@ -51,10 +51,16 @@
     <mat-label>You can also upload a .csv of IPs to filter by:&nbsp;</mat-label>
     <input #fileInput type="file" [(ngModel)]="selectedFile" (change)="handleFileInput($event.target.files)" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel,.zip">
     <p>
-      <label class="red" *ngIf="error">{{error}}</label>
+<!--      <label class="red" *ngIf="error">{{error}}</label>-->
+
+      <mat-chip style="color:red" *ngIf="error"><mat-icon>error_outline</mat-icon>{{error}}</mat-chip>
     </p>
   </div>
+  <p>
+    <mat-chip color="accent" *ngIf="!tryBaskerville"><mat-icon>info</mat-icon>Note: If you changed the feedback context, hit SEARCH again to get results</mat-chip>
+  </p>
   <button mat-button color="primary" (click)="submit()">SEARCH</button>
+
 </div>
 
 <app-feedback-context *ngIf="attackPanel"></app-feedback-context>

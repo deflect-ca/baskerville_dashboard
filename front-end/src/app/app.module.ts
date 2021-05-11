@@ -76,6 +76,7 @@ import { EditorComponent } from './editor/editor.component';
 import { NotificationsListComponent } from './notifications-list/notifications-list.component';
 import { MessagesComponent } from './messages/messages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 
 const socketConfig: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
@@ -287,11 +288,11 @@ const appRoutes: Routes = [
     MatButtonModule, LayoutModule, MatOptionModule,
     MatNativeDateModule, MatSidenavModule,
     MatSnackBarModule, MatSelectModule, MatChipsModule,
-    MatProgressBarModule, MatStepperModule, MatBadgeModule, MatDividerModule,
+    MatProgressBarModule, MatStepperModule, MatBadgeModule, MatDividerModule, MatProgressSpinnerModule,
     CodeEditorModule.forRoot()
   ],
   exports: [
-    MatProgressBarModule, MatChipsModule, MatDatepickerModule, MatInputModule, MatGridListModule,
+    MatProgressBarModule, MatChipsModule, MatDatepickerModule, MatInputModule, MatGridListModule, MatProgressSpinnerModule,
     MatSliderModule, BrowserAnimationsModule, SafeHtmlPipe, MatStepperModule, MatSidenavModule, MatBadgeModule
   ],
   providers: [

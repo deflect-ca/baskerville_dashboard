@@ -48,9 +48,14 @@
             <img  src="/assets/icons/Work-26.jpg" alt="" width="450" height="400">
           </mat-card-content>
           <mat-card-actions>
+            <p>
+              <mat-chip style="color:red" *ngIf="error"><mat-icon>error_outline</mat-icon>{{error}}</mat-chip>
+            </p>
             <button mat-stroked-button *ngIf="!inProgress && !submitted" (click)="submitToBaskerville()">SUBMIT</button>
             <p *ngIf="!inProgress && submitted">Thank you, you are now done. Your feedback has been sent to Baskerville for processing to improve the predictions</p>
-            <mat-spinner *ngIf="inProgress"></mat-spinner>
+            <mat-spinner
+              *ngIf="inProgress">
+            </mat-spinner>
           </mat-card-actions>
         </mat-card>
 
