@@ -382,12 +382,13 @@ class ReadLogs(Thread):
     def follow(self):
         import time
         line = '-- waiting...'
-        while not os.path.exists(self.full_path):
+        while not os.path.exists(self.full_path) and not self.stopped():
             self.socketio.emit(self.user_channel, line)
             time.sleep(1)
         for line in follow_file(self.full_path, timeout=300):
             self.socketio.emit(self.user_channel, line)
-
+            if self.stopped():
+                break
         self.socketio.emit(self.user_channel, '--end--')
         self.socketio.emit('message', '--end--')
 

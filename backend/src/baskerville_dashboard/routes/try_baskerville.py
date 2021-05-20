@@ -336,7 +336,6 @@ def app_details(app_id):
         app_data = get_active_app(app_id)
         respose.success = True
         respose.message = f'The data for app_id: {app_id}'
-        print(app_data)
         if app_data:
             details = process_details(app_data)
             # details['running'] = app_data['process'].is_alive()
@@ -356,6 +355,16 @@ def cancel_app(app_id):
     respose = ResponseEnvelope()
     try:
         app_data = get_active_app(app_id)
+        if app_data:
+            p = app_data['process']
+            t = app_data['thread']
+            details = process_details(app_data)
+            if details['running']:
+                p.terminate()
+                p.join()
+                t.stop()
+                t.join()
+
         respose.success = True
         respose.message = f'The data for app_id: {app_id}'
         if app_data:
