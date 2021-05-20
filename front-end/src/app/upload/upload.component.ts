@@ -91,5 +91,10 @@ export class UploadComponent implements OnInit {
       }
     );
   }
+  qualifiedToStart(): boolean {
+    // Cannot click start baskerville if there is no filename selected
+    // and baskerville is not already running.
+    return !this.selectedFileName || this.baskervilleSvc.inProgress;
+  }
 }
 

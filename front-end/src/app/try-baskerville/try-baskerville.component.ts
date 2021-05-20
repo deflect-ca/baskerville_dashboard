@@ -93,6 +93,7 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
   cancelRun(): void {
     this.baskervilleSvc.cancelRun().subscribe(
       (data: Envelop) => {
+        console.log(data);
         this.notificationSvc.showSnackBar(data.message);
       },
       error => {
@@ -128,62 +129,5 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
       this.baskervilleSvc.setInProgress(false);
     }
   }
-  setMessageComm(): void {
-    this.notificationSvc.getMessage().subscribe(
-      d => {
-        this.notificationSvc.addNotification(d, NotificationType.basic);
-      },
-      e => console.error(e)
-    );
-  }
-  handleFileInput(files: FileList): any {
-
-    if (!files || files.length === 0) {
-      this.error = 'No file selected.';
-      this.notificationSvc.showSnackBar(this.error);
-      return;
-    }
-    if (!validFileSize(files[0])){
-      this.error = `File is too big. Max allowed size is ${environment.maxFileSize} MB`;
-      this.notificationSvc.showSnackBar(this.error);
-      return;
-    }
-    this.inProgress = true;
-    this.error = null;
-    this.baskervilleSvc.uploadLogs(files).subscribe(data => {
-        this.uploadResults = data as Envelop;
-        this.selectedFileName = this.uploadResults.data.filename;
-        this.notificationSvc.showSnackBar(this.uploadResults.message);
-      },
-      error1 => {
-        this.notificationSvc.showSnackBar(error1.message, NotificationType.error);
-        console.error(error1);
-        this.error = error1.message;
-      });
-  }
-  startBaskerville(stepper: MatStepper): any{
-    // stepper.next();
-    this.baskervilleSvc.tryBaskerville(this.userSvc.getUser().uuid, this.selectedFileName).subscribe(
-      d => {
-        const results = d as Envelop;
-        this.baskervilleSvc.setActiveAppId(results.data.app_id, true);
-        this.baskervilleSvc.setInProgress(results.data.app_id !== null);
-        this.activeAppId = this.baskervilleSvc.activeAppId;
-        //
-        this.notificationSvc.addNotification(results.message, NotificationType.success);
-        this.notificationSvc.sendToSelf(this.userSvc.getUserChannel(), 'Starting Baskerville...');
-        this.setNotificationsForAppId();
-      },
-      e => {
-        this.notificationSvc.addNotification(e.message, NotificationType.error);
-        this.notificationSvc.addNotification(e.error.message, NotificationType.error);
-        console.error(e);
-      }
-    );
-  }
-  setInProgress(): void {
-    this.baskervilleSvc.setInProgress(!this.baskervilleSvc.inProgress);
-    this.inProgress = this.baskervilleSvc.inProgress;
-    console.warn('this.inProgressSvc.inProgress', this.baskervilleSvc.inProgress);
-  }
+  active(): boolean { return this.baskervilleSvc.inProgress; }
 }

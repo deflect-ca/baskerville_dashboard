@@ -1,19 +1,27 @@
 <div class="try-baskerville">
-  <mat-vertical-stepper [linear]="false" #stepper>
+  <mat-vertical-stepper [linear]="true" #stepper>
     <mat-step id="upload">
       <ng-template matStepLabel><a href="try-baskerville/#upload">Upload your logs or use the sample logs</a></ng-template>
       <app-upload [stepper]="stepper"></app-upload>
       <div>
-        <button mat-button matStepperNext>Next</button>
+        <p>
+          <button mat-button matStepperNext color="accent">Next</button>
+        </p>
       </div>
     </mat-step>
     <mat-step id="logs">
-      <ng-template matStepLabel><a href="try-baskerville/#logs">Baskerville output</a></ng-template>
+      <ng-template matStepLabel>
+        <a href="try-baskerville/#logs">Baskerville output</a>
+      </ng-template>
+      <h3>Baskerville now starts processing your logs. This takes a lot of time, depending on the timestamps on your logs.</h3>
+      Baskerville's progress will be visible in the console below.
       <app-logs></app-logs>
       <!--<button mat-raised-button (click)="cancelRun()" id="cancel-run">Cancel</button>-->
       <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button matStepperNext>Next</button>
+        <p>
+          <button mat-button matStepperPrevious [disabled]="active()" color="accent">Back</button>
+          <button mat-button matStepperNext [disabled]="active()" color="accent">Next</button>
+        </p>
       </div>
     </mat-step>
     <mat-step id="results">
@@ -22,7 +30,9 @@
         <mat-label *ngIf="activeAppId">To provide feedback for your results for <mat-basic-chip>{{activeAppId}}</mat-basic-chip>&nbsp;<a mat-raised-button routerLink="/feedback">CLICK HERE</a> </mat-label>
       </p>
       <app-results></app-results>
-      <button mat-button matStepperPrevious>Back</button>
+      <p>
+        <button mat-button matStepperPrevious color="accent">Back</button>
+      </p>
     </mat-step>
   </mat-vertical-stepper>
 </div>
