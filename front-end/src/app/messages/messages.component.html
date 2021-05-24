@@ -16,9 +16,9 @@
 
       </table>
 
-      <mat-paginator #paginator [length]="dataSource.numResults || 200"
+      <mat-paginator #paginator [length]="dataSource.numResults || 0"
                      [pageIndex]="dataSource?.currentPage || 0"
-                     [pageSize]="dataSource?.pageSize || 25"
+                     [pageSize]="dataSource?.pageSize || 0"
                      [pageSizeOptions]="[25, 50, 100, 250]"
                      (page)="pageEvent = getData($event)"
                      showFirstLastButtons>

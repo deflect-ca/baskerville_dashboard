@@ -5,7 +5,7 @@
       <app-upload [stepper]="stepper"></app-upload>
       <div>
         <p>
-          <button mat-button matStepperNext color="accent">Next</button>
+<!--          <button mat-button matStepperNext color="accent" [disabled]="!hasFileSelected()">Next</button>-->
         </p>
       </div>
     </mat-step>
@@ -15,7 +15,9 @@
       </ng-template>
       <h3>Baskerville now starts processing your logs. This takes a lot of time, depending on the timestamps on your logs.</h3>
       Baskerville's progress will be visible in the console below.
+
       <app-logs></app-logs>
+      <button mat-button color="warn" (click)="cancelRun()"><mat-icon>close</mat-icon>CANCEL RUN</button>
       <!--<button mat-raised-button (click)="cancelRun()" id="cancel-run">Cancel</button>-->
       <div>
         <p>

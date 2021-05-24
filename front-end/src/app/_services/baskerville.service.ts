@@ -37,8 +37,8 @@ export class BaskervilleService {
   }
   cancelRun(): Observable<object> {
     return this.http.post(
-      environment.baseApiUrl + `/try/app/${this.getActiveAppId()}/cancel`,
-      {}
+      environment.baseApiUrl + `/try/app/cancel`,
+      {app_id: this.getActiveAppId()}
       );
   }
   uploadLogs(files: FileList): Observable<object> {

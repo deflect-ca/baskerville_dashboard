@@ -497,10 +497,13 @@ def get_rss(
     )
     if id_runtime:
         rs_q = rs_q.filter(RequestSet.id_runtime == id_runtime)
-    if not id_runtime and not user.is_admin:
+    if not user.is_admin:
         logger.debug(f'Filtering runtimes for user.id:{user.id}')
         # admins can see everything, for everyone else, filter
         runtime_ids = [r.id for r in get_user_runtimes(user)]
+        if id_runtime:
+            if id_runtime not in runtime_ids:
+                raise ValueError('No runtime with this id found.')
         logger.debug(f'Runtime ids: {runtime_ids}')
         rs_q = rs_q.filter(RequestSet.id_runtime.in_(runtime_ids))
     if ip:

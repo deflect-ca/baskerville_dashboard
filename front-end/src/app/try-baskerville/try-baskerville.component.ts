@@ -102,6 +102,9 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
       }
     );
   }
+  hasFileSelected(): boolean {
+    return this.stepper?.selected?.completed;
+  }
   setNotificationsForAppId(): void {
     this.activeAppId = this.baskervilleSvc.getActiveAppId();
     if (this.activeAppId) {

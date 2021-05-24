@@ -95,7 +95,7 @@ export class ResultsComponent implements OnInit, AfterViewInit{
         this.reSubmitSearch = this.baskervilleSvc.reSubmitSearch;
       },
       e => {
-        this.notificationSvc.showSnackBar(e.message);
+        this.notificationSvc.showSnackBar(e.error?.message);
         this.baskervilleSvc.inProgress = false;
       }
     );
@@ -111,7 +111,7 @@ export class ResultsComponent implements OnInit, AfterViewInit{
         this.baskervilleSvc.inProgress = false;
       },
       e => {
-        this.notificationSvc.showSnackBar(e.message);
+        this.notificationSvc.showSnackBar(e.error?.message);
         this.baskervilleSvc.inProgress = false;
       }
     );
@@ -127,7 +127,7 @@ export class ResultsComponent implements OnInit, AfterViewInit{
         this.baskervilleSvc.inProgress = false;
       },
       e => {
-        this.notificationSvc.showSnackBar(e.message);
+        this.notificationSvc.showSnackBar(e.error?.message);
         this.baskervilleSvc.inProgress = false;
         console.error(e);
       }
