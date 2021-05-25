@@ -348,12 +348,14 @@ def app_details(app_id):
     return response_jsonified(respose, code)
 
 
-@try_baskerville_app.route('/try/app/<app_id>/cancel', methods=['GET'])
+@try_baskerville_app.route('/try/app/cancel', methods=['GET'])
 @login_required
-def cancel_app(app_id):
+def cancel_app():
     code = 200
     respose = ResponseEnvelope()
     try:
+        data = request.get_json()
+        app_id = data.get('app_id')
         app_data = get_active_app(app_id)
         if app_data:
             p = app_data['process']
