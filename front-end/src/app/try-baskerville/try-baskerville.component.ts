@@ -71,6 +71,8 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
     this.baskervilleSvc.setInProgress(this.baskervilleSvc.getActiveAppId());
   }
   ngAfterViewInit(): void {
+    this.baskervilleSvc.loadTryBaskervilleData();
+    this.stepper.selectedIndex = this.baskervilleSvc.tryBaskervilleData?.currentStep || this.stepToFragment.upload;
     if (this.activeAppId) {
       this.baskervilleSvc.getAppStatus().subscribe(
         d => {
@@ -83,18 +85,21 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
         }
       );
     }
-    this.route.fragment.subscribe(
+    /*this.route.fragment.subscribe(
       (fragments) => {
         fragments = fragments || 'upload';
         this.stepper.selectedIndex = this.stepToFragment[fragments];
       }
-    );
+    );*/
   }
   cancelRun(): void {
     this.baskervilleSvc.cancelRun().subscribe(
       (data: Envelop) => {
         console.log(data);
+        console.log('HERE');
         this.notificationSvc.showSnackBar(data.message);
+        this.baskervilleSvc.setInProgress(false);
+        this.baskervilleSvc.setTryBaskervilleData({running: false});
       },
       error => {
         console.error(error);
@@ -103,7 +108,7 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
     );
   }
   hasFileSelected(): boolean {
-    return this.stepper?.selected?.completed;
+    return this.baskervilleSvc.tryBaskervilleData.fileName !== null;
   }
   setNotificationsForAppId(): void {
     this.activeAppId = this.baskervilleSvc.getActiveAppId();

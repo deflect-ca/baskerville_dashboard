@@ -5,7 +5,7 @@
       <app-upload [stepper]="stepper"></app-upload>
       <div>
         <p>
-<!--          <button mat-button matStepperNext color="accent" [disabled]="!hasFileSelected()">Next</button>-->
+          <button mat-button matStepperNext color="accent" [disabled]="!hasFileSelected()">Next</button>
         </p>
       </div>
     </mat-step>
@@ -13,11 +13,24 @@
       <ng-template matStepLabel>
         <a href="try-baskerville/#logs">Baskerville output</a>
       </ng-template>
-      <h3>Baskerville now starts processing your logs. This takes a lot of time, depending on the timestamps on your logs.</h3>
-      Baskerville's progress will be visible in the console below.
+      <h3>Baskerville has started processing your logs.</h3>
+      <ul>
+        <li>This can take a lot of time, depending on the timestamps on your logs.</li>
+        <li>You can navigate out of this page if you'd like, Baskerville will keep running in the background</li>
+        <li>Progress will be visible in the console below.</li>
+        <li>Click here to <button mat-button color="warn" (click)="cancelRun()">CANCEL RUN</button></li>
+      </ul>
+<!--      <mat-chip-list class="mat-chip">
+        <mat-chip>
+          This can take a lot of time, depending on the timestamps on your logs.
+        </mat-chip>
+        <mat-chip>
+          You can navigate out of this page if you'd like, Baskerville will keep running in the background
+        </mat-chip>
+        <mat-chip>Progress will be visible in the console below.</mat-chip>
+      </mat-chip-list>-->
 
       <app-logs></app-logs>
-      <button mat-button color="warn" (click)="cancelRun()"><mat-icon>close</mat-icon>CANCEL RUN</button>
       <!--<button mat-raised-button (click)="cancelRun()" id="cancel-run">Cancel</button>-->
       <div>
         <p>

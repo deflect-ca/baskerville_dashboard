@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {validFileSize} from '../_models/helpers';
 import {environment} from '../../environments/environment';
-import {Envelop, NotificationType} from '../_models/models';
+import {Envelop, NotificationType, TryBaskervilleStepEnum} from '../_models/models';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BaskervilleService} from '../_services/baskerville.service';
 import {NotificationService} from '../_services/notification.service';
@@ -28,6 +28,8 @@ export class UploadComponent implements OnInit {
     private userSvc: UserService) { }
 
   ngOnInit(): void {
+    this.baskervilleSvc.tryBaskervilleData.currentStep = TryBaskervilleStepEnum.upload;
+    this.baskervilleSvc.tryBaskervilleData.fileName = this.selectedFileName;
   }
   handleFileInput(files: FileList): any {
 
@@ -48,11 +50,21 @@ export class UploadComponent implements OnInit {
         this.selectedFileName = this.uploadResults.data.filename;
         this.notificationSvc.showSnackBar(this.uploadResults.message);
         this.error = '';
+        this.baskervilleSvc.setTryBaskervilleData({
+          currentStep: TryBaskervilleStepEnum.upload,
+          running: false,
+          fileName: this.selectedFileName
+        });
       },
       e => {
         this.notificationSvc.showSnackBar(e.message, NotificationType.error);
         console.error(e);
         this.error = e.message;
+        this.baskervilleSvc.setTryBaskervilleData({
+          currentStep: TryBaskervilleStepEnum.upload,
+          running: false,
+          fileName: this.selectedFileName
+        });
       });
   }
   uploadTempLogs(): void {
@@ -61,11 +73,21 @@ export class UploadComponent implements OnInit {
                this.selectedFileName = this.uploadResults.data.filename;
                this.notificationSvc.showSnackBar(this.uploadResults.message);
                this.error = '';
+               this.baskervilleSvc.setTryBaskervilleData({
+                  currentStep: TryBaskervilleStepEnum.upload,
+                  running: false,
+                  fileName: this.selectedFileName
+               });
         },
       e => {
         this.notificationSvc.showSnackBar(e.message, NotificationType.error);
         console.error(e);
         this.error = e.message;
+        this.baskervilleSvc.setTryBaskervilleData({
+          currentStep: TryBaskervilleStepEnum.upload,
+          running: false,
+          fileName: this.selectedFileName
+        });
       },
     );
   }
@@ -83,11 +105,21 @@ export class UploadComponent implements OnInit {
         this.notificationSvc.sendToSelf(this.userSvc.getUserChannel(), 'Starting Baskerville...');
         // this.router.navigate(['try-baskerville', this.activeAppId]);
         // this.setNotificationsForAppId();
+        this.baskervilleSvc.setTryBaskervilleData({
+          currentStep: TryBaskervilleStepEnum.running,
+          running: true,
+          fileName: this.selectedFileName
+        });
       },
       e => {
         this.notificationSvc.addNotification(e.message, NotificationType.error);
         this.notificationSvc.addNotification(e.error.message, NotificationType.error);
         console.error(e);
+        this.baskervilleSvc.setTryBaskervilleData({
+          currentStep: TryBaskervilleStepEnum.upload,
+          running: false,
+          fileName: this.selectedFileName
+        });
       }
     );
   }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {environment} from '../../environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {Observable, BehaviorSubject} from 'rxjs';
-import {Envelop, FeedbackContext, Filter, RequestSet, RequestSetFilter, Results} from '../_models/models';
+import {Envelop, FeedbackContext, Filter, RequestSet, RequestSetFilter, Results, TryBaskervilleData} from '../_models/models';
 import {UserService} from './user.service';
 
 @Injectable({
@@ -16,6 +16,7 @@ export class BaskervilleService {
   appIsActive = false;
   selectedFeedback: FeedbackContext;
   reSubmitSearch = true;
+  tryBaskervilleData: TryBaskervilleData = null;
 
   resultsBehaviorSubj = new BehaviorSubject(this.results);
   constructor(
@@ -23,7 +24,19 @@ export class BaskervilleService {
     private userSvc: UserService
   ) {
     this.activeAppId = this.getActiveAppId();
+    this.tryBaskervilleData = this.loadTryBaskervilleData();
     // this.setInProgress(this.activeAppId !== null);
+  }
+  loadTryBaskervilleData(): TryBaskervilleData {
+    this.tryBaskervilleData = JSON.parse(localStorage.getItem('TryBaskervilleData')) || new TryBaskervilleData();
+    return this.tryBaskervilleData;
+  }
+  saveTryBaskervilleData(): void {
+    localStorage.setItem('TryBaskervilleData', JSON.stringify(this.tryBaskervilleData));
+  }
+  setTryBaskervilleData(data): void {
+    this.tryBaskervilleData = new TryBaskervilleData(data);
+    localStorage.setItem('TryBaskervilleData', JSON.stringify(this.tryBaskervilleData));
   }
   setSelectedFeedback(fb): void {
     this.selectedFeedback = fb;
