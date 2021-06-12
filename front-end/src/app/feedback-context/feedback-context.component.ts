@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {FeedbackContext, FeedbackContextTypeEnum, FeedbackContextVM} from '../_models/models';
+import {FeedbackContext, FeedbackContextTypeEnum, FeedbackContextVM, FeedbackStepEnum} from '../_models/models';
 import {BaskervilleService} from '../_services/baskerville.service';
 import {NotificationService} from '../_services/notification.service';
 
@@ -40,7 +40,6 @@ export class FeedbackContextComponent implements OnInit {
     });
   }
   reasonChange(e): void {
-    console.warn(this.contextFormGroup.controls.reason.value);
     this.selectedReason = this.reasons[this.contextFormGroup.controls.reason.value.replace(' ', '_')];
     this.selectedDescription = this.feedbackContextVM.feedbackContextTypeToDescr[this.selectedReason];
   }

@@ -38,7 +38,7 @@
           <app-results (change)="feedbackChange($event)" [feedbackContextId]="selectedFeedbackContext?.id"></app-results>
           <div>
             <button mat-button matStepperPrevious>Back</button>
-            <button mat-button matStepperNext>Next</button>
+            <button mat-button matStepperNext (click)="updateFeedbackData()">Next</button>
           </div>
       </mat-step>
       <mat-step>

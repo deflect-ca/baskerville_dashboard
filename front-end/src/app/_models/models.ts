@@ -289,7 +289,6 @@ export class FeedbackContextVM {
   idToFc: object = {};
   constructor(options?: any) {
     options = JSONCamelCase.convert(options) || {};
-    console.info(options);
     this.feedbackContexts = options.feedbackContexts || [];
     this.feedbackContextType = options.feedbackContextType || FeedbackContextTypeEnum.attack;
     this.feedbackContextTypeToDescr = options.feedbackContextTypeToDescr || {};
@@ -333,6 +332,12 @@ export const TryBaskervilleStepEnum = {
   results: 2
 };
 
+export const FeedbackStepEnum = {
+  feedbackContext: 0,
+  feedback: 1,
+  submit: 2
+};
+
 export class TryBaskervilleData {
   fileName: string = null;
   running = false;
@@ -342,5 +347,15 @@ export class TryBaskervilleData {
     this.fileName = options.fileName || null;
     this.running = options.running || false;
     this.currentStep = options.currentStep || TryBaskervilleStepEnum.upload;
+  }
+}
+
+export class FeedbackData {
+  selectedFeedbackContext: FeedbackContext = null;
+  currentStep = FeedbackStepEnum.feedbackContext;
+  constructor(options?: any) {
+    options = options ? JSONCamelCase.convert(options) : {};
+    this.selectedFeedbackContext = options.selectedFeedbackContext || null;
+    this.currentStep = options.currentStep || FeedbackStepEnum.feedbackContext;
   }
 }

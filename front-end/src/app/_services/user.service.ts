@@ -53,7 +53,7 @@ export class UserService {
     const url = environment.baseApiUrl + '/users/' + id;
     return this.http.get<Envelop>(url)
       .pipe(
-        tap(res => console.info('Got user:', res)),
+        tap(res => console.info('Got user.')),
         shareReplay(1)
       );
   }

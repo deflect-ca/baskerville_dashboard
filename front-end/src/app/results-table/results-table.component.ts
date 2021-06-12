@@ -126,7 +126,6 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     return this.multipleSelectedItems;
   }
   handleCheckboxChange(event): void {
-    console.info('handleCheckboxChange')
     console.warn(event);
     if (event) {
       this.masterToggle();

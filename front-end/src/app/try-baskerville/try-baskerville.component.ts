@@ -2,7 +2,7 @@ import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {BaskervilleService} from '../_services/baskerville.service';
 import {validFileSize} from '../_models/helpers';
 import {environment} from '../../environments/environment';
-import {Envelop, NotificationType} from '../_models/models';
+import {Envelop, NotificationType, TryBaskervilleStepEnum} from '../_models/models';
 import {NotificationService} from '../_services/notification.service';
 import {ActivatedRoute, NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {filter} from 'rxjs/operators';
@@ -23,17 +23,10 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
   @ViewChild('stepper') stepper: MatStepper;
   inProgress = false;
   activeAppId = null;
-  selectedFileName = null;
-  uploadResults: Envelop = null;
   error: string = null;
   browserRefresh = false;
   uploadFileFormGroup: FormGroup;
   getLogsFormGroup: FormGroup;
-  stepToFragment = {
-    upload: 0,
-    logs: 1,
-    results: 2,
-  };
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -72,7 +65,7 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit(): void {
     this.baskervilleSvc.loadTryBaskervilleData();
-    this.stepper.selectedIndex = this.baskervilleSvc.tryBaskervilleData?.currentStep || this.stepToFragment.upload;
+    this.stepper.selectedIndex = this.baskervilleSvc.tryBaskervilleData?.currentStep || TryBaskervilleStepEnum.upload;
     if (this.activeAppId) {
       this.baskervilleSvc.getAppStatus().subscribe(
         d => {

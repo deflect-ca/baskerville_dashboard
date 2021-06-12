@@ -1,6 +1,6 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {FeedbackContextVM, FeedbackContextTypeEnum, FeedbackContext} from '../_models/models';
+import {FeedbackContextVM, FeedbackContextTypeEnum, FeedbackContext, FeedbackStepEnum} from '../_models/models';
 import {BaskervilleService} from '../_services/baskerville.service';
 import {NotificationService} from '../_services/notification.service';
 import {MatStepper} from '@angular/material/stepper';
@@ -12,7 +12,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
   templateUrl: './feedback.component.html',
   styleUrls: ['./feedback.component.css']
 })
-export class FeedbackComponent implements OnInit {
+export class FeedbackComponent implements OnInit, AfterViewInit {
   @ViewChild('stepper') stepper: MatStepper;
   contextFormGroup: FormGroup;
   resultsFormGroup: FormGroup;
@@ -38,15 +38,23 @@ export class FeedbackComponent implements OnInit {
     this.resultsFormGroup = this.formBuilder.group({
       secondCtrl: ['', Validators.required]
     });
+    this.baskervilleSvc.loadFeedbackData();
+  }
+  ngAfterViewInit(): void {
+    this.baskervilleSvc.loadFeedbackData();
+    // todo: need to have a single source of truth... this needs refactoring.
+    if (this.baskervilleSvc.feedbackData.selectedFeedbackContext) {
+      this.baskervilleSvc.selectedFeedback = this.baskervilleSvc.feedbackData.selectedFeedbackContext;
+      this.selectedFeedbackContext = this.baskervilleSvc.feedbackData.selectedFeedbackContext;
+    }
+    this.stepper.selectedIndex = this.baskervilleSvc.feedbackData?.currentStep || FeedbackStepEnum.feedbackContext;
   }
   setFeedbackContextVM(): void {
     this.baskervilleSvc.getFeedbackContentVM().subscribe(
       data => {
         if (data.success) {
-          console.warn(data);
           this.feedbackContextVM = new FeedbackContextVM(data.data);
           this.notificationSvc.showSnackBar(data.message);
-          console.warn(this.feedbackContextVM);
         }
       },
       e => {
@@ -59,6 +67,10 @@ export class FeedbackComponent implements OnInit {
       this.submitted = false;
       this.selectedFeedbackContext = this.baskervilleSvc.selectedFeedback;
       this.baskervilleSvc.reSubmitSearch = true;
+      this.baskervilleSvc.setFeedbackData({
+        feedbackContext: this.selectedFeedbackContext,
+        currentStep: FeedbackStepEnum.feedback
+      });
       this.stepper.next();
     }
   }
@@ -67,11 +79,26 @@ export class FeedbackComponent implements OnInit {
     this.baskervilleSvc.setSelectedFeedback(this.feedbackContextVM.idToFc[this.contextFormGroup.controls.fc.value]);
     this.selectedFeedbackContext = this.baskervilleSvc.selectedFeedback;
     this.baskervilleSvc.reSubmitSearch = true;
+    this.baskervilleSvc.setFeedbackData({
+      selectedFeedbackContext: this.selectedFeedbackContext,
+      currentStep: FeedbackStepEnum.feedback
+    });
     this.stepper.next();
   }
   feedbackChange(e: boolean): void {
     this.submitted = false;
     this.inProgress = false;
+    this.baskervilleSvc.setFeedbackData({
+      selectedFeedbackContext: this.selectedFeedbackContext,
+      currentStep: FeedbackStepEnum.feedback
+    });
+  }
+  updateFeedbackData(): void {
+    this.baskervilleSvc.setFeedbackData({
+      selectedFeedbackContext: this.selectedFeedbackContext,
+      currentStep: FeedbackStepEnum.submit
+    });
+    this.stepper.next();
   }
   submitToBaskerville(): void {
     this.error = this.baskervilleSvc.checkForSelectedFeedbackErrors();

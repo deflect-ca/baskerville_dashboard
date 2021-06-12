@@ -28,7 +28,6 @@ export class EditorComponent implements OnInit {
   ngOnInit(): void {
   }
   onCodeChanged(value): void {
-    console.log('CODE', value);
     this.codeModel.value = value;
     this.emitter.emit(value);
   }

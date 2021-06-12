@@ -59,7 +59,6 @@ export class AppComponent implements AfterViewInit{
     // );
     const channel = this.userSvc.getUserChannel();
     if (channel){
-      console.warn(`this.userSvc.getUserChannel()`, channel);
       this.notificationSvc.registerChannel(channel).subscribe(
         d => {
           this.notificationSvc.addNotification(
