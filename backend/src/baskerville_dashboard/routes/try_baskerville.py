@@ -348,7 +348,7 @@ def app_details(app_id):
     return response_jsonified(respose, code)
 
 
-@try_baskerville_app.route('/try/app/cancel', methods=['GET'])
+@try_baskerville_app.route('/try/app/cancel', methods=['POST'])
 @login_required
 def cancel_app():
     code = 200
@@ -357,24 +357,24 @@ def cancel_app():
         data = request.get_json()
         app_id = data.get('app_id')
         app_data = get_active_app(app_id)
+
         if app_data:
             p = app_data['process']
-            t = app_data['thread']
+            t = app_data['log_thread']
             details = process_details(app_data)
+            print('details', details)
             if details['running']:
                 p.terminate()
-                p.join()
+                # p.join()
                 t.stop()
-                t.join()
-
+                # t.join()
+                print('STOPPED')
+                respose.message = f'Successfully stopped Baskerville for {app_id}'
+            else:
+                respose.message = 'Process already stoped.'
         respose.success = True
-        respose.message = f'The data for app_id: {app_id}'
-        if app_data:
-            if app_data['process'].is_alive():
-                app_data['process'].terminate()
-                app_data['process'].join()
-                respose.data = f'Successfully stopped Baskerville for {app_id}'
     except Exception as e:
+        traceback.print_exc()
         respose.success = False
         respose.message = str(e)
         code = 500
