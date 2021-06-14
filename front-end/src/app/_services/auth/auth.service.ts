@@ -8,6 +8,7 @@ import {Subject} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {UserService} from '../user.service';
 import jwtDecode from 'jwt-decode';
+import {KEYSTOEXPIRE} from '../../_models/helpers';
 // import { tokenNotExpired } from 'angular2-jwt';
 
 @Injectable({
@@ -48,11 +49,13 @@ export class AuthService {
     localStorage.setItem('currentUser', JSON.stringify(authResult));
     localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()) );
   }
-
+  resetData(): void {
+    KEYSTOEXPIRE.forEach(e => {
+      localStorage.removeItem(e);
+    });
+  }
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('expires_at');
+    this.resetData();
     this._user = undefined;
     this.userSvc.setUser(this._user);
   }

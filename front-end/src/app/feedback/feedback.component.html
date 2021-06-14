@@ -51,7 +51,14 @@
             <p>
               <mat-chip style="color:red" *ngIf="error"><mat-icon>error_outline</mat-icon>{{error}}</mat-chip>
             </p>
-            <button mat-stroked-button *ngIf="!inProgress && !submitted" (click)="submitToBaskerville()">SUBMIT</button>
+            <p>
+              <mat-chip style="color:#15579A" *ngIf="feedbackCount >= 0">
+                <mat-icon *ngIf="feedbackCount>0">check</mat-icon>
+                <mat-icon *ngIf="feedbackCount===0">error_outline</mat-icon>
+                Number of rows to be sent: {{feedbackCount}}
+              </mat-chip>
+            </p>
+            <button mat-stroked-button *ngIf="!inProgress && !submitted" (click)="submitToBaskerville()" [disabled]="feedbackCount===0">SUBMIT</button>
             <p *ngIf="!inProgress && submitted">Thank you, you are now done. Your feedback has been sent to Baskerville for processing to improve the predictions</p>
             <mat-spinner
               *ngIf="inProgress">
@@ -60,7 +67,7 @@
         </mat-card>
 
         <div>
-          <button mat-button matStepperPrevious>Back</button>
+          <button mat-button matStepperPrevious (click)="backToFeedback()">Back</button>
           <!--<button mat-button (click)="stepper.reset()">Reset</button>-->
         </div>
       </mat-step>

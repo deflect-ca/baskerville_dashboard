@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {FeedbackContextVM, FeedbackContextTypeEnum, FeedbackContext, FeedbackStepEnum} from '../_models/models';
+import {FeedbackContextVM, FeedbackContextTypeEnum, FeedbackContext, FeedbackStepEnum, Envelop} from '../_models/models';
 import {BaskervilleService} from '../_services/baskerville.service';
 import {NotificationService} from '../_services/notification.service';
 import {MatStepper} from '@angular/material/stepper';
@@ -20,6 +20,7 @@ export class FeedbackComponent implements OnInit, AfterViewInit {
   feedbackContextVM: FeedbackContextVM;
   inProgress = false;
   submitted = false;
+  feedbackCount: number = null;
   error = '';
   constructor(
     private formBuilder: FormBuilder,
@@ -94,6 +95,17 @@ export class FeedbackComponent implements OnInit, AfterViewInit {
     });
   }
   updateFeedbackData(): void {
+    this.baskervilleSvc.feedbackCount().subscribe(
+      d => {
+        d = (d as Envelop);
+        this.feedbackCount = d.data;
+        this.notificationSvc.showSnackBar(d.message);
+      },
+      e => {
+        console.error(e.error);
+        this.feedbackCount = null;
+      },
+    );
     this.baskervilleSvc.setFeedbackData({
       selectedFeedbackContext: this.selectedFeedbackContext,
       currentStep: FeedbackStepEnum.submit
@@ -122,6 +134,10 @@ export class FeedbackComponent implements OnInit, AfterViewInit {
         this.baskervilleSvc.setInProgress(this.inProgress);
       }
     );
+  }
+  backToFeedback(): void {
+    this.error = '';
+    // this.stepper.previous();
   }
 }
 

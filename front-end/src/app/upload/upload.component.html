@@ -1,5 +1,6 @@
 <mat-card class="upload-card mat-elevation-z5">
-  <mat-card-title>Upload your logs </mat-card-title>
+  <mat-card-title *ngIf="!selectedFileName">Upload your logs </mat-card-title>
+  <mat-card-title><mat-label *ngIf="selectedFileName">Selected file name: {{selectedFileName}}</mat-label> </mat-card-title>
   <mat-card-content>
     <mat-grid-list cols="1" rowHeight="40vh">
        <mat-grid-tile>
@@ -9,9 +10,11 @@
         <p>
           <label class="red" *ngIf="error">{{error}}</label>
         </p>
+         <p>
 
+         </p>
          <mat-grid-tile-footer>
-          &nbsp;
+           &nbsp;
           <p>
             Max size 50MB.
             To see the supported log format, click <a href="https://github.com/equalitie/baskerville/blob/master/data/samples/log_schema.json" target="_blank">here</a>.

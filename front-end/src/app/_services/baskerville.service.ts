@@ -29,11 +29,11 @@ export class BaskervilleService {
     // this.setInProgress(this.activeAppId !== null);
   }
   loadTryBaskervilleData(): TryBaskervilleData {
-    this.tryBaskervilleData = JSON.parse(localStorage.getItem('TryBaskervilleData')) || new TryBaskervilleData();
+    this.tryBaskervilleData = JSON.parse(localStorage.getItem('tbd')) || new TryBaskervilleData();
     return this.tryBaskervilleData;
   }
   saveTryBaskervilleData(): void {
-    localStorage.setItem('TryBaskervilleData', JSON.stringify(this.tryBaskervilleData));
+    localStorage.setItem('tbd', JSON.stringify(this.tryBaskervilleData));
   }
   setTryBaskervilleData(data): void {
     this.tryBaskervilleData = new TryBaskervilleData(data);
@@ -64,6 +64,11 @@ export class BaskervilleService {
     return this.http.post(
       environment.baseApiUrl + `/try/app/cancel`,
       {app_id: this.getActiveAppId()}
+      );
+  }
+  feedbackCount(): Observable<any> {
+    return this.http.get(
+      environment.baseApiUrl + `/feedback/${this.selectedFeedback.id}/count`
       );
   }
   uploadLogs(files: FileList): Observable<object> {

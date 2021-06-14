@@ -305,6 +305,49 @@ def submit_feedback_for(context_id):
     return response_jsonified(re, code)
 
 
+@feedback_app.route('/feedback/<context_id>/count', methods=('GET',))
+@login_required
+@resolve_user
+def feedback_count(context_id):
+    _q_filter = get_qparams(request)
+    sm = SessionManager()
+    re = ResponseEnvelope()
+    code = 200
+    try:
+        user = request.user
+        fc = sm.session.query(FeedbackContext)
+        if not user.is_admin:
+            fc = fc.filter_by(
+                id_user=user.id
+            )
+        fc = fc.filter_by(
+            id=context_id
+        ).first()
+        if not fc:
+            code = 403
+            raise ValueError(
+                'Could not find feedback context. '
+            )
+
+        feedback_count = sm.session.query(Feedback).filter_by(
+            id_user=user.id
+        ).filter_by(
+            id_feedback_context=fc.id
+        ).count()
+
+        re.data = feedback_count
+        re.success = True
+        re.message = 'Feedback count for current feedback context'
+    except Exception as e:
+        traceback.print_exc()
+        re.success = False
+        re.message = str(e)
+        if code == 200:
+            code = 500
+
+    return response_jsonified(re, code)
+
+
 def submit_feedback_to_isac(feedback_vm: FeedbackVM):
     result = submit_feedback_vm(feedback_vm)
     if result:
