@@ -7,3 +7,7 @@
   padding-left: 22vw;
 }
 
+::ng-deep .mat-horizontal-stepper-header{
+  pointer-events: none !important;
+}
+

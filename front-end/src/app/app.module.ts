@@ -76,6 +76,7 @@ import { EditorComponent } from './editor/editor.component';
 import { NotificationsListComponent } from './notifications-list/notifications-list.component';
 import { MessagesComponent } from './messages/messages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 
 const socketConfig: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
@@ -103,6 +104,21 @@ const appRoutes: Routes = [
     path: 'try-baskerville/upload',
     component: UploadComponent,
     data: { title: 'Upload Logs' },
+    canActivate: [AuthGuard]
+  }, {
+    path: 'try-baskerville/#upload',
+    component: TryBaskervilleComponent,
+    data: { title: 'Upload Logs' },
+    canActivate: [AuthGuard]
+  }, {
+    path: 'try-baskerville/#logs',
+    component: TryBaskervilleComponent,
+    data: { title: 'Baskerville Logs' },
+    canActivate: [AuthGuard]
+  },  {
+    path: 'try-baskerville/#results',
+    component: TryBaskervilleComponent,
+    data: { title: 'Results' },
     canActivate: [AuthGuard]
   }, {
     path: 'try-baskerville/:appId',
@@ -202,7 +218,8 @@ const appRoutes: Routes = [
     component: LoginComponent,
     data: { title: 'Login' },
   },
-  { path: '**', component: PageNotFoundComponent },
+  {path: '404', component: PageNotFoundComponent},
+  {path: '**', redirectTo: '/404'}
 ];
 
 @NgModule({
@@ -271,11 +288,11 @@ const appRoutes: Routes = [
     MatButtonModule, LayoutModule, MatOptionModule,
     MatNativeDateModule, MatSidenavModule,
     MatSnackBarModule, MatSelectModule, MatChipsModule,
-    MatProgressBarModule, MatStepperModule, MatBadgeModule, MatDividerModule,
+    MatProgressBarModule, MatStepperModule, MatBadgeModule, MatDividerModule, MatProgressSpinnerModule,
     CodeEditorModule.forRoot()
   ],
   exports: [
-    MatProgressBarModule, MatChipsModule, MatDatepickerModule, MatInputModule, MatGridListModule,
+    MatProgressBarModule, MatChipsModule, MatDatepickerModule, MatInputModule, MatGridListModule, MatProgressSpinnerModule,
     MatSliderModule, BrowserAnimationsModule, SafeHtmlPipe, MatStepperModule, MatSidenavModule, MatBadgeModule
   ],
   providers: [

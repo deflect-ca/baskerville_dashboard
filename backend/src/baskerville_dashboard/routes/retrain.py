@@ -29,7 +29,7 @@ def retrain():
     try:
         code = 200
         data = request.get_json()
-        user = get_user_by_org_uuid(session['org_uuid'])
+        user = get_user_by_org_uuid(session['org_uuid'], session['user_id'])
         config = parse_config(data=data['config'])
         training_config = TrainingConfig(config).validate()
         if len(training_config.errors) > 0:

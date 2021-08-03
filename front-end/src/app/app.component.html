@@ -40,7 +40,7 @@
     <div class="content" role="main">
       <mat-icon *ngIf="!drawer.opened" (click)="drawer.toggle()" class="menu-small mat-elevation-z2">menu_open</mat-icon>
       <app-login  *ngIf="!userExists()"></app-login>
-      <app-try-menu *ngIf="userIsGuest()"></app-try-menu>
+<!--      <app-try-menu *ngIf="userIsGuest()"></app-try-menu>-->
       <app-app-status *ngIf="userExists()"></app-app-status>
       <router-outlet *ngIf="userExists()"></router-outlet>
       <app-footer></app-footer>

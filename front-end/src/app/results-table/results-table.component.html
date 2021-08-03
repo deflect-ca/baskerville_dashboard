@@ -1,4 +1,6 @@
+<mat-chip style="color:red" *ngIf="error"><mat-icon>error_outline</mat-icon>{{error}}</mat-chip>
 <div class="mat-elevation-z8">
+
   <div *ngIf="allSelected">
     <!--<mat-slide-toggle (click)="selectAllInQ()" [checked]="allInQSelected" color="primary">all in query</mat-slide-toggle>-->
     <!--<mat-label>Select all in query
@@ -15,9 +17,9 @@
         <div *ngIf="isAllSelected()">
           <button mat-icon-button color="primary" (click)="sendPositiveFeedback(row)"><mat-icon aria-hidden="false" aria-label="correct" title="Correct">check</mat-icon></button>
           <button mat-icon-button color="warn" (click)="sendNegativeFeedback(row)"><mat-icon aria-hidden="false" aria-label="incorrect" title="Incorrect">close</mat-icon></button>
-          <button mat-icon-button color="basic" class="active-low-rate" (click)="sendNegativeFeedback(row, true)"><span class="material-icons" [ngClass]="{'active-low-rate': row.lowRate}">slow_motion_video</span></button>
+          <button mat-icon-button color="basic" class="active-low-rate" (click)="sendNegativeFeedback(row, true)"><span class="material-icons" [ngClass]="{'active-low-rate': row.lowRateFeedback}">slow_motion_video</span></button>
         </div>
-        <mat-checkbox (change)="$event ? masterToggle() : null"
+        <mat-checkbox (change)="handleCheckboxChange($event)"
                       [checked]="selection.hasValue() && isAllSelected()"
                       [indeterminate]="selection.hasValue() && !isAllSelected()">
         </mat-checkbox>
@@ -28,7 +30,7 @@
     </ng-container>
     <ng-container *ngFor="let col of dataColumns; let i=index;" [matColumnDef]="col">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ col }} </th>
-      <td mat-cell *matCellDef="let element" >{{ element[col] }}</td>
+      <td mat-cell *matCellDef="let element"  [title]="element[col]">{{ element[col]?.toString() | slice:0:12}}{{element[col]?.toString()?.length > 12? '...': ''}}</td>
     </ng-container>
     <ng-container matColumnDef="Feedback" *ngIf="dataSource.data.length > 0">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -49,8 +51,8 @@
           <img  src="/assets/icons/BOT.png" alt="BOT" width="40" height="40">
           <img  *ngIf="row.feedback==='bot'" style="margin-left: -40px;" src="/assets/icons/BOT_selected.png" alt="BOT" width="40" height="40">
         </button>
-        <button mat-icon-button color="warn" title="LOW RATE" [ngClass]="{'active-low-rate': row.lowRate}" (click)="sendNegativeFeedback(row, true)" [disabled]="multipleSelectedItems" class="mat-elevation-z5">
-          <span class="material-icons" [ngClass]="{'active-low-rate': row.lowRate}">slow_motion_video</span>
+        <button mat-icon-button color="warn" title="LOW RATE" [ngClass]="{'active-low-rate': row.lowRateFeedback}" (click)="sendNegativeFeedback(row, true)" [disabled]="multipleSelectedItems" class="mat-elevation-z5">
+          <span class="material-icons" [ngClass]="{'active-low-rate': row.lowRateFeedback}">slow_motion_video</span>
         </button>
       </td>
     </ng-container>
@@ -74,9 +76,9 @@
 
   </table>
 
-  <mat-paginator #paginator [length]="dataSource.numResults || 200"
+  <mat-paginator #paginator [length]="dataSource.numResults || 0"
       [pageIndex]="dataSource?.currentPage || 0"
-      [pageSize]="dataSource?.pageSize || 25"
+      [pageSize]="dataSource?.pageSize || 0"
       [pageSizeOptions]="[25, 50, 100, 250]"
       (page)="pageEvent = getData($event)"
       showFirstLastButtons>

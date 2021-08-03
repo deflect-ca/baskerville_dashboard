@@ -9,6 +9,12 @@
   z-index: 3;
 }
 
+.disabled-link {
+  pointer-events: none;
+}
+::ng-deep .mat-vertical-stepper-header{
+  pointer-events: none !important;
+}
 /*
 #cancel-run {
   z-index: 2;

@@ -3,9 +3,12 @@
 #
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
+from concurrent.futures import Future
 from datetime import datetime
 
 import eventlet
+import psutil
+from baskerville.db.models import Runtime, RequestSet
 from baskerville_dashboard.vm.retrain_vm import RetrainVm
 
 eventlet.monkey_patch()
@@ -15,9 +18,8 @@ import re
 from baskerville_dashboard.utils.kafka import get_kafka_producer
 from docker.errors import DockerException
 
-
 from baskerville.db.dashboard_models import User, Organization, Feedback
-from baskerville.models.config import KafkaConfig, TrainingConfig
+from baskerville.models.config import KafkaConfig
 from baskerville.util.enums import FeedbackEnum
 from baskerville_dashboard.vm.feedback_vm import FeedbackVM
 from docker.models.containers import Container
@@ -29,13 +31,15 @@ from dateutil import parser
 from math import ceil
 from functools import wraps
 from threading import Thread, Event
+from pyaml_env import parse_config
 
 import docker
 from flask import abort
 from baskerville_dashboard.db.manager import SessionManager
-from baskerville.util.helpers import parse_config, SerializableMixin
+from baskerville.util.helpers import SerializableMixin, \
+    get_logger
 from baskerville.util.enums import LabelEnum
-from baskerville.db.models import RequestSet, Runtime
+
 
 KAFKA_PRODUCER = None
 KAFKA_CONSUMER = None
@@ -44,8 +48,9 @@ ALLOWED_EXTENSIONS = {'json', 'zip', 'gzip', 'tar'}
 COMPRESSION_EXTENSIONS = {'zip', 'gzip', 'tar'}
 REVERSE_LABELS = {e.name: e.value for e in LabelEnum}
 ALLOWED_COLS = [
-    'id', 'ip', 'uuid_request_set', 'target', 'target_original', 'start', 'stop',
-    'num_requests', 'prediction', 'score'
+    'id', 'ip', 'uuid_request_set', 'target', 'target_original', 'start',
+    'stop',
+    'num_requests', 'prediction', 'score', 'low_rate_attack'
 ]
 FILTER = {
     'page': 0,
@@ -83,6 +88,8 @@ BOT_NOT_BOT = {
 ALLOWED_FEEDBACK = {'bot', 'notbot'}
 DOCKER_CLIENT = None
 camel_case_pattern = re.compile(r'(?<!^)(?=[A-Z])')
+
+logger = get_logger(__name__, output_file='baskerville_dashboard.log')
 
 
 def get_docker_client():
@@ -220,6 +227,7 @@ def submit_training(retrain_vm: RetrainVm, retrain_topic='retrain'):
         return False
     return True
 
+
 def follow_file(file_path, timeout=150):
     not_line = 0
     with open(file_path) as f:
@@ -282,9 +290,9 @@ def get_active_apps():
 
 
 def get_active_processes():
-    from flask import g
-    if g and hasattr(g, 'ACTIVE_APPS'):
-        return {k: v.p for k, v in g.ACTIVE_APPS.items()}
+    from baskerville_dashboard.app import ACTIVE_APPS
+    if ACTIVE_APPS:
+        return {k: v.p for k, v in ACTIVE_APPS.items()}
     return {}
 
 
@@ -359,8 +367,8 @@ def get_socket_io():
 
 
 class ReadLogs(Thread):
-    def __init__(self, org_uuid, full_path):
-        self.org_uuid = org_uuid
+    def __init__(self, user_channel, full_path):
+        self.user_channel = user_channel
         self.full_path = full_path
         self.socketio = get_socket_io()
         self._stop_event = Event()
@@ -375,17 +383,45 @@ class ReadLogs(Thread):
     def follow(self):
         import time
         line = '-- waiting...'
-        while not os.path.exists(self.full_path):
-            self.socketio.emit(self.org_uuid, line)
+        while not os.path.exists(self.full_path) and not self.stopped():
+            self.socketio.emit(self.user_channel, line)
             time.sleep(1)
         for line in follow_file(self.full_path, timeout=300):
-            self.socketio.emit(self.org_uuid, line)
-
-        self.socketio.emit(self.org_uuid, '--end--')
+            self.socketio.emit(self.user_channel, line)
+            if self.stopped():
+                break
+        self.socketio.emit(self.user_channel, '--end--')
         self.socketio.emit('message', '--end--')
 
     def run(self):
         self.follow()
+
+
+def is_process_running(p):
+    if isinstance(p, Future):
+        return p.running()
+    else:
+        if hasattr(p, 'is_alive'):
+            return p.is_alive()
+        if hasattr(p, 'name'):
+            name = p.name
+            for proc in psutil.process_iter():
+                print(proc.name())
+                if proc.name() == name:
+                    print("have")
+                    return True
+                else:
+                    print("Dont have")
+        # else:
+        #     p = psutil.Process(pid)
+    print('No process info...')
+    return False
+
+
+def process_details(app_data):
+    details = app_data['details']
+    details['running'] = is_process_running(app_data['process'])
+    return details
 
 
 class ResponseEnvelope(SerializableMixin):
@@ -454,7 +490,7 @@ def get_user_runtimes(user: User):
 
 def get_rss(
         ip, target, start, stop, prediction, size, page,
-        id_runtime=None, user=None, ip_list=None
+        id_runtime=None, user=None, ip_list=None, id_feedback_context=None
 ):
     sm = SessionManager()
     rs_q = sm.session.query(
@@ -462,9 +498,14 @@ def get_rss(
     )
     if id_runtime:
         rs_q = rs_q.filter(RequestSet.id_runtime == id_runtime)
-    if not id_runtime and not user.is_admin:
+    if not user.is_admin:
+        logger.debug(f'Filtering runtimes for user.id:{user.id}')
         # admins can see everything, for everyone else, filter
         runtime_ids = [r.id for r in get_user_runtimes(user)]
+        if id_runtime:
+            if id_runtime not in runtime_ids:
+                raise ValueError('No runtime with this id found.')
+        logger.debug(f'Runtime ids: {runtime_ids}')
         rs_q = rs_q.filter(RequestSet.id_runtime.in_(runtime_ids))
     if ip:
         rs_q = rs_q.filter(RequestSet.ip == ip)
@@ -490,17 +531,26 @@ def get_rss(
         } for r in data]
         # todo: join
         feedback = sm.session.query(Feedback)
-        if not user.is_admin:
-            feedback = feedback.filter(Feedback.id_user == user.id)
+        if id_feedback_context:
+            feedback = feedback.filter(
+                Feedback.id_feedback_context == id_feedback_context
+            )
         feedback.filter(
+            Feedback.id_user == user.id
+        ).filter(
             Feedback.uuid_request_set.in_(
                 [d[ALLOWED_COLS.index('uuid_request_set')] for d in data])
         ).all()
-        feedback_to_rs = {f.uuid_request_set: f.feedback for f in feedback}
+        feedback_to_rs = {
+            f.uuid_request_set: (f.feedback, f.low_rate)
+            for f in feedback
+        }
 
         if feedback_to_rs:
             for rs in data_dict:
-                rs['feedback'] = str(feedback_to_rs.get(rs['id']))
+                fb, lr = feedback_to_rs.get(rs['uuid_request_set'], (None, 0))
+                rs['feedback'] = str(fb)
+                rs['low_rate_feedback'] = lr
 
         # todo: model:
         return {
@@ -590,15 +640,21 @@ def get_docker_container_status(container_name):
     return container_state['Status']
 
 
-def get_user_by_org_uuid(org_uuid):
+def get_user_by_org_uuid(org_uuid, user_id) -> User:
     from flask import session
     sm = SessionManager()
     org_uuid = org_uuid or session.get('user_uuid')
     if org_uuid:
         org = sm.session.query(Organization).filter_by(
             uuid=org_uuid).first()
-        return sm.session.query(User).filter_by(
-            id_organization=org.id).first()
+        if org:
+            user = sm.session.query(User).filter_by(
+                id=user_id
+            ).filter_by(
+                id_organization=org.id
+            ).first()
+            logger.debug(f'User: {user.username} {user.id}')
+            return user
     return None
 
 

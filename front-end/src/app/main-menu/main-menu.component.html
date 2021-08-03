@@ -16,7 +16,7 @@
   </mat-grid-tile>
   <mat-grid-tile *ngIf="!userIsGuest()">
     <div class="card-menu card-small" tabindex="3" routerLink="/pipelines" routerLinkActive="active">
-      <a routerLink="/pipelines" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Pipelines</a>
+      <a routerLink="/pipelines" class="menu-link" routerLinkActive="active" routerLinkActiveOptions="{exact:true}">Pipelines&nbsp;<mat-chip color="warn">ALPHA</mat-chip></a>
     </div>
   </mat-grid-tile>
   <mat-grid-tile *ngIf="userIsAdmin()">

@@ -24,7 +24,7 @@ def all_notifications():
     re = ResponseEnvelope()
     try:
         code = 200
-        user = get_user_by_org_uuid(session['org_uuid'])
+        user = get_user_by_org_uuid(session['org_uuid'], session['user_id'])
         notifications = sm.session.query(
             Message
         ).filter_by(uuid_organization=session['org_uuid'])

@@ -33,6 +33,10 @@ export class UserService {
     }
     return this.currentUser;
   }
+  getUserChannel(): string {
+    const user = this.getUser();
+    return user ? user.uuid + '_' + user.id: null;
+  }
   userIsAdmin(): boolean {
     return this.getUser()?.category === UserCategoryEnum.admin;
   }
@@ -49,7 +53,7 @@ export class UserService {
     const url = environment.baseApiUrl + '/users/' + id;
     return this.http.get<Envelop>(url)
       .pipe(
-        tap(res => console.info('Got user:', res)),
+        tap(res => console.info('Got user.')),
         shareReplay(1)
       );
   }
