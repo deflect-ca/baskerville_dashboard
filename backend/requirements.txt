@@ -13,3 +13,4 @@ uuid==1.30
 baskerville==1.0.0
 docker==4.4.4
 docker-compose==1.28.5
+pyaml-env==1.1.1

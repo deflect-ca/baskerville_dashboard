@@ -31,11 +31,12 @@ from dateutil import parser
 from math import ceil
 from functools import wraps
 from threading import Thread, Event
+from pyaml_env import parse_config
 
 import docker
 from flask import abort
 from baskerville_dashboard.db.manager import SessionManager
-from baskerville.util.helpers import parse_config, SerializableMixin, \
+from baskerville.util.helpers import SerializableMixin, \
     get_logger
 from baskerville.util.enums import LabelEnum
 
