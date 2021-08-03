@@ -2,7 +2,7 @@ import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {BaskervilleService} from '../_services/baskerville.service';
 import {validFileSize} from '../_models/helpers';
 import {environment} from '../../environments/environment';
-import {Envelop, NotificationType} from '../_models/models';
+import {Envelop, NotificationType, TryBaskervilleStepEnum} from '../_models/models';
 import {NotificationService} from '../_services/notification.service';
 import {ActivatedRoute, NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {filter} from 'rxjs/operators';
@@ -23,17 +23,10 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
   @ViewChild('stepper') stepper: MatStepper;
   inProgress = false;
   activeAppId = null;
-  selectedFileName = null;
-  uploadResults: Envelop = null;
   error: string = null;
   browserRefresh = false;
   uploadFileFormGroup: FormGroup;
   getLogsFormGroup: FormGroup;
-  stepToFragment = {
-    upload: 0,
-    logs: 1,
-    results: 2,
-  };
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -71,6 +64,8 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
     this.baskervilleSvc.setInProgress(this.baskervilleSvc.getActiveAppId());
   }
   ngAfterViewInit(): void {
+    this.baskervilleSvc.loadTryBaskervilleData();
+    this.stepper.selectedIndex = this.baskervilleSvc.tryBaskervilleData?.currentStep || TryBaskervilleStepEnum.upload;
     if (this.activeAppId) {
       this.baskervilleSvc.getAppStatus().subscribe(
         d => {
@@ -83,23 +78,30 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
         }
       );
     }
-    this.route.fragment.subscribe(
+    /*this.route.fragment.subscribe(
       (fragments) => {
         fragments = fragments || 'upload';
         this.stepper.selectedIndex = this.stepToFragment[fragments];
       }
-    );
+    );*/
   }
   cancelRun(): void {
     this.baskervilleSvc.cancelRun().subscribe(
       (data: Envelop) => {
+        console.log(data);
+        console.log('HERE');
         this.notificationSvc.showSnackBar(data.message);
+        this.baskervilleSvc.setInProgress(false);
+        this.baskervilleSvc.setTryBaskervilleData({running: false});
       },
       error => {
         console.error(error);
         this.notificationSvc.showSnackBar(error.msg);
       }
     );
+  }
+  hasFileSelected(): boolean {
+    return this.baskervilleSvc.tryBaskervilleData.fileName !== null;
   }
   setNotificationsForAppId(): void {
     this.activeAppId = this.baskervilleSvc.getActiveAppId();
@@ -128,62 +130,5 @@ export class TryBaskervilleComponent implements OnInit, AfterViewInit {
       this.baskervilleSvc.setInProgress(false);
     }
   }
-  setMessageComm(): void {
-    this.notificationSvc.getMessage().subscribe(
-      d => {
-        this.notificationSvc.addNotification(d, NotificationType.basic);
-      },
-      e => console.error(e)
-    );
-  }
-  handleFileInput(files: FileList): any {
-
-    if (!files || files.length === 0) {
-      this.error = 'No file selected.';
-      this.notificationSvc.showSnackBar(this.error);
-      return;
-    }
-    if (!validFileSize(files[0])){
-      this.error = `File is too big. Max allowed size is ${environment.maxFileSize} MB`;
-      this.notificationSvc.showSnackBar(this.error);
-      return;
-    }
-    this.inProgress = true;
-    this.error = null;
-    this.baskervilleSvc.uploadLogs(files).subscribe(data => {
-        this.uploadResults = data as Envelop;
-        this.selectedFileName = this.uploadResults.data.filename;
-        this.notificationSvc.showSnackBar(this.uploadResults.message);
-      },
-      error1 => {
-        this.notificationSvc.showSnackBar(error1.message, NotificationType.error);
-        console.error(error1);
-        this.error = error1.message;
-      });
-  }
-  startBaskerville(stepper: MatStepper): any{
-    // stepper.next();
-    this.baskervilleSvc.tryBaskerville(this.userSvc.getUser().uuid, this.selectedFileName).subscribe(
-      d => {
-        const results = d as Envelop;
-        this.baskervilleSvc.setActiveAppId(results.data.app_id, true);
-        this.baskervilleSvc.setInProgress(results.data.app_id !== null);
-        this.activeAppId = this.baskervilleSvc.activeAppId;
-        //
-        this.notificationSvc.addNotification(results.message, NotificationType.success);
-        this.notificationSvc.sendToSelf(this.activeAppId, 'Starting Baskerville...');
-        this.setNotificationsForAppId();
-      },
-      e => {
-        this.notificationSvc.addNotification(e.message, NotificationType.error);
-        this.notificationSvc.addNotification(e.error.message, NotificationType.error);
-        console.error(e);
-      }
-    );
-  }
-  setInProgress(): void {
-    this.baskervilleSvc.setInProgress(!this.baskervilleSvc.inProgress);
-    this.inProgress = this.baskervilleSvc.inProgress;
-    console.warn('this.inProgressSvc.inProgress', this.baskervilleSvc.inProgress);
-  }
+  active(): boolean { return this.baskervilleSvc.inProgress; }
 }

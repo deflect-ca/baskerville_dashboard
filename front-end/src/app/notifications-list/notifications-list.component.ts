@@ -17,7 +17,6 @@ export class NotificationsListComponent implements OnInit {
   ngOnInit(): void {
     this.notificationSvc.loadAllMessages().subscribe(
       d => {
-        console.log(d);
         const data = (d as Envelop);
         this.notificationSvc.showSnackBar(data.message);
         for (let i of data.data) {

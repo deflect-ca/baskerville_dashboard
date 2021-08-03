@@ -8,7 +8,7 @@ import uuid
 import traceback
 
 from pathlib import Path
-from baskerville_dashboard.auth import login_required
+from baskerville_dashboard.auth import login_required, resolve_user
 from baskerville_dashboard.utils.helpers import ResponseEnvelope, get_qparams, \
     get_rss, response_jsonified, get_active_app, get_extension, is_compressed, \
     get_ip_list, unzip, get_user_by_org_uuid
@@ -74,6 +74,7 @@ def upload_file():
 
 @results_app.route('/results', methods=['POST'])
 @login_required
+@resolve_user
 def get_all_results():
     _q_filter = get_qparams(request)
     re = ResponseEnvelope()
@@ -83,18 +84,29 @@ def get_all_results():
     re.message = f'No results found.'
     code = 200
     ip_list = None
+    runtime = None
     try:
+        data = request.json
         org_uuid = session['org_uuid']
         ip_file_name = request.args.get('file')
-        user = get_user_by_org_uuid(org_uuid)
-        if not user:
-            code = 404
-            re.success = False
-            re.message = 'No user found'
-            return response_jsonified(re, code)
+        app_id = request.args.get('appId')
+        context_id = data.get('feedbackContextId')
+        user = request.user
         if ip_file_name:
             ip_list = get_ip_list(ip_file_name, org_uuid)
-        re.data = get_rss(**_q_filter, user=user, ip_list=ip_list)
+        if app_id:
+            if app_id.startswith(org_uuid):
+                app_id = app_id.replace(f'{org_uuid}_', '', 1)
+            runtime = sm.session.query(Runtime).filter(
+            Runtime.file_name.like(f'%{app_id}%')
+        ).first()
+        re.data = get_rss(
+            **_q_filter,
+            user=user,
+            ip_list=ip_list,
+            id_feedback_context=context_id,
+            id_runtime=runtime.id if runtime else None
+        )
         re.message = f'The request sets for {">>"}'
     except Exception as e:
         sm.session.rollback()
@@ -108,6 +120,7 @@ def get_all_results():
 
 @results_app.route('/results/<app_id>', methods=['POST'])
 @login_required
+@resolve_user
 def get_results(app_id: str):
     from flask import session
     _q_filter = get_qparams(request)
@@ -123,7 +136,7 @@ def get_results(app_id: str):
         if app_id.startswith(org_uuid):
             app_id = app_id.replace(f'{org_uuid}_', '', 1)
         ip_file_name = request.args.get('file')
-        user = get_user_by_org_uuid(org_uuid)
+        user = get_user_by_org_uuid(org_uuid, session['user_id'])
         if not user:
             code = 404
             re.success = False

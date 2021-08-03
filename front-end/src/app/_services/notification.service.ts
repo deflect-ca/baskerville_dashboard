@@ -100,9 +100,9 @@ export class NotificationService {
     return this.socket.fromEvent(uuid)
       .pipe(map( (data: any) => data ));
   }
-  registerUUID(uuid: string): any {
-    this.registeredAppToUser[uuid] = true;
-    return this.socket.fromEvent(uuid)
+  registerChannel(channel: string): any {
+    this.registeredAppToUser[channel] = true;
+    return this.socket.fromEvent(channel)
       .pipe(map( (data: any) => data ));
   }
   showSnackBar(message: string, action?: string, duration?: number): void {

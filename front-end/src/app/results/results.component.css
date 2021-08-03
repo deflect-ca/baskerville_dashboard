@@ -6,3 +6,8 @@
 .filter-container {
   padding: 10px
 }
+
+.filter-label {
+  vertical-align: super;
+  margin-left:4px;
+}

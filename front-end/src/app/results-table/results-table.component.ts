@@ -16,7 +16,7 @@ import {
 } from '../_models/models';
 import {NotificationService} from '../_services/notification.service';
 import {SelectionModel} from '@angular/cdk/collections';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 
 const initialSelection = [];
 const allowMultiSelect = true;
@@ -28,6 +28,7 @@ const allowMultiSelect = true;
 })
 export class ResultsTableComponent implements AfterViewInit, OnInit {
   @Input() rsFilter: RequestSetFilter;
+  @Input() feedbackContextId: number;
   @Output() created = new EventEmitter<boolean>();
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -42,6 +43,8 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
   allSelected = false;
   allInQSelected = false;
   resultsFeedback = false;
+  error = '';
+  tryBaskerville = false;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = [];
@@ -50,10 +53,21 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
   constructor(
     private baskervilleSvc: BaskervilleService,
     private notificationSvc: NotificationService,
-    private router: Router
+    private router: Router,
+    private activatedRoute: ActivatedRoute
     ) {}
 
   ngOnInit(): void {
+    this.activatedRoute.url.subscribe(
+      d => {
+        console.log(d);
+        this.tryBaskerville = d[0].path.includes('try-baskerville');
+      },
+      e => {
+        console.error(e);
+        this.tryBaskerville = false;
+      }
+    );
     this.resultsFeedback = this.router.url === '/feedback';
     this.dataSource = new ResultsTableDataSource();
     this.selection = new SelectionModel<RequestSet>(allowMultiSelect, initialSelection);
@@ -70,7 +84,8 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
         this.displayedColumns = data.data.length > 0 ? Object.keys(data.data[0]) : [];
         this.dataColumns = this.displayedColumns;
         if (this.dataColumns.length > 0){
-          this.dataColumns.splice(this.dataColumns.indexOf('feedback'), 1)
+          this.dataColumns.splice(this.dataColumns.indexOf('feedback'), 1);
+          this.dataColumns.splice(this.dataColumns.indexOf('lowRateFeedback'), 1);
           this.displayedColumns = this.displayedColumns.concat(rightCols);
           this.displayedColumns.unshift('Select');
         }
@@ -92,7 +107,8 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     this.table.dataSource = this.dataSource;
   }
   toggle(row): void{
-    row.isSelected = !row.isSelected;
+    row.isSelected = this.allSelected? this.allSelected : !row.isSelected;
+    this.multipleSelected();
   }
   isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
@@ -102,18 +118,25 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
   multipleSelected(): boolean {
     let numSelected = 0;
     this.dataSource.data.forEach(row => {
-      numSelected += +row.isSelected;
+      numSelected += +row.isSelected || 0;
       if (numSelected > 1) return;
     });
     this.multipleSelectedItems = numSelected > 1;
+    // console.warn('this.multipleSelectedItems', this.multipleSelectedItems, numSelected)
     return this.multipleSelectedItems;
   }
+  handleCheckboxChange(event): void {
+    console.warn(event);
+    if (event) {
+      this.masterToggle();
+    }
+  }
   masterToggle(): void {
+    this.allSelected = !this.allSelected;
     this.dataSource.data.forEach(row => {
       this.toggle(row);
       // this.selection.select(row)
     });
-    this.allSelected = !this.allSelected;
   }
   getSelected(): RequestSet[] {
     const selectedIds = [];
@@ -124,11 +147,31 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     });
     return selectedIds;
   }
+  updateSelected(botNotBot, lowRate): RequestSet[] {
+    const selectedIds = [];
+    this.dataSource.data.forEach(rs => {
+      if (rs.isSelected) {
+        rs.feedback = botNotBot.toLowerCase();
+        rs.lowRate = lowRate;
+        rs.lowRateFeedback = lowRate;
+      }
+    });
+    return selectedIds;
+  }
   selectAllInQ(): boolean {
     this.allInQSelected = !this.allInQSelected;
     return this.allInQSelected;
   }
+  checkForContextErrors(): void {
+    if (!this.tryBaskerville) {
+      this.error = this.baskervilleSvc.checkForSelectedFeedbackErrors();
+      if (this.error) return;
+      this.error = '';
+    }
+  }
   sendBulkPositiveFeedback(): any {
+    this.error = this.baskervilleSvc.checkForSelectedFeedbackErrors();
+    if (this.error) return;
     const data = this.getSelected();
     this.baskervilleSvc.sendBulkFeedback(FeedbackEnum.correct, data).subscribe(
       d => {
@@ -141,6 +184,8 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendBulkBotNotBotFeedback(botNotBot: string, lowRate?: boolean): any {
+    this.error = this.baskervilleSvc.checkForSelectedFeedbackErrors();
+    if (this.error) return;
     const data = {
       rss: this.getSelected(),
       lowRate: lowRate || false
@@ -148,6 +193,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     this.baskervilleSvc.sendBulkFeedback(BotNotBotEnum[botNotBot], data).subscribe(
       d => {
         this.notificationSvc.showSnackBar(d.message);
+        this.updateSelected(botNotBot, lowRate);
         this.created.emit(true);
       },
       e => {
@@ -157,6 +203,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendBulkNegativeFeedback(): any {
+    this.checkForContextErrors();
     const data = this.getSelected();
     this.baskervilleSvc.sendBulkFeedback(FeedbackReversedEnum[FeedbackEnum.incorrect], data).subscribe(
       d => {
@@ -170,6 +217,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendBulkAttack(): any {
+    this.checkForContextErrors();
     const data = this.getSelected();
     this.baskervilleSvc.sendBulkAttack(FeedbackEnum.correct, data).subscribe(
       d => {
@@ -182,6 +230,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendPositiveFeedback(row): any {
+    this.checkForContextErrors();
     const feedbackStr = 'notbot';  // this.botNotBotToFeedback(row.prediction, 'NOTBOT');
     this.baskervilleSvc.sendFeedback(
       feedbackStr, row.id, this.rsFilter.submit
@@ -198,6 +247,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendNegativeFeedback(row, lowRate?: boolean): any {
+    this.checkForContextErrors();
     const feedbackStr = 'bot';  // this.botNotBotToFeedback(row.prediction, 'BOT');
     this.baskervilleSvc.sendFeedback(
       feedbackStr, row.id, lowRate
@@ -205,6 +255,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
       d => {
         row.feedback = feedbackStr;
         row.lowRate = lowRate;
+        row.lowRateFeedback = lowRate;
         this.notificationSvc.showSnackBar(d.message);
         this.created.emit(true);
       },
@@ -215,6 +266,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   sendAttack(row): any {
+    this.checkForContextErrors();
     this.baskervilleSvc.sendAttack(row.id).subscribe(
       d => {
         this.notificationSvc.showSnackBar(d.message);
@@ -226,6 +278,7 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     );
   }
   getData(e): any {
+    this.checkForContextErrors();
     this.rsFilter.size = e.pageSize;
     this.rsFilter.page = e.pageIndex;
     this.getResults();
@@ -235,10 +288,12 @@ export class ResultsTableComponent implements AfterViewInit, OnInit {
     this.dataSource.numPages = Math.ceil(e.pageSize / this.dataSource.numResults);
   }
   getResults(): any {
+    this.checkForContextErrors();
     this.baskervilleSvc.inProgress = true;
-    this.baskervilleSvc.getResults(this.rsFilter.appId, this.rsFilter).subscribe(
+    this.baskervilleSvc.getResults(this.rsFilter.appId, this.rsFilter, this.feedbackContextId).subscribe(
       d => {
         const envelop = d as Envelop;
+        console.log(envelop);
         this.notificationSvc.showSnackBar(envelop.message);
         this.baskervilleSvc.resultsBehaviorSubj.next(new Results(envelop.data));
         this.baskervilleSvc.inProgress = false;

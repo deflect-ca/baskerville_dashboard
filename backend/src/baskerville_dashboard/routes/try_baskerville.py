@@ -7,23 +7,43 @@
 import os
 import traceback
 import uuid
+from concurrent.futures import Future
 from datetime import datetime
 from multiprocessing import Process
 
+import psutil
 import requests
 
 from pathlib import Path
 
-from baskerville_dashboard.auth import login_required
-from baskerville_dashboard.utils.helpers import response_jsonified, allowed_file, \
+from baskerville_dashboard.auth import login_required, resolve_user
+from baskerville_dashboard.utils.helpers import response_jsonified, \
+    allowed_file, \
     validate_config, get_active_app, unzip, init_active_apps, \
     get_baskerville_config, ReadLogs, ResponseEnvelope, is_compressed, \
-    get_extension, start_local_baskerville, get_default_data_path
+    get_extension, start_local_baskerville, get_default_data_path, \
+    process_details, is_process_running
+from daemonize import Daemonize
+from daemons.daemonizer import run
 from requests.auth import HTTPBasicAuth
 from werkzeug.utils import secure_filename
-from flask import Blueprint, request, jsonify, g, session, current_app, url_for
+from flask import Blueprint, request, jsonify, session, current_app, url_for
 
 try_baskerville_app = Blueprint('try_baskerville_app', __name__)
+
+# from concurrent.futures import ProcessPoolExecutor as Pool, Future
+
+from multiprocessing import Pool
+
+
+POOL = None
+
+
+def get_pool() -> Pool:
+    global POOL
+    if not POOL:
+        POOL = Pool(2)
+    return POOL
 
 
 @try_baskerville_app.route('/try/upload/temp', methods=['POST'])
@@ -110,12 +130,15 @@ def upload_file():
 @try_baskerville_app.route('/try', methods=['POST'])
 @login_required
 @init_active_apps
+@resolve_user
 def start_baskerville_for():
     from baskerville_dashboard.app import ACTIVE_APPS
 
     from baskerville.util.enums import RunType
     data = request.get_json()
     org_uuid = session['org_uuid']
+    user = request.user
+
     file_name = data['filename']
     re = ResponseEnvelope()
     code = 200
@@ -134,6 +157,7 @@ def start_baskerville_for():
 
     config = get_baskerville_config()
     app_name = f'{org_uuid}_{file_name}'
+    print('APP_NAME', app_name)
     spark_file_path = f'{full_path}/*.json' if is_compressed(full_path) \
         else full_path
 
@@ -142,34 +166,64 @@ def start_baskerville_for():
         org_uuid,
         f'{app_name}_baskerville.log'
     )
+    user = request.user
     config['engine']['raw_log']['paths'] = [spark_file_path]
     config['engine']['logpath'] = log_path
     config['engine']['id_client'] = org_uuid
     config['spark']['app_name'] = app_name
-    config_errors = validate_config(config)
+    config['user_details']['username'] = user.username
+    config['user_details']['organization_uuid'] = user.organization.uuid
+    config['user_details']['organization_name'] = user.organization.name
 
+    config_errors = validate_config(config)
+    cname = f'{org_uuid}_{user.id}'
     if config_errors:
         re.success = False
         re.message = jsonify(config_errors)
         code = 422
     else:
         try:
-            p = Process(
-                daemon=True,
-                name=app_name,
-                target=start_local_baskerville,
-                args=(config, pipeline),
-                kwargs={
+            args_to_action = (config, pipeline)
+            kwargs_to_action = {
                     'BASKERVILLE_ROOT': os.environ['BASKERVILLE_ROOT'],
                     'DB_HOST': os.environ['DB_HOST'],
                     'DB_USER': os.environ['DB_USER'],
                     'DB_PASS': os.environ['DB_PASS'],
                     'DB_PORT': os.environ['DB_PORT'],
                 }
+            p = Process(
+                daemon=True,
+                name=app_name,
+                target=start_local_baskerville,
+                args=args_to_action,
+                kwargs=kwargs_to_action
             )
-            from baskerville_dashboard.app import socketio
-            t = ReadLogs(org_uuid, log_path)
 
+            # input_to_action = (lambda : *args_to_action, **kwargs_to_action)
+
+            # def args_to_action():
+            #     return config, pipeline
+            # pidfile = os.path.join(get_default_data_path(), f'{app_name}.pid')
+            # p = Daemonize(
+            #     app=app_name,
+            #     pid=pidfile,
+            #     action=start_local_baskerville,
+            #     privileged_action=args_to_action
+            # )
+            # p = get_pool().apply_async(
+            #     start_local_baskerville,
+            #     args=(config, pipeline),
+            #     kwds={
+            #         'BASKERVILLE_ROOT': os.environ['BASKERVILLE_ROOT'],
+            #         'DB_HOST': os.environ['DB_HOST'],
+            #         'DB_USER': os.environ['DB_USER'],
+            #         'DB_PASS': os.environ['DB_PASS'],
+            #         'DB_PORT': os.environ['DB_PORT'],
+            #     })
+            from baskerville_dashboard.app import socketio
+            t = ReadLogs(cname, log_path)
+            t.start()
+            p.start()
             ACTIVE_APPS[app_name] = {
                 'process': p,
                 'log_thread': t,
@@ -178,25 +232,30 @@ def start_baskerville_for():
                 'details': {
                     'pipeline': str(pipeline),
                     'started_at': datetime.utcnow(),
-                    'active': p.is_alive()
+                    'active': is_process_running(p)
                 }
             }
-
+            # ACTIVE_APPS[app_name]['log_thread'].start()
             # register(org_uuid)
-            ACTIVE_APPS[app_name]['process'].start()
-            ACTIVE_APPS[app_name]['log_thread'].start()
+
             re.success = True
             re.message = f'Application {app_name} submitted successfully'
             re.data = {
                 'app_name': app_name,
-                'app_id': app_name
+                'app_id': app_name,
+                'cname': cname
             }
             session['app_name'] = app_name
 
         except Exception as e:
             traceback.print_exc()
             re.success = False
-            re.message = str(e)
+            message = 'Server is busy, please try again in a few minutes.' if '' in str(e) else str(e)
+            re.message = message
+            if app_name in ACTIVE_APPS:
+                ACTIVE_APPS[app_name]['log_thread'].stop()
+                ACTIVE_APPS[app_name]['process'].terminate()
+                ACTIVE_APPS[app_name]['process'].join()
             # re.data = e
             code = 500
 
@@ -278,9 +337,9 @@ def app_details(app_id):
         respose.success = True
         respose.message = f'The data for app_id: {app_id}'
         if app_data:
-            details = app_data['details']
-            details['running'] = app_data['process'].is_alive()
-        respose.data = details
+            details = process_details(app_data)
+            # details['running'] = app_data['process'].is_alive()
+            respose.data = details
     except Exception as e:
         respose.success = False
         respose.message = str(e)
@@ -289,21 +348,33 @@ def app_details(app_id):
     return response_jsonified(respose, code)
 
 
-@try_baskerville_app.route('/try/app/<app_id>/cancel', methods=['GET'])
+@try_baskerville_app.route('/try/app/cancel', methods=['POST'])
 @login_required
-def cancel_app(app_id):
+def cancel_app():
     code = 200
     respose = ResponseEnvelope()
     try:
+        data = request.get_json()
+        app_id = data.get('app_id')
         app_data = get_active_app(app_id)
-        respose.success = True
-        respose.message = f'The data for app_id: {app_id}'
+
         if app_data:
-            if app_data['process'].is_alive():
-                app_data['process'].terminate()
-                app_data['process'].join()
-                respose.data = f'Successfully stopped Baskerville for {app_id}'
+            p = app_data['process']
+            t = app_data['log_thread']
+            details = process_details(app_data)
+            print('details', details)
+            if details['running']:
+                p.terminate()
+                # p.join()
+                t.stop()
+                # t.join()
+                print('STOPPED')
+                respose.message = f'Successfully stopped Baskerville for {app_id}'
+            else:
+                respose.message = 'Process already stoped.'
+        respose.success = True
     except Exception as e:
+        traceback.print_exc()
         respose.success = False
         respose.message = str(e)
         code = 500

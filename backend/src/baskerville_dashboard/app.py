@@ -99,7 +99,7 @@ def add_guest_org(session):
         if not org:
             org = Organization()
             new_org = True
-        org.uuid = org_uuid
+        org.uuid = org.uuid if not new_org else org_uuid
         org.name = name
         org.registered = org.registered or False
         if new_org:
@@ -345,4 +345,4 @@ def clean_up_before_shutdown():
 
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=5000)
+    socketio.run(app, host="0.0.0.0", port=5000, use_reloader=False)

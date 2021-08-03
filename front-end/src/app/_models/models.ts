@@ -63,7 +63,7 @@ export class Notification {
   severity: string;
   kind: NotificationType = NotificationType.info;
   message = '';
-  url: string = '';
+  url = '';
 
   constructor(props) {
     props = JSONCamelCase.convert(props);
@@ -147,14 +147,18 @@ export class RequestSet {
   score: number;
   anomalyScore: number;
   isSelected: boolean;
+  feedback: string;
+  lowRate: boolean;
+  lowRateFeedback: boolean;
+  lowRateAttack: boolean;
 }
 
 export class Results<T> {
   data: T[];
-  numPages: number = 0;
-  currentPage: number = 0;
-  pageSize: number = 25;
-  numResults: number = 0;
+  numPages = 0;
+  currentPage = 0;
+  pageSize = 25;
+  numResults = 0;
 
   constructor(props?) {
     props = props || {};
@@ -169,8 +173,8 @@ export class Results<T> {
 }
 
 export class Filter {
-  page: number = 0;
-  size: number = 25;
+  page = 0;
+  size = 25;
   constructor(props?) {
     props = props || {};
     this.page = props.page || 0;
@@ -285,11 +289,10 @@ export class FeedbackContextVM {
   idToFc: object = {};
   constructor(options?: any) {
     options = JSONCamelCase.convert(options) || {};
-    console.info(options)
     this.feedbackContexts = options.feedbackContexts || [];
     this.feedbackContextType = options.feedbackContextType || FeedbackContextTypeEnum.attack;
     this.feedbackContextTypeToDescr = options.feedbackContextTypeToDescr || {};
-    this.setIdToFc()
+    this.setIdToFc();
   }
   setIdToFc(): void {
     for (let i = 0; i < this.feedbackContexts.length; i++) {
@@ -323,3 +326,36 @@ export class FeedbackContext {
   }
 }
 
+export const TryBaskervilleStepEnum = {
+  upload: 0,
+  running: 1,
+  results: 2
+};
+
+export const FeedbackStepEnum = {
+  feedbackContext: 0,
+  feedback: 1,
+  submit: 2
+};
+
+export class TryBaskervilleData {
+  fileName: string = null;
+  running = false;
+  currentStep = TryBaskervilleStepEnum.upload;
+  constructor(options?: any) {
+    options = options ? JSONCamelCase.convert(options) : {};
+    this.fileName = options.fileName || null;
+    this.running = options.running || false;
+    this.currentStep = options.currentStep || TryBaskervilleStepEnum.upload;
+  }
+}
+
+export class FeedbackData {
+  selectedFeedbackContext: FeedbackContext = null;
+  currentStep = FeedbackStepEnum.feedbackContext;
+  constructor(options?: any) {
+    options = options ? JSONCamelCase.convert(options) : {};
+    this.selectedFeedbackContext = options.selectedFeedbackContext || null;
+    this.currentStep = options.currentStep || FeedbackStepEnum.feedbackContext;
+  }
+}

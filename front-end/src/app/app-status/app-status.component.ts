@@ -30,7 +30,7 @@ export class AppStatusComponent implements OnInit {
       this.baskervilleSvc.getAppStatus().subscribe(
         d => {
           d = (d as Envelop);
-          this.statusOK = d.data !== null && d.running === true;
+          this.statusOK = d.data !== null && d.data.running === true;
           this.baskervilleSvc.setInProgress(this.statusOK);
           this.notificationSvc.showSnackBar(d.message);
         },

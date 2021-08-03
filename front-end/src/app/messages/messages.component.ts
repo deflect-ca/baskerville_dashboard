@@ -36,7 +36,6 @@ export class MessagesComponent implements AfterViewInit, OnInit {
     this.notificationSvc.loadAllMessages().subscribe(
       d => {
         this.notificationSvc.messagesBehaviorSubj.next(d as Results<Notification>);
-        console.log(d);
         this.notificationSvc.showSnackBar((d as Envelop).message);
       },
       e => {}
