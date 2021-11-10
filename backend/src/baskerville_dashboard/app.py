@@ -10,6 +10,7 @@ import uuid
 import eventlet
 import redis
 from redis import Redis
+from pyaml_env import parse_config
 
 eventlet.monkey_patch()
 
@@ -21,7 +22,7 @@ from baskerville_dashboard.utils.kafka import consume_from_kafka
 import atexit
 
 from baskerville.db import set_up_db
-from baskerville.util.helpers import parse_config, get_logger
+from baskerville.util.helpers import get_logger
 from baskerville_dashboard.utils.helpers import get_default_conf_path, \
     get_active_processes, response_jsonified, ResponseEnvelope
 from flask import Flask, jsonify
