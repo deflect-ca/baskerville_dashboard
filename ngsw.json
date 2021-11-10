@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1627983352062,
+  "timestamp": 1636543301726,
   "index": "baskerville_dashboard/index.html",
   "assetGroups": [
     {
@@ -69,7 +69,7 @@
     "baskerville_dashboard/assets/icons/icon-96x96.png": "3914125a4b445bf111c5627875fc190f560daa41",
     "baskerville_dashboard/assets/icons/icons8-bot-100.png": "d2b965091b2e2fa8eefe0271b9d5b5eb477f0d22",
     "baskerville_dashboard/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "baskerville_dashboard/index.html": "ce117c37a6716fc37bcdb7b260b568c0d0d2c552",
+    "baskerville_dashboard/index.html": "d41635e819142052fbc42f4413d7e7c5141cacba",
     "baskerville_dashboard/main-es2015.eb106563c91930ad4b2c.js": "70f35461ff97f1abff7451e1548ef177c42eff1a",
     "baskerville_dashboard/main-es5.eb106563c91930ad4b2c.js": "a8135950dff84bf7d2dcbe263aa972bf048160ce",
     "baskerville_dashboard/manifest.webmanifest": "42e07fc7d33bce0fb247a20f123b0d42f6c729f0",
