@@ -111,7 +111,9 @@ def get_default_data_path():
     Returns the absolute path to the data folder
     :return:
     """
-    return f'{os.path.dirname(os.path.realpath(__file__))}/../../../data'
+    return os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), '..', '..', '..', 'data'
+    )
 
 
 def get_default_conf_path():
@@ -119,7 +121,9 @@ def get_default_conf_path():
     Returns the absolute path to the conf folder
     :return:
     """
-    return f'{os.path.dirname(os.path.realpath(__file__))}/../../../conf'
+    return os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), '..', '..', '..', 'conf'
+    )
 
 
 def get_baskerville_config_path():
