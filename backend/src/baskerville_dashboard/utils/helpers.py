@@ -112,7 +112,7 @@ def get_default_data_path():
     :return:
     """
     return os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), '..', '..', '..', 'data'
+        os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data'
     )
 
 
@@ -122,7 +122,7 @@ def get_default_conf_path():
     :return:
     """
     return os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), '..', '..', '..', 'conf'
+        os.path.dirname(os.path.realpath(__file__)), '..', '..', 'conf'
     )
 
 
