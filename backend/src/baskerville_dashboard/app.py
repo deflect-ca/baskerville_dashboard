@@ -214,7 +214,6 @@ def set_up_kafka_thread(app_config, baskerville_config):
 def create_app(config=None, environment=None):
     global jwtApp, SECRET_KEY
     from baskerville_dashboard.db.manager import SessionManager
-    from baskerville.util.helpers import parse_config
 
     url_prefix = config['APP_CONFIG']['PREFIX']
     SECRET_KEY = config['APP_CONFIG']['SECRET_KEY']
