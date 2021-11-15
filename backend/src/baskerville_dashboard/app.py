@@ -258,7 +258,7 @@ def create_app(config=None, environment=None):
     return app
 
 
-app = create_app(parse_config('../conf/config.yaml'))
+app = create_app(parse_config('../../conf/config.yaml'))
 Session(app)
 CORS(
     app,
