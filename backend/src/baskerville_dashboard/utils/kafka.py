@@ -7,6 +7,8 @@ import asyncio
 import json
 import traceback
 
+import kafka.errors
+
 from baskerville.db.dashboard_models import Message, PendingWork
 from baskerville.models.config import KafkaConfig
 from baskerville_dashboard.utils.enums import NotificationKind
@@ -25,14 +27,36 @@ def value_deserializer(v):
         return {}
 
 
+def create_kafka_topics(bootstrap_servers, topics):
+    from kafka.admin import KafkaAdminClient, NewTopic
+    admin_client = KafkaAdminClient(
+        bootstrap_servers=bootstrap_servers,
+        client_id='test'
+    )
+
+    topic_list = []
+    for topic in topics:
+        topic_list.append(
+            NewTopic(name=topic, num_partitions=1, replication_factor=1)
+        )
+    try:
+        admin_client.create_topics(
+            new_topics=topic_list, validate_only=False
+        )
+    except kafka.errors.TopicAlreadyExistsError:
+        pass
+
+
 def get_kafka_consumer(kafka_config: KafkaConfig, topics=()):
     global KAFKA_CONSUMER
     from kafka import KafkaConsumer
     from kafka.client_async import selectors
     if not KAFKA_CONSUMER:
+        bootstrap_servers = f"{kafka_config['connection']['bootstrap_servers']}:9092"
+        create_kafka_topics(bootstrap_servers, topics)
         KAFKA_CONSUMER = KafkaConsumer(
             *topics,
-            bootstrap_servers=kafka_config['bootstrap_servers'],
+            bootstrap_servers=bootstrap_servers,
             selector=selectors.DefaultSelector,
             auto_offset_reset='earliest',
             value_deserializer=value_deserializer
@@ -47,7 +71,7 @@ def get_aiokafka_consumer(kafka_config: KafkaConfig, topics=()):
     if not ASYNC_KAFKA_CONSUMER:
         ASYNC_KAFKA_CONSUMER = AIOKafkaConsumer(
             *topics,
-            bootstrap_servers=kafka_config['bootstrap_servers'],
+            bootstrap_servers=kafka_config['connection']['bootstrap_servers'],
             auto_offset_reset='earliest',
             value_deserializer=value_deserializer
         )
@@ -58,14 +82,15 @@ def get_kafka_producer(kafka_config: KafkaConfig):
     global KAFKA_PRODUCER
     from kafka.client_async import selectors
     if not KAFKA_PRODUCER:
+        connection = kafka_config['connection']
         KAFKA_PRODUCER = KafkaProducer(
-        bootstrap_servers=kafka_config.bootstrap_servers,
+        bootstrap_servers=connection['bootstrap_servers'],
         selector=selectors.DefaultSelector,
-        security_protocol=kafka_config['security_protocol'],
-        ssl_check_hostname=kafka_config['ssl_check_hostname'],
-        ssl_cafile=kafka_config['ssl_cafile'],
-        ssl_certfile=kafka_config['ssl_certfile'],
-        ssl_keyfile=kafka_config['ssl_keyfile']
+        security_protocol=connection['security_protocol'],
+        ssl_check_hostname=connection['ssl_check_hostname'],
+        ssl_cafile=connection['ssl_cafile'],
+        ssl_certfile=connection['ssl_certfile'],
+        ssl_keyfile=connection['ssl_keyfile']
     )
 
     return KAFKA_PRODUCER
