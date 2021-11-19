@@ -8,11 +8,12 @@ import traceback
 import uuid
 
 import eventlet
+eventlet.monkey_patch()
+
 import redis
 from redis import Redis
 from pyaml_env import parse_config
 
-eventlet.monkey_patch()
 
 from baskerville_dashboard.auth import Auth
 from baskerville_dashboard.db.manager import SessionManager
@@ -203,12 +204,16 @@ def set_up_kafka_thread(app_config, baskerville_config):
     """
     global KAFKA_CONSUMER_THREAD
     import threading
-    KAFKA_CONSUMER_THREAD = threading.Thread(
-        target=consume_from_kafka,
-        args=(app_config, baskerville_config,),
-        daemon=True
-    )
-    KAFKA_CONSUMER_THREAD.start()
+    try:
+        KAFKA_CONSUMER_THREAD = threading.Thread(
+            target=consume_from_kafka,
+            args=(app_config, baskerville_config,),
+            daemon=True
+        )
+        KAFKA_CONSUMER_THREAD.start()
+    except:
+        traceback.print_exc()
+        logger.error(f'COULD NOT CONNECT TO KAFKA. ')
 
 
 def create_app(config=None, environment=None):

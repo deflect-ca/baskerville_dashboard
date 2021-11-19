@@ -16,4 +16,4 @@ class SessionManager(Singleton):
 
     @property
     def session(self):
-        return self.Session()
+        return self.Session
