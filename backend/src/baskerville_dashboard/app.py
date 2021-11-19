@@ -151,7 +151,7 @@ def add_extra_users(config, session):
         ).first()
     new_user = False
     try:
-        for u in config.get('USERS'):
+        for u in config.get('USERS', []):
             logger.debug(f'Checking {u.get("username")}')
             user = session.query(User).filter_by(username=u['username']).first()
             if not user:
