@@ -8,7 +8,8 @@ A dashboard for the Baskerville project: setup, labelling and feedback
 ## How to set up and run
 
 ### The backend
-To have a fully functional Baskerville Dashboard you need to have Baskerville installed and set up. You will need a Baskerville config to continue.
+The backend is tightly connected to your Baskerville instance, it uses the same database and it uses the `baskerville` library for some of the parts.
+To have a fully functional Baskerville Dashboard you need to have Baskerville installed and set up and a valid Baskerville config to continue.
 To run the backend, rename the [`config.yaml.example`](backend/conf/config.yaml.example) and fill in the details:
 
 ```yaml
@@ -31,15 +32,46 @@ APP_CONFIG:
     - 'test.feedback'       # where test is the uuid of your organization, as provided to you by eq. It should be present in baskerville config.
     - 'test.registration'   # you can use environment variables like: - !ENV '${ORG_UUID}.registration'
 ```
-The next step is to run the flask app:
+
+For the installation, you need to follow [Baskerville's instructions first](https://github.com/deflect-ca/baskerville/tree/develop#installation).
+In short, `spark-iforest`, `esretriever` and `baskerville` should be installed in this order:
+```bash
+# clone and install spark-iforest
+git clone https://github.com/titicaca/spark-iforest
+cd spark-iforest/python
+pip install .
+
+# clone and install esretriever - for the ElasticSearch pipeline
+cd ../../
+git clone https://github.com/equalitie/esretriever.git
+cd esretriever
+pip install .
+
+# Finally, clone and install baskerville
+cd ../
+git clone --branch dashboard_changes_pt2 https://github.com/deflect-ca/baskerville.git
+cd baskerville
+pip install -e .
+```
+
+Next clone and install the dashboard:
+```bash
+git clone https://github.com/deflect-ca/baskerville_dashboard.git
+cd baskerville_dashboard/backend
+pip install -e .
+```
+
+Finally run the flask app:
 ```bash
 python app.py
 ```
 The backend should be up and running on http://localhost:5000. You should be able to see `Baskerville-dashboard v0.0.1` in your browser.
 
-*Note: This is the dev server. For deployment, see the options [here](https://flask.palletsprojects.com/en/1.1.x/deploying/))*
+*Note: SocketIO for Python includes a production grade web server. For deployment, see the options [here](https://flask.palletsprojects.com/en/1.1.x/deploying/))*
 Make sure that the communication between the backend, your Baskerville deployment (Spark Cluster, Redis, Kafka, Postgres) and the Prediction Center (through Kafka)
 is allowed.
+
+*Note2: For the feedback functionality described bellow, you need to have a running Baskerville feedback pipeline.
 
 ### The front-end
 The front-end is developed with Angular (11.1.0 currently). 
@@ -53,6 +85,38 @@ ng serve
 The website is served on http://localhost:4200
 
 To deploy it and serve it through an NGINX for example you can follow the steps [here](https://angular.io/guide/deployment)
+
+Example of deployment (NodeJS version: v14.8.0):
+```bash
+cd baskerville_dashboard/front-end
+# install front-end packages - might take time
+npm install
+
+# provide values for the following
+export API_BASE_URL='https://api.baskerville-dashboard.deflect.ca/api/1'
+export SOCKET_URL='https://api.baskerville-dashboard.deflect.ca'
+export BASKERVILLE_DASH_ROOT=/root/baskerville_dashboard
+export BASKERVILLE_ROOT=/root/baskerville
+export ADMIN_PASS=admin_pass_very_secret
+export DB_PORT=5432
+export SPARK_LOCAL_HOSTNAME=localhost
+
+# this builds the front-end with provided configuration and copies the result in /var/www for nginx
+npm run config && ng build --prod && \
+rm -rf /var/www/baskerville_dashboard_frontend/ && \
+cp -r dist/baskerville_dashboard_frontend/ /var/www/baskerville_dashboard_frontend/ && \
+
+# reload nginx
+/etc/init.d/nginx reload
+```
+
+## Docker-compose
+You can find a Dockerized version of this repo [here](https://github.com/deflect-ca/baskerville_client)
+```bash
+export DOCKER_KAFKA_HOST=$(ipconfig getifaddr en0)
+docker-compose up -d dashboard
+```
+
 
 
 ## How to provide feedback

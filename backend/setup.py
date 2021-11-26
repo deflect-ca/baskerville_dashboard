@@ -34,5 +34,8 @@ setup(name='baskerville_dashboard',
           'baskerville_dashboard.utils',
           'baskerville_dashboard.vm',
       ],
+      package_data={
+          'baskerville_dashboard': ['data/*'],
+       },
       )
 

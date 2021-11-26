@@ -23,8 +23,8 @@ from baskerville_dashboard.utils.helpers import response_jsonified, \
     get_baskerville_config, ReadLogs, ResponseEnvelope, is_compressed, \
     get_extension, start_local_baskerville, get_default_data_path, \
     process_details, is_process_running
-from daemonize import Daemonize
-from daemons.daemonizer import run
+# from daemonize import Daemonize
+# from daemons.daemonizer import run
 from requests.auth import HTTPBasicAuth
 from werkzeug.utils import secure_filename
 from flask import Blueprint, request, jsonify, session, current_app, url_for
@@ -184,12 +184,14 @@ def start_baskerville_for():
     else:
         try:
             args_to_action = (config, pipeline)
+            # TODO: get the values from the current_app config
+            # current_app.config
             kwargs_to_action = {
                     'BASKERVILLE_ROOT': os.environ['BASKERVILLE_ROOT'],
-                    'DB_HOST': os.environ['DB_HOST'],
-                    'DB_USER': os.environ['DB_USER'],
-                    'DB_PASS': os.environ['DB_PASS'],
-                    'DB_PORT': os.environ['DB_PORT'],
+                    'DB_HOST': os.environ.get('DB_HOST'),
+                    'DB_USER': os.environ.get('DB_USER'),
+                    'DB_PASS': os.environ.get('DB_PASS'),
+                    'DB_PORT': os.environ.get('DB_PORT'),
                 }
             p = Process(
                 daemon=True,

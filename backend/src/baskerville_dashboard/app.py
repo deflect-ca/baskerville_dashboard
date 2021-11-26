@@ -8,11 +8,12 @@ import traceback
 import uuid
 
 import eventlet
+eventlet.monkey_patch()
+
 import redis
 from redis import Redis
 from pyaml_env import parse_config
 
-eventlet.monkey_patch()
 
 from baskerville_dashboard.auth import Auth
 from baskerville_dashboard.db.manager import SessionManager
@@ -150,8 +151,8 @@ def add_extra_users(config, session):
         ).first()
     new_user = False
     try:
-        for u in config.get('USERS'):
-            print(u)
+        for u in config.get('USERS', []):
+            logger.debug(f'Checking {u.get("username")}')
             user = session.query(User).filter_by(username=u['username']).first()
             if not user:
                 user = User()
@@ -203,18 +204,21 @@ def set_up_kafka_thread(app_config, baskerville_config):
     """
     global KAFKA_CONSUMER_THREAD
     import threading
-    KAFKA_CONSUMER_THREAD = threading.Thread(
-        target=consume_from_kafka,
-        args=(app_config, baskerville_config,),
-        daemon=True
-    )
-    KAFKA_CONSUMER_THREAD.start()
+    try:
+        KAFKA_CONSUMER_THREAD = threading.Thread(
+            target=consume_from_kafka,
+            args=(app_config, baskerville_config,),
+            daemon=True
+        )
+        KAFKA_CONSUMER_THREAD.start()
+    except:
+        traceback.print_exc()
+        logger.error(f'COULD NOT CONNECT TO KAFKA. ')
 
 
 def create_app(config=None, environment=None):
     global jwtApp, SECRET_KEY
     from baskerville_dashboard.db.manager import SessionManager
-    from baskerville.util.helpers import parse_config
 
     url_prefix = config['APP_CONFIG']['PREFIX']
     SECRET_KEY = config['APP_CONFIG']['SECRET_KEY']
@@ -258,7 +262,7 @@ def create_app(config=None, environment=None):
     return app
 
 
-app = create_app(parse_config('../config.yaml'))
+app = create_app(parse_config('../../conf/config.yaml'))
 Session(app)
 CORS(
     app,

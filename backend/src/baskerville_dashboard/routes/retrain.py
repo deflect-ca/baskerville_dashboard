@@ -7,9 +7,10 @@ import json
 import traceback
 
 import uuid
+from pyaml_env import parse_config
+
 from baskerville.db.dashboard_models import PendingWork
 from baskerville.models.config import TrainingConfig
-from baskerville.util.helpers import parse_config
 from baskerville_dashboard.auth import login_required
 from baskerville_dashboard.db.manager import SessionManager
 from baskerville_dashboard.utils.helpers import ResponseEnvelope, \
